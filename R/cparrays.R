@@ -285,7 +285,7 @@ if (FALSE) {
 cpfun <- function(
                   ciarrays = myciarrays,
 #                  contrast = "RR",
-#                  alph = NULL,
+                  alph = NULL,
                   psis = NULL,
                   phis = c(0, 0.25, 0.5, 0.75),
                   n.grid = 200,
@@ -305,7 +305,7 @@ cpfun <- function(
   cis <- ciarrays[["cis"]]
   contrast <- dimnames(cis)[[6]]
   mymethods <- longlab <- dimnames(cis)[[3]]
-  alph <- 1 - (as.numeric(dimnames(cis)[[4]])/100)
+  if (is.null(alph)) alph <- 1 - (as.numeric(dimnames(cis)[[4]])/100)
   nmeth <- length(mymethods)
   n <- as.numeric(dimnames(cis)[[5]])
 
