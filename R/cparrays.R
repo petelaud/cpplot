@@ -647,6 +647,213 @@ if (FALSE) {
   arrays
 }
 
+
+
+onecpfun <- function(
+    p1 = c(0.3, 0.4),
+    p2 = c(0.1, 0.2),
+    ciarrays = myciarrays,
+    alph = NULL,
+    psis = NULL,
+    phis = 0.25,
+#    n.grid = 200,
+#    res.factor = 6,
+#    methods = "All",
+#    limits = c(0, 1),
+#    window = 0.08,
+#    square = TRUE,
+#    smooth = TRUE,
+#    prerun = F,
+    jitt = FALSE
+#    sided = "R"
+) {
+  # This function calculates coverage probabilities (raw and smoothed) and associated summaries
+
+  xs <- ciarrays[["xs"]]
+  cis <- ciarrays[["cis"]]
+  contrast <- dimnames(cis)[[6]]
+  mymethods <- longlab <- dimnames(cis)[[3]]
+#  alph <- 1 - (as.numeric(dimnames(cis)[[4]])/100)
+  nmeth <- length(mymethods)
+  n <- as.numeric(dimnames(cis)[[5]])
+
+  #  p1 <- as.numeric(dimnames(arrays[["mastercp"]])[[1]])
+  #  p2 <- as.numeric(dimnames(arrays[["mastercp"]])[[2]])
+  #  if (is.null(psis)) psis <- as.numeric(dimnames(arrays[["mastercp"]])[[3]])
+  #  if (is.null(alph)) alph <- (1 - as.numeric(dimnames(arrays[["mastercp"]])[[5]])/100)
+  #    names(longlab) <- dimnames(cis)[[3]]
+
+  if (!is.null(psis)) par3 <- psis
+  if (!is.null(phis)) par3 <- rep_len(phis, length.out = length(p1))
+#  p.grid <- limits[1] + ppoints(n.grid, a = 0.5) * (limits[2] - limits[1])
+#  nn <- qbinom(0.99999, n, limits[2]) # Upper limit for n when considering Poisson rates?
+#  p1 <- p2 <- p.grid
+
+#  mastercp <- array(NA, dim = c(length(p1), length(p2), length(par3), length(mymethods), length(alph), 6, 1, 1))
+  mastercp <- array(NA, dim = c(length(p1), length(mymethods), length(alph), 6, 1, 1))
+  dimnames(mastercp) <- list(paste(p2),
+#                             paste(p2),
+#                             paste(par3),
+                             mymethods,
+                             paste(100*(1-alph)),
+                             c("cp", "lncp", "rncp", "mncp", "len", "locindex"),
+                             paste(n),
+                             contrast)
+
+
+#  arrays <- list(xs = xs, cis = cis, mastercp = mastercp, summaries = summaries)
+
+#  n.grid <- length(p2)
+  set.seed(2012) # ensure we use the same jitters for each run
+#  px <- pxg <- expand.grid(p1, p2, par3)
+  px <- pxg <- cbind(p1, p2, par3)
+
+
+#  refine <- 1 / n.grid
+#  if (jitt) {
+#    jitter <- (limits[2] - limits[1]) * array(runif(2 * dim(pxg)[1], -refine / 2, refine / 2), dim = dim(pxg)) # OK if n.grid is even
+#    px[, 1:2] <- pxg[, 1:2] + jitter[, 1:2]
+#  } else {
+    px <- pxg
+#  }
+
+  # dimnames(px)[2]=c("p1","p2")
+  if (contrast %in% c("RR")) {
+    theta <- (px[, 1] / px[, 2])
+  } else if (contrast == "OR") {
+    #    theta <- log(px[, 1] * (1 - px[, 2]) / (px[, 2] * (1 - px[, 1])))
+    theta <- (px[, 1] * (1 - px[, 2]) / (px[, 2] * (1 - px[, 1])))
+  } else if (contrast == "RD") {
+    theta <- px[, 1] - px[, 2]
+  } # theta estimate for every p1,p2 pair
+
+  # can we improve efficiency here? -
+  # not without creating an array which is too large for available RAM.
+
+
+  # alpha <- 0.05
+  for (alpha in alph) {
+    print(paste0("alpha=", alpha))
+    #    if (contrast != "OR") {
+    ci <- cis[,,, paste(100 * (1 - alpha)),,]
+    #    } else ci <- log(cis[,,, paste(100 * (1 - alpha)),])
+
+    # To obtain coverage probability for n,p1,p2, we determine the probability
+    # of each possible pair of observed frequencies a,b given p1,p2 using
+    # binomial probabilities
+    # and sum over all combinations where p1-p2 is included in the corresponding
+    #  CI, for each CI method.
+    cpl <- lncpl <- rncpl <- lenl <- locindexl <-
+      array(NA, dim = c(dim(px)[1], nmeth))
+
+    # NB method using sapply was no quicker than this loop:
+    # NB this is the most time-consuming part of the process when n is small
+    # i <- 40 #gives negative probs at p1=0.95, p2=0.35. phi=0.5
+    # - pdfpair function updated to give prob=NA for such impossible combinations
+    # First switched to parameterisation using psi instead.
+    # Then revisited in order to produce plots based on phi (more interpretable)
+#i <- 1
+    pb <- txtProgressBar(min = 0, max = dim(px)[1], style = 3) #text based bar
+    for (i in 1:dim(px)[1]) {
+      setTxtProgressBar(pb, i)
+      if (!is.null(psis)) {
+        prob <- pdfpair(p1 = px[i, 1],
+                        p2 = px[i, 2],
+                        psi = px[i, 3],
+                        x = xs)
+      } else if (!is.null(phis)) {
+        prob <- pdfpair(p1 = px[i, 1],
+                        p2 = px[i, 2],
+                        phi = px[i, 3],
+                        x = xs)
+      }
+
+      # can we improve efficiency here? -
+      # not without creating an array which is too large for available RAM.
+      # - could loop by px and then by alpha?
+
+      # exclude (0,0) CI from CP calcs by setting its probability to zero and
+      # rescaling all other probabilities - not advisable
+      # prob<-prob*(1-prob[1])
+      # prob[1]<-0
+
+      #      cbind(xs, prob[, i])
+      #      prob[prob == 0] <- NA
+
+      if (any(!is.na(prob))) {
+
+        cpl[i, ] <- t(ci[, 1, ] <= theta[i] & ci[, 2, ] >= theta[i] & ci[, 2, ] > ci[, 1, ]) %*% prob # 2-sided coverage probability. NB degenerate intervals excluded
+        #        cpl[i, ] <-  t(prob) %*% (ci[, 1, ] <= theta[i] & ci[, 2, ] >= theta[i] & ci[, 2, ] > ci[, 1, ])
+        lncpl[i, ] <- t(ci[, 1, ] > theta[i] | ci[, 2, ] == ci[, 1, ]) %*% prob # L-sided non-coverage (R-side is a mirror image)
+        rncpl[i, ] <- t(ci[, 2, ] < theta[i] | ci[, 2, ] == ci[, 1, ]) %*% prob # R-sided non-coverage
+
+        # not really interested in length, I think location is more important
+        # - and its complicated to explain on log scale
+        # but included as reviewers might request it
+        lens <- ci[, 2, ] - ci[, 1, ]
+        ## you get pretty whacky results with length on linear scale
+        # 		if(contrast %in% c("RR")) lens<-(ci[,2,])-(ci[,1,])
+        # 		lens[lens>100]<-100 #workaround for infinite lengths with RR
+        if (contrast %in% c("RR")) {
+          # for RR, use length on the log scale
+      #    lens <- log(ci[, 2, ]) - log(pmax(0.0000000001, ci[, 1, ]))
+      #    lens <- ci[, 2, ]/(1 + ci[, 2, ]) - ci[, 1, ]/(1 + ci[, 1, ])
+          lens <- log(1/(1 + 1/ci[, 2, ])) - log(ci[, 1, ]/(1 + ci[, 1, ]))
+        }
+#        lens[lens > 10] <- 10 # workaround for infinite lengths with RR
+        lens[ci[, 2, ] == ci[, 1, ]] <- 0
+        lenl[i, ] <- t(lens) %*% prob
+      }
+    }
+
+
+    mncpl <- rncpl
+    thetagt <- px[,1] > px[,2]
+    mncpl[thetagt, ] <- lncpl[thetagt, ]
+    locindexl <- ifelse(cpl == 1, 0, mncpl / (1 - cpl))
+
+    # Free up some memory
+    rm(ci)
+
+    # convert CPs etc to a square grid of p1,p2 points
+#    mydim <- c(length(p1), length(p2), length(par3), nmeth)
+#    cp <- array(cpl, dim = mydim)
+#    lncp <- array(lncpl, dim = mydim)
+#    rncp <- array(rncpl, dim = mydim)
+#    mncp <- array(mncpl, dim = mydim)
+#    len <- array(lenl, dim = mydim)
+    # Calculate Newcombe's location index
+#    locindex <- ifelse(cp == 1, 0, mncp / (1 - cp))
+#    dimnames(cp) <- dimnames(locindex) <- dimnames(lncp) <-
+#      list(paste(p1), paste(p2), paste(par3), mymethods)
+##      dimnames(rncp) <- dimnames(len) <- dimnames(mncp) <-
+
+    dimnames(cpl) <- dimnames(locindexl) <- dimnames(lncpl) <-
+      dimnames(rncpl) <- dimnames(lenl) <- dimnames(mncpl) <-
+      list(p2, mymethods)
+
+
+#    arrays[["mastercp"]][, , , , paste(100 * (1 - alpha)), "cp", , ] <- cp
+#    arrays[["mastercp"]][, , , , paste(100 * (1 - alpha)), "lncp", , ] <- lncp
+#    arrays[["mastercp"]][, , , , paste(100 * (1 - alpha)), "rncp", , ] <- rncp
+    #    arrays[["mastercp"]][, , , , paste(100 * (1 - alpha)), "mncp", , ] <- mncp
+#    arrays[["mastercp"]][, , , , paste(100 * (1 - alpha)), "locindex", , ] <- locindex
+#    arrays[["mastercp"]][, , , , paste(100 * (1 - alpha)), "len", , ] <- len
+
+    mastercp <- array(rbind(cpl, lncpl, rncpl, mncpl, locindexl, lenl), dim = c(length(p2), 6, nmeth))
+    dimnames(mastercp) <- list(p2, c("cp", "lncp", "rncp", "mncp", "locindex", "len") , mymethods)
+
+    # Free up some memory
+    rm(
+  #    cp, lncp, rncp, mncp, locindex, len,
+       cpl, lncpl, rncpl, mncpl, lenl, locindexl)
+
+  }
+
+  aperm(mastercp, c(1,3,2))
+}
+
+
 #save(cparrays_RD40, file = paste(outpath, "cparrays.RD.40.200.Rdata", sep = ""))
 
 if (FALSE) {
