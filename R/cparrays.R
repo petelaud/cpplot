@@ -246,7 +246,7 @@ if (FALSE) {
                                "avelncp", "averncp", "len", "locindex", "avelocindex"),
                              paste(n))
 
-  summarylist <- c("meanCP", "minCP", "pctCons", "pctBad", "pctnear",
+  summarylist <- c("meanCP", "minCP", "pctCons", "pctBad", "pctBad2", "pctnear",
     "pctAveCons", "pctAvenear", "pctAvenearlo", "pctAvenearhi", "pctAveBad",
     "meanMNCP", "meanDNCP", "maxLNCP", "pctCons.1side", "pctBad.1side",
     "pctnear.1side", "pctAvenear.1side", "typeI", "maxtypeI", "avetypeI",
@@ -332,7 +332,7 @@ cpfun <- function(
                              paste(n),
                              contrast)
 
-  summarylist <- c("meanCP", "minCP", "pctCons", "pctBad", "pctnear",
+  summarylist <- c("meanCP", "minCP", "pctCons", "pctBad", "pctBad2", "pctnear",
                    "pctAveCons", "pctAvenear", "pctAvenearlo", "pctAvenearhi", "pctAveBad",
                    "meanMNCP", "meanDNCP", "maxLNCP", "pctCons.1side", "pctBad.1side",
                    "pctnear.1side", "pctAvenear.1side", "typeI", "maxtypeI", "avetypeI",
@@ -373,8 +373,10 @@ cpfun <- function(
   # can we improve efficiency here? -
   # not without creating an array which is too large for available RAM.
 
+
 # alpha <- 0.05
   for (alpha in alph) {
+    print(paste0("alpha=", alpha))
 #    if (contrast != "OR") {
       ci <- cis[,,, paste(100 * (1 - alpha)),,]
 #    } else ci <- log(cis[,,, paste(100 * (1 - alpha)),])
@@ -493,6 +495,7 @@ if (FALSE) {
     minCP <- format(round(apply(cp, 3:4, function(x) min(x, na.rm = TRUE)), 3), nsmall = 3)
     pctCons <- format(100 * round(apply(cp, 3:4, FUN = function(x) mymean(x > (1 - alpha))), 3), nsmall = 1)
     pctBad <- format(100 * round(apply(cp, 3:4, FUN = function(x) mymean(x < (1 - (alpha * 1.1)))), 3), nsmall = 1)
+    pctBad2 <- format(100 * round(apply(cp, 3:4, FUN = function(x) mymean(x < (1 - (alpha * 1.2)))), 3), nsmall = 1)
     pctnear <- format(100 * round(apply(cp, 3:4, FUN = function(x) mymean(x > (1 - 1.1 * alpha) & x < (1 - 0.9 * alpha))), 3), nsmall = 1)
     meanlocindex <- format(round(apply(locindex, 3:4, mymean), 3), nsmall = 3)
     pctgoodloc <- format(100 * round(apply(locindex, 3:4, FUN = function(x) mymean(x > 0.4 & x < 0.6)), 3), nsmall = 1)
