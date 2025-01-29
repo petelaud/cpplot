@@ -571,40 +571,42 @@ if (smooth == TRUE) {
       ## in the region (p1-avedelta, p1+avedelta, p2-avedelta, p2+avedelta)
       ma.win <- round(0.5 * window * length(p1))
       arraytemp <- array(NA, dim = dim(cp))
-      dimnames(arraytemp) <- list(paste(p1), paste(p2), paste(psis), mymethods)
+      dimnames(arraytemp) <- list(paste(p1), paste(p2), paste(par3), mymethods)
       avecp <- avelncp <- averncp <- avelocindex <- arraytemp
       if (square == TRUE) { # skip this bit if we're not wanting the whole square grid (usually do)
+        pb <- txtProgressBar(min = 0, max = nmeth, style = 3) #text based bar
         for (meth in 1:nmeth) {
-          for (psi in psis) {
+          setTxtProgressBar(pb, meth)
+          for (p3 in par3) {
             avecp[-c(1:ma.win, (dim(cp)[1] - (ma.win - 1)):(dim(cp)[1])),
                   -c(1:ma.win, (dim(cp)[2] - (ma.win - 1)):(dim(cp)[2])),
-                  paste(psi), meth] <-
-              t(rollapply(zoo(t(rollapply(zoo(cp[, , paste(psi), meth]), (2 * ma.win + 1), mean))), 2 * ma.win + 1, mean))
+                  paste(p3), meth] <-
+              t(rollapply(zoo(t(rollapply(zoo(cp[, , paste(p3), meth]), (2 * ma.win + 1), mymean))), 2 * ma.win + 1, mymean))
             avelncp[-c(1:ma.win, (dim(cp)[1] - (ma.win - 1)):(dim(cp)[1])),
                     -c(1:ma.win, (dim(cp)[2] - (ma.win - 1)):(dim(cp)[2])),
-                    paste(psi), meth] <-
-              t(rollapply(zoo(t(rollapply(zoo(lncp[, , paste(psi), meth]), 2 * ma.win + 1, mean))), 2 * ma.win + 1, mean))
+                    paste(p3), meth] <-
+              t(rollapply(zoo(t(rollapply(zoo(lncp[, , paste(p3), meth]), 2 * ma.win + 1, mymean))), 2 * ma.win + 1, mymean))
             averncp[-c(1:ma.win, (dim(cp)[1] - (ma.win - 1)):(dim(cp)[1])),
                     -c(1:ma.win, (dim(cp)[2] - (ma.win - 1)):(dim(cp)[2])),
-                    paste(psi), meth] <-
-              t(rollapply(zoo(t(rollapply(zoo(rncp[, , paste(psi), meth]), 2 * ma.win + 1, mean))), 2 * ma.win + 1, mean))
+                    paste(p3), meth] <-
+              t(rollapply(zoo(t(rollapply(zoo(rncp[, , paste(p3), meth]), 2 * ma.win + 1, mymean))), 2 * ma.win + 1, mymean))
             avelocindex[-c(1:ma.win, (dim(cp)[1] - (ma.win - 1)):(dim(cp)[1])),
                         -c(1:ma.win, (dim(cp)[2] - (ma.win - 1)):(dim(cp)[2])),
-                   paste(psi), meth] <-
-              t(rollapply(zoo(t(rollapply(zoo(locindex[, , paste(psi), meth]), 2 * ma.win + 1, mean))), 2 * ma.win + 1, mean))
+                   paste(p3), meth] <-
+              t(rollapply(zoo(t(rollapply(zoo(locindex[, , paste(p3), meth]), 2 * ma.win + 1, mymean))), 2 * ma.win + 1, mymean))
           }
         }
       }
 
-      arrays[["mastercp"]][, , , , paste(100 * (1 - alpha)), "avecp", ] <- avecp
-      arrays[["mastercp"]][, , , , paste(100 * (1 - alpha)), "avelncp", ] <- avelncp
-      arrays[["mastercp"]][, , , , paste(100 * (1 - alpha)), "averncp", ] <- averncp
-      arrays[["mastercp"]][, , , , paste(100 * (1 - alpha)), "avelocindex", ] <- avelocindex
+      arrays[["mastercp"]][, , , , paste(100 * (1 - alpha)), "avecp", , ] <- avecp
+      arrays[["mastercp"]][, , , , paste(100 * (1 - alpha)), "avelncp", , ] <- avelncp
+      arrays[["mastercp"]][, , , , paste(100 * (1 - alpha)), "averncp", , ] <- averncp
+      arrays[["mastercp"]][, , , , paste(100 * (1 - alpha)), "avelocindex", , ] <- avelocindex
       # Note expected interval length tends to be smooth already
 
 if (FALSE) {
   # For reference
-      c("meanCP", "minCP", "pctCons", "pctBad", "pctnear",
+      c("meanCP", "minCP", "pctCons", "pctBad", "pctBad2", "pctnear",
         "pctAveCons", "pctAvenear", "pctAvenearlo", "pctAvenearhi", "pctAveBad",
         "meanMNCP", "meanDNCP", "maxLNCP", "pctCons.1side", "pctBad.1side",
         "pctnear.1side", "pctAvenear.1side", "typeI", "maxtypeI", "avetypeI",
@@ -626,23 +628,23 @@ if (FALSE) {
 # Close bracket for smoothing
 }
 
-        arrays[["summaries"]][,, paste(100 * (1 - alpha)), , 1, 1] <-
-        array(c(meanCP, minCP, pctCons, pctBad, pctnear,
-                pctAveCons, pctAvenear, pctAvenearlo, pctAvenearhi, pctAveBad,
-                meanMNCP, meanDNCP, maxLNCP, pctCons.1side, pctBad.1side,
-                pctnear.1side, pctAvenear.1side, typeI, maxtypeI, avetypeI,
-                meanlen, meanlocindex, pctgoodloc),
-              dim=c(max(length(psis), length(phis)), nmeth, 23))
+    arrays[["summaries"]][,, paste(100 * (1 - alpha)), , 1, 1] <-
+      array(c(meanCP, minCP, pctCons, pctBad, pctBad2, pctnear,
+              pctAveCons, pctAvenear, pctAvenearlo, pctAvenearhi, pctAveBad,
+              meanMNCP, meanDNCP, maxLNCP, pctCons.1side, pctBad.1side,
+              pctnear.1side, pctAvenear.1side, typeI, maxtypeI, avetypeI,
+              meanlen, meanlocindex, pctgoodloc),
+            dim=c(max(length(psis), length(phis)), nmeth, length(summarylist)))
 
         # Free up some memory
-        rm(cp, lncp, rncp, mncp, locindex, len,
+    rm(cp, lncp, rncp, mncp, locindex, len,
            cpl, lncpl, rncpl, mncpl, lenl, locindexl)
-  }
 
-  save(arrays,
-       file = paste(outpath, "cparrays.", contrast, ".",
-                    n, ".", n.grid, ".Rdata", sep = "")
-  )
+    save(arrays,
+         file = paste(outpath, "cparrays.", contrast, ".",
+                      n, ".", n.grid, ".Rdata", sep = "")
+    )
+  }
 
   arrays
 }
