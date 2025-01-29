@@ -2,8 +2,6 @@
 # 2025 update using parameter p11p22/p12p21 from Fagerland instead of rho(=phi)
 # and adding MOVER methods
 #install.packages("zoo")
-#install.packages("MKmisc") - not used?
-#install.packages("PropCIs") - not used?
 
 rm(list = ls())
 library(zoo)
@@ -79,7 +77,6 @@ mtext(expression(paste("at selected values of ", theta["RR"])),
       side=3, line=-6, outer=TRUE, cex=1.5)
 }
 
-
 # For a given parameter combination: p1, p2, (psi or phi)
 # calculate the probability density function for each combination
 pdfpair <- function(x,
@@ -87,19 +84,7 @@ pdfpair <- function(x,
                     p2 = NULL,
                     phi = NULL,
                     psi = NULL
-#                    theta = NULL,
-#                    contrast = "RR"
                     ) {
-  #  p1 <- p2 * theta
-#  if (contrast == "RR") {
-#    p2 <- p1 / theta
-#  } else if (contrast == "RD") {
-#    if (is.null(p1)) {
-#      p1 <- p2 + theta
-#    } else if (is.null(p2)) {
-#      p2 <- p1 - theta
-#    }
-#  }
   if (is.null(psi)) {
     p11 <- p1 * p2 + phi * sqrt(p1 * (1 - p1) * p2 * (1 - p2)) # with DelRocco parameterisation using rho(=phi)
   }
@@ -124,11 +109,7 @@ pdfpair <- function(x,
 cifun <- function( n,
                    contrast = "RD",
                    alph = c(0.01, 0.05, 0.1),
-                   prerun = FALSE #,
-#                   n.grid = 100,
-#                   limits = c(0, 1),
-#                   psis = NULL,
-#                   phis = NULL
+                   prerun = FALSE
                    ) {
   # This function calculates all possible confidence intervals for a given n,
 
@@ -188,10 +169,6 @@ cifun <- function( n,
 
     # Might be able to reuse same code for RD & RR?
     if (contrast == "RR") {
-#      if (prerun == "cis" | prerun == "some") {
-#        ci <- arrays[["cis"]][, , , paste(100 * (1 - alpha)), 1]
-# 			overwriting CIs for a few changed methods: Not implemented
-#      } else {
         ci <- array(NA, dim = c(lenxs, 2, length(mymethods)))
         dimnames(ci)[[3]] <- mymethods
         ci[, 1:2, "Tang"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, level = 1-alpha)$estimates[,c(1,3)]))
@@ -215,12 +192,7 @@ cifun <- function( n,
 #        if (alpha == 0.05) {
 #          ci[, 1:2, "TDAS"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RR = "TDAS")$estimates[c(1,3)]))
 #        }
-#      }
     } else if (contrast == "RD") {
-#      if (prerun == "cis" | prerun == "some") {
-#        ci <- arrays[["cis"]][, , , paste(100 * (1 - alpha)), 1]
-# 			overwriting CIs for a few changed methods: Not implemented
-#      } else {
         ci <- array(NA, dim = c(lenxs, 2, length(mymethods)))
         dimnames(ci)[[3]] <- mymethods
         ci[, 1:2, "Tango"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, level = 1-alpha)$estimates[,c(1,3)]))
@@ -243,17 +215,13 @@ cifun <- function( n,
 #        if (alpha == 0.05) {
 #          ci[, 1:2, "TDAS"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RD = "TDAS")$estimates[c(1,3)]))
 #        }
-#      }
     } else if (contrast == "OR") {
-#      if (prerun == "cis" | prerun == "some") { # Not implemented
-#      } else {
         ci <- array(NA, dim = c(lenxs, 2, length(mymethods)))
         dimnames(ci)[[3]] <- mymethods
         ci[, 1:2, "SCAS"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_OR = "SCAS", level = 1-alpha)$estimates[,c(1,3)]))
         ci[, 1:2, "Jeffreys"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_OR = "jeff", level = 1-alpha)$estimates[,c(1,3)]))
         ci[, 1:2, "mid-p"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_OR = "midp", level = 1-alpha)$estimates[,c(1,3)]))
         ci[, 1:2, "Wilson"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_OR = "wilson", level = 1-alpha)$estimates[,c(1,3)]))
-#      }
     }
 
     cis[, , , paste(100 * (1 - alpha)), 1, 1] <- ci
@@ -405,32 +373,6 @@ cpfun <- function(
   # can we improve efficiency here? -
   # not without creating an array which is too large for available RAM.
 
-#  if (!is.null(psis)) {
-#    prob <- sapply(1:dim(px)[1],
-#                   function(i) pdfpair(p1 = px[i, 1],
-#                    p2 = px[i, 2],
-#                    psi = px[i, 3],
-#                    x = xs)
-#  } else if (!is.null(phis)) {
-#    )
-#    prob <- sapply(1:dim(px)[1],
-#                   function(i) pdfpair(p1 = px[i, 1],
-#                                       p2 = px[i, 2],
-#                                       phi = px[i, 3],
-#                                       x = xs)
-#    )
-#    prob <- c()
-#    for (i in 1:dim(px)[1]) {
-#            probi <- pdfpair(p1 = px[i, 1],
-#                             p2 = px[i, 2],
-#                             phi = px[i, 3],
-#    }
-#                             x = xs)
-#    prob <- cbind(prob, probi)
-#  }
-# dim(prob)
-# dim(px)
-# dim(xs)
 # alpha <- 0.05
   for (alpha in alph) {
 #    if (contrast != "OR") {
@@ -449,15 +391,6 @@ cpfun <- function(
     # NB this is the most time-consuming part of the process when n is small
     # i <- 40 #gives negative probs at p1=0.95, p2=0.35. phi=0.5 - need to produce a warning for impossible parameter combinations
     # so I've switched to parameterisation using psi instead.
-
-    #    px[abs(px[,1]-0.4)<0.01 & abs(px[,2]-0.6)<0.01, ]
-    #    i <- 5941 # psi=2
-    #    i <- 25940 # psi=100
-    #    px[abs(px[,1]-0.2)<0.01 & abs(px[,2]-0.8)<0.01, ]
-    #    i <- 8020
-
-#    px[20095,]
-#    i <- 20095
     for (i in 1:dim(px)[1]) {
       if (!is.null(psis)) {
         prob <- pdfpair(p1 = px[i, 1],
@@ -535,8 +468,7 @@ if (FALSE) {
     dimnames(cp) <- dimnames(locindex) <- dimnames(lncp) <-
       dimnames(rncp) <- dimnames(len) <- dimnames(mncp) <-
       list(paste(p1), paste(p2), paste(par3), mymethods)
-#    dim(cp)
-#    cp[,,0.25,]
+
     arrays[["mastercp"]][, , , , paste(100 * (1 - alpha)), "cp", , ] <- cp
     arrays[["mastercp"]][, , , , paste(100 * (1 - alpha)), "lncp", , ] <- lncp
     arrays[["mastercp"]][, , , , paste(100 * (1 - alpha)), "rncp", , ] <- rncp
