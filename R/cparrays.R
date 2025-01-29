@@ -85,24 +85,28 @@ pdfpair <- function(x,
                     phi = NULL,
                     psi = NULL
                     ) {
-  if (is.null(psi)) {
+  if (!is.null(phi)) {
     p11 <- p1 * p2 + phi * sqrt(p1 * (1 - p1) * p2 * (1 - p2)) # with DelRocco parameterisation using rho(=phi)
   }
   # Or Fagerland parameterisation using psi=(p11*p22)/(p12*p21) (labelled as theta in Fagerland)
-  if (is.null(phi)) {
+  if (!is.null(psi)) {
     A <- psi - 1
     B <- p1 + p2 - 1 - psi * (p1 + p2)
     C <- psi * p1 * p2
     p11 <- ifelse(psi == 1, -C / B,(-B - sqrt(B^2 - 4 * A * C)) / (2 * A))
   }
-  p12 <- pmax(0, p1 - p11)
-  p21 <- pmax(0, p2 - p11)
+#  p12 <- pmax(0, p1 - p11)
+#  p21 <- pmax(0, p2 - p11)
+  p12 <- p1 - p11
+  p21 <- p2 - p11
   p22 <- pmax(0, 1 - p11 - p12 - p21)
   dens <- exp(
     lfactorial(rowSums(x)) -
-      (lfactorial(x[,1]) + lfactorial(x[,2]) + lfactorial(x[,3]) + lfactorial(x[,4]))
-  ) * p11^x[,1] * p12^x[,2] * p21^x[,3] * (1 - p11 - p12 - p21)^(x[,4])
-  dens[p21 == 0 | p12 == 0] <- NA
+      (lfactorial(x[, 1]) + lfactorial(x[, 2]) + lfactorial(x[, 3]) + lfactorial(x[, 4]))
+    ) * p11^x[, 1] * p12^x[, 2] * p21^x[, 3] * (1 - p11 - p12 - p21)^(x[, 4])
+#  dens[p11 * p12 * p21 * (1 - p11 - p12 - p21) == 0] <- 0
+  dens[p21 <= 0 | p12 <= 0] <- NA
+#  dens[p21 < 0 | p12 < 0] <- NA
   return(dens)
 }
 
