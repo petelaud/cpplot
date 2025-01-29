@@ -389,9 +389,16 @@ cpfun <- function(
 
     # NB method using sapply was no quicker than this loop:
     # NB this is the most time-consuming part of the process when n is small
-    # i <- 40 #gives negative probs at p1=0.95, p2=0.35. phi=0.5 - need to produce a warning for impossible parameter combinations
-    # so I've switched to parameterisation using psi instead.
+    # i <- 40 #gives negative probs at p1=0.95, p2=0.35. phi=0.5
+    # - pdfpair function updated to give prob=NA for such impossible combinations
+    # First switched to parameterisation using psi instead.
+    # Then revisited in order to produce plots based on phi (more interpretable)
+#i <- 1
+    pb <- txtProgressBar(min = 0, max = dim(px)[1], style = 3) #text based bar
     for (i in 1:dim(px)[1]) {
+      setTxtProgressBar(pb, i)
+#      print(paste0("alpha=", alpha, ", i=",i," of ",dim(px)[1],"\n"))
+
       if (!is.null(psis)) {
         prob <- pdfpair(p1 = px[i, 1],
                          p2 = px[i, 2],
