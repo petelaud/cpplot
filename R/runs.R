@@ -2,13 +2,19 @@
 set.seed(2012) #ensure we use the same jitters for each run
 
 
-RRpairteam <- c("Tang", "Tang-bc", "Tang-sc", "Tang-scbc") 	#Paired RR
-RR2pairteam <- c("MOVER-w", "MOVER-nw", "MOVER-nj","MOVER-ns") 	#Paired RR
-RRccpairteam <- c("Tang-cc5", "Tang-cc125", "Tang-sccc", "MOVER-ccns") 	#Paired RR, cc
+RRpairteam <- c("SCAS-bc", "AS", "MOVER-NJ", "MOVER-W", "BP-W") 	#Paired RR
+#RRpairteam <- c("SCAS", "SCAS-bc", "AS", "AS-bc") 	#Paired RR
+#RRpairteam <- c("SCAS", "AS", "MOVER-NJ", "MOVER-W") 	#Paired RR
+#RR2pairteam <- c("MOVER-NJ", "MOVER-W", "BP-J", "BP-W") 	#Paired RR
+#RR2pairteam <- c("MOVER-w", "MOVER-nw", "MOVER-nj","MOVER-ns") 	#Paired RR
+RRccpairteam <- c("SCAS-cc125", "SCAS-cc5", "MOVER-NJcc125", "MOVER-NJcc5") 	#Paired RR, cc
 
-RDpairteam <- c("Tango", "Tango-bc", "Tango-sc", "Tango-scbc") 	#Paired RD
-RD2pairteam <- c("MOVER-w", "MOVER-nw", "MOVER-nj","MOVER-ns") 	#Paired RD
-RDccpairteam <- c("Tango-cc5", "Tango-cc125", "Tango-sccc", "MOVER-ccns") 	#Paired RD, cc
+RDpairteam <- c("SCAS-bc", "AS", "MOVER-NJ", "MOVER-W", "BP") 	#Paired RD
+#RDpairteam <- c("SCAS", "SCAS-bc", "AS", "AS-bc" ) 	#Paired RD
+#RDpairteam <- c("SCAS", "Tango", "MOVER-nj", "MOVER-w") 	#Paired RD
+#RD2pairteam <- c("MOVER-NJ","MOVER-W", "MOVER-NW", "BP") 	#Paired RD
+#RDccpairteam <- c("Tango-cc5", "Tango-cc125", "SCAS-cc", "MOVER-NJcc") 	#Paired RD, cc
+RDccpairteam <- c("SCAS-cc125", "SCAS-cc5", "MOVER-NJcc125", "MOVER-NJcc5") 	#Paired RD, cc
 
 #Remotes:
 #  petelaud/ratesci-dev
@@ -31,35 +37,110 @@ if (FALSE) {
   # 11min per alpha (33)
   # +39min per combo for n=200 with smoothing (8h for 3*4)
 
+load(file=paste0(outpath, "cis.RD.", 41, ".Rdata"))
+mycis <- ciarrays
 #system.time(mycis <- cifun(n=10, contrast="RR", n.grid=100,
                                  #alph = c(0.01, 0.05, 0.1), psis = c(1, 2, 10, 100)))[[3]]/60
 #                                 alph = c(0.01, 0.05, 0.1), psis = c(1, 2, 10, 100)))[[3]]/60
-system.time(mycis <- cifun(n=40, contrast="RR", alph = c(0.05, 0.1)))[[3]]/60
+system.time(mycis <- cifun(n=10, contrast="RD", alph = c(0.1, 0.05, 0.01)))[[3]]/60
+#dimnames(mycis[[2]])
 Sys.time()
 system.time(
-  cparrays_RR40 <- cpfun(ciarrays = mycis,
-                         n.grid=200, phis=c(0, 0.25, 0.5), smooth=FALSE)
-  )[[3]]/60
+  arrays <- cpfun(ciarrays = mycis,
+                      n.grid=200, phis=c(0.1, 0.25, 0.5, 0.75), smooth=TRUE)
+          )[[3]]/60
 
-teamlist <- list(RDpairteam, RD2pairteam, RDccpairteam)
-teamlabels <- c("RDpair", "RD2pair", "RDccpair")
+teamlist <- list(RDpairteam,  RD2pairteam)
+teamlabels <- c("RDpair", "RD2pair")
 
-teamlist <- list(RRpairteam, RR2pairteam, RRccpairteam)
-teamlabels <- c("RRpair", "RR2pair", "RRccpair")
+teamlist <- list(RRpairteam, RR2pairteam)
+teamlabels <- c("RRpair", "RR2pair")
+
+teamlist <- list(RDpairteam)
+teamlabels <- c("RDpair")
+
+teamlist <- list(RRpairteam, RRccpairteam)
+teamlabels <- c("RRpair", "RRccpair")
+
+teamlist <- list(RDpairteam, RDccpairteam)
+teamlabels <- c("RDpair", "RDccpair")
 
 # load(file=paste0(outpath, "cparrays.RR.", 40, ".",200,".Rdata"))
-# cparrays_RR40 <- arrays
-# dimnames(cparrays_RR40)[[1]]
-for (j in c(0, 0.25, 0.5)) {
-  for (i in c(0.05, 0.1)) {
-    for (k in 1:2) {
-      plotpanel(plotdata=cparrays_RR40, alpha=i, par3=j,
+dimnames(arrays[[3]])
+# cparrays_RD30 <- arrays
+# names(cparrays_RD30)
+# dimnames(cparrays_RD30)[3]
+# dim(cparrays_RD30)[[3]]
+#for (j in c(0.1, 0.25, 0.5)) {
+#  for (i in c(0.01, 0.05, 0.1)) {
+
+#for (j in c(0.1, 0.25, 0.5, 0.75)) {
+for (j in c(0.1, 0.25, 0.5, 0.75)) {
+  for (i in c(0.05)) {
+    for (k in 1) {
+      plotpanel(plotdata=arrays, alpha=i, par3=j,
                 limits=c(0,1), sel=teamlist[[k]], oneside=F, plotlab=teamlabels[k],
                 res.factor=6, fmt="png", linesx=F, colour=T, sided="R",
                 smoothed=FALSE)
     }
   }
 }
+
+install.packages('latex2exp')
+dev.off()
+
+load(file=paste0(outpath, "cis.RD.", 40,".Rdata"))
+mycis <- ciarrays
+load(file=paste0(outpath, "cparrays.RD.", 40, ".",200,".Rdata"))
+#cparrays_RD30 <- arrays
+load(file=paste0(outpath, "cparrays.RR.", 40, ".",200,".Rdata"))
+#cparrays_RR30 <- arrays$summaries[,-12,,,,]
+
+dim(cparrays_RD30$summaries)
+dim(cparrays_RR30$summaries)
+dimnames(cparrays_RD30$summaries)[[2]]
+dimnames(cparrays_RR30$summaries)[[2]]
+
+mydims <- dim(cparrays_RD30$summaries)
+mydims[6] <- 2
+mydimnames <- dimnames(cparrays_RD30$summaries)
+mydimnames[[6]] <- c("RD", "RR")
+bigarray <- array(NA, dim = mydims)
+dimnames(bigarray) <- mydimnames
+bigarray[,,,,,1] <- cparrays_RD30$summaries
+bigarray[,,,,,2] <- cparrays_RR30$summaries[,-12,,,,]
+
+selectmethods <- c("SCAS", "AS", "MOVER-NJ", "MOVER-W")
+mysummary <- bigarray[, selectmethods, "95", c("pctnear", "pctgoodloc"),,]
+
+library(data.table)
+as.data.table(mysummary)
+
+#𝜙 𝜙 ϕ
+
+install.packages("Unicode")
+#φ
+special_char <- "ϕ"
+Unicode::as.u_char(utf8ToInt(special_char))
+
+
+par(pty = 's')
+for (contrast in c("RD", "RR")) {
+for (phi in c("0.1", "0.25", "0.5")) {
+  plot(as.numeric(mysummary[phi,,"pctnear", contrast]),
+       as.numeric(mysummary[phi,,"pctgoodloc", contrast]),
+       xlim = c(0, 100), ylim=c(0, 100),
+       xlab = "% proximate",
+       ylab = "% central",
+       main = paste0(contrast, ", \u03D5=", phi)
+       )
+  text(as.numeric(mysummary[phi,,"pctnear", contrast]),
+       as.numeric(mysummary[phi,,"pctgoodloc", contrast]),
+       labels = dimnames(mysummary)[[2]],
+       pos = 4
+       )
+}}
+
 
 
 x <- c(1,1,7,12)
@@ -69,6 +150,42 @@ round(pairbinci(x=x, contrast = "RR", method_RR = "MOVER", moverbase = "SCAS")$e
 round(pairbinci(x=x, contrast = "RR", method_RR = "MOVER", moverbase = "jeff")$estimates[,c(1,3)], 3)
 
 
+# Tang version of Jeffreys
+Y <- 9
+n <- 14
+(2*Y + 1) / (2*Y + 1 + (2*(n-Y)+1) * qf(0.025, 2*(n-Y)+1, 2*Y+1, lower.tail=T ) )
+(2*Y + 1) / (2*Y + 1 + (2*(n-Y)+1) * qf(0.975, 2*(n-Y)+1, 2*Y+1, lower.tail=T ) )
+jeffreysci(9,14, adj=T)
+x <- c(43, 0, 1, 0)
+x <- c(8,3,1,2)
+x <- c(4,9,3,16)
+x <- c(16,9,3,4)
+pairbinci(x=x, contrast="RD", method_RD = "Score", skew=F)$estimates[,c(1,3)]
+#pairbinci(x=x, contrast="RD", method_RD = "MOVER", moverbase = "wilson")$estimates[,c(1,3)]
+pairbinci(x=x, contrast="RD", method_RD = "MOVER_newc", moverbase = "wilson")$estimates[,c(1,3)]
+pairbinci(x=x, contrast="RD", method_RD = "MOVER", moverbase = "jeff")
+pairbinci(x=x, contrast="RD", method_RD = "MOVER", moverbase = "jeff", cc=0.125)
+pairbinci(x=x, contrast="RD", method_RD = "MOVER_newc", moverbase = "jeff")$estimates[,c(1,3)]
+pairbinci(x=x, contrast="RD", method_RD = "MOVER_newc", moverbase = "jeff", cc=0.125)$estimates[,c(1,3)]
+pairbinci(x=x, contrast="RD", method_RD = "MOVER_newc", moverbase = "jeff", level=0.95)$estimates[,c(1,3)]
+moverpair(x=x, contrast="RD", method = "wilson")
+moverpair(x=x, contrast="RD", method = "wilson", corc=T)
+moverpair(x=x, contrast="RD", method = "jeff")
+moverpair(x=x, contrast="RD", method = "jeff", corc=T, crudemid=F)
+moverpair(x=x, contrast="RD", method = "jeff", corc=T, crudemid=T)
+
+
+x <- c(1, 1, 7, 12)
+
+
+pairbinci(x=x, contrast="RR", method_RR = "Score", skew=F, bcf=F)
+pairbinci(x=x, contrast="RR", method_RR = "MOVER", moverbase = "wilson")
+pairbinci(x=x, contrast="RR", method_RR = "MOVER", moverbase = "jeff")
+
+
+x[1] * x[4] - x[2] * x[3]
+
+?FDist
 
 
 }
