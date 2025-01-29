@@ -416,10 +416,12 @@ cpfun <- function(
 #      cbind(xs, prob[, i])
 #      prob[prob == 0] <- NA
 
-      cpl[i, ] <- t(ci[, 1, ] <= theta[i] & ci[, 2, ] >= theta[i] & ci[, 2, ] > ci[, 1, ]) %*% prob # 2-sided coverage probability. NB degenerate intervals excluded
+      if (any(!is.na(prob))) {
+
+        cpl[i, ] <- t(ci[, 1, ] <= theta[i] & ci[, 2, ] >= theta[i] & ci[, 2, ] > ci[, 1, ]) %*% prob # 2-sided coverage probability. NB degenerate intervals excluded
 #        cpl[i, ] <-  t(prob) %*% (ci[, 1, ] <= theta[i] & ci[, 2, ] >= theta[i] & ci[, 2, ] > ci[, 1, ])
-      lncpl[i, ] <- t(ci[, 1, ] > theta[i] | ci[, 2, ] == ci[, 1, ]) %*% prob # L-sided non-coverage (R-side is a mirror image)
-      rncpl[i, ] <- t(ci[, 2, ] < theta[i] | ci[, 2, ] == ci[, 1, ]) %*% prob # R-sided non-coverage
+        lncpl[i, ] <- t(ci[, 1, ] > theta[i] | ci[, 2, ] == ci[, 1, ]) %*% prob # L-sided non-coverage (R-side is a mirror image)
+        rncpl[i, ] <- t(ci[, 2, ] < theta[i] | ci[, 2, ] == ci[, 1, ]) %*% prob # R-sided non-coverage
 
 if (FALSE) {
 # Exploration of OR issues
