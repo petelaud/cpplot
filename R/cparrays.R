@@ -433,20 +433,23 @@ if (FALSE) {
 # Margin where rncp=0 is bigger because the conditional method is working with less data?
 }
 
-      # not really interested in length, I think location is more important
-      # - and its complicated to explain on log scale
-      # but included as reviewers might request it
-      lens <- ci[, 2, ] - ci[, 1, ]
-      ## you get pretty whacky results with length on linear scale
-      # 		if(contrast %in% c("RR")) lens<-(ci[,2,])-(ci[,1,])
-      # 		lens[lens>100]<-100 #workaround for infinite lengths with RR
-      if (contrast %in% c("RR")) {
-        # for RR, use length on the log scale
-        lens <- log(ci[, 2, ]) - log(pmax(0.0000000001, ci[, 1, ]))
+        # not really interested in length, I think location is more important
+        # - and its complicated to explain on log scale
+        # but included as reviewers might request it
+        lens <- ci[, 2, ] - ci[, 1, ]
+        ## you get pretty whacky results with length on linear scale
+        # 		if(contrast %in% c("RR")) lens<-(ci[,2,])-(ci[,1,])
+        # 		lens[lens>100]<-100 #workaround for infinite lengths with RR
+        if (contrast %in% c("RR")) {
+          # for RR, use length on the log scale
+     #     lens <- log(ci[, 2, ]) - log(pmax(0.0000000001, ci[, 1, ]))
+          # Try Newcombe's book suggestion to use U/(1+U) - L/(1+L)
+          lens <- ci[, 2, ]/(1 + ci[, 2, ]) - ci[, 1, ]/(1 + ci[, 1, ])
+        }
+#        lens[lens > 10] <- 10 # workaround for infinite lengths with RR
+        lens[ci[, 2, ] == ci[, 1, ]] <- 0
+        lenl[i, ] <- t(lens) %*% prob
       }
-      lens[lens > 10] <- 10 # workaround for infinite lengths with RR
-      lens[ci[, 2, ] == ci[, 1, ]] <- 0
-      lenl[i, ] <- t(lens) %*% prob
     }
 
     mncpl <- rncpl
