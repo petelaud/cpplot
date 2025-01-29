@@ -121,13 +121,20 @@ texsize=1
 	x <- p1[p1>=min(xlim) & p1<=max(xlim)]
 	y <- p2[p2>=min(ylim) & p2<=max(ylim)]
 
-	avecpdata <- plotdata[["mastercp"]][paste(x),
+	rawcpdata <- plotdata[["mastercp"]][paste(x),
+	                                    paste(y),
+	                                    paste(par3),
+	                                    methlab,
+	                                    paste(100*(1-alpha)),
+	                                    "cp",
+	                                    nums,]
+	avecpdata <- ifelse(is.na(rawcpdata), NA, plotdata[["mastercp"]][paste(x),
 	                                    paste(y),
 	                                    paste(par3),
 	                                    methlab,
 	                                    paste(100*(1-alpha)),
 	                                    "avecp",
-	                                    nums,]
+	                                    nums,])
 	if(avg) {
 		if(lside == TRUE) cpdata <- plotdata[["mastercp"]][paste(x),
 		                                          paste(y),
@@ -136,13 +143,7 @@ texsize=1
 		                                          paste(100*(1-alpha)),
 		                                          "averncp",
 		                                          nums,]
-		else cpdata <- plotdata[["mastercp"]][paste(x),
-		                             paste(y),
-		                             paste(par3),
-		                             methlab,
-		                             paste(100*(1-alpha)),
-		                             "avecp",
-		                             nums,]
+		else cpdata <- avecpdata
 	} else {
 	  if(lside == TRUE) cpdata <- plotdata[["mastercp"]][paste(x),
 	                                            paste(y),
@@ -151,13 +152,7 @@ texsize=1
 	                                            paste(100*(1-alpha)),
 	                                            "rncp",
 	                                            nums,]
-	  else cpdata <- plotdata[["mastercp"]][paste(x),
-	                               paste(y),
-	                               paste(par3),
-	                               methlab,
-	                               paste(100*(1-alpha)),
-	                               "cp",
-	                               nums,]
+	  else cpdata <- rawcpdata
 	}
 	if(CIlen) {
 		if(avg) cpdata <- plotdata[["mastercp"]][paste(x),
@@ -230,9 +225,14 @@ texsize=1
 	if (locind) palette <- loccols
 #	par(mar=res.factor*(c(2,1,2,0)+0.1))
 #	par(bg="lightgray") # Set colour for missing values
+	plot(x, y, type = 'n', col.axis="white", xlim=xlim,
+	     ylim=ylim, 	      xaxs="i",
+	     yaxs="i",)
+	abline(h = seq(0, 1, 0.02), v = seq(0, 1, 0.025), col="black")
 	image(x,
 	      y,
 	      ccol,
+	      add = TRUE,
 	      col = palette[min(ccol+shift,na.rm=T):max(ccol+shift,na.rm=T)],
 	      xlab="",
 	      ylab="",
@@ -244,12 +244,16 @@ texsize=1
 	      xlim=xlim,
 	      ylim=ylim
 	      )
-	if (any(is.na(ccol))) {
-	  mmat <- ifelse(is.na(ccol), 1, NA)
-	  image(mmat, axes = FALSE, xlab = "", ylab = "", col = "lightgray", useRaster=TRUE, add = TRUE)
-	}
-#	if (avg | CIlen) {
-if (FALSE) {
+#	if (any(is.na(ccol))) {
+#	  mmat <- ifelse(is.na(ccol), 1, NA)
+#	  image(mmat, axes = FALSE, xlab = "", ylab = "", col = "lightgray", useRaster=TRUE, add = TRUE)
+#	}
+#	if (any(is.na(rawcpdata))) {
+#	  mmat <- ifelse((is.na(rawcpdata) | is.na(ccol)), 1, NA)
+#	  image(mmat, axes = FALSE, xlab = "", ylab = "", col = "lightgray", useRaster=TRUE, add = TRUE)
+#	}
+	if (avg | CIlen) {
+# if (FALSE) {
 	if (locind == FALSE) {
 	    contour(x,
 	          y,
@@ -334,12 +338,20 @@ plotpanel <- function(plotdata,
 ) {
 
   g <- "gamma"
+  nmeth <- length(sel)
   nums <- dimnames(plotdata[["summaries"]])[[5]]
+  contrast <- dimnames(plotdata[["summaries"]])[[6]]
   summaries <- plotdata[["summaries"]][paste(par3),,paste(100*(1-alpha)),,nums,]
   longlab <- methods <- dimnames(plotdata[["mastercp"]])[[4]]
-  longlab[longlab=="Tang-cc5"] <- "Tang-cc (\U0263=0.5)"
-  longlab[longlab=="Tang-cc25"] <- "Tang-cc (\U0263=0.25)"
-  longlab[longlab=="Tang-cc125"] <- "Tang-cc (\U0263=0.125)"
+#  longlab[longlab=="Tang-cc5"] <- "Tang-cc (\U0263=0.5)"
+#  longlab[longlab=="Tang-cc25"] <- "Tang-cc (\U0263=0.25)"
+#  longlab[longlab=="Tang-cc125"] <- "Tang-cc (\U0263=0.125)"
+  longlab[longlab=="SCAS-bc"] <- "SCAS"
+  longlab[longlab=="MOVER-NJcc5"] <- "MOVER-NJcc (\U0263=0.5)"
+  longlab[longlab=="MOVER-NJcc125"] <- "MOVER-NJcc (\U0263=0.125)"
+  longlab[longlab=="SCAS-cc5"] <- "SCAS-cc (\U0263=0.5)"
+  longlab[longlab=="SCAS-cc25"] <- "SCAS-cc (\U0263=0.25)"
+  longlab[longlab=="SCAS-cc125"] <- "SCAS-cc (\U0263=0.125)"
   if (FALSE) {
     longlab[longlab=="SC"] <- "SCAS"
     #	longlab[longlab=="SC"] <- "GNbc"
@@ -377,9 +389,9 @@ plotpanel <- function(plotdata,
                      ifelse(oneside,"os",""),collab,".png",
                      sep=""
     ),
-    width=600*res.factor,
-    height=360*res.factor,
-    type="quartz"
+    width = (120 * nmeth + 60) * res.factor,
+    height = 12 * 39 * res.factor,
+    type = "quartz"
     ) #,res=360,compression="none")  ## to create a png file ##   changed from 600x360
   } else if(fmt=="eps") {
     setEPS()
@@ -402,17 +414,18 @@ plotpanel <- function(plotdata,
     height=400*res.factor
     )
   }
-
-  layout(matrix(c(1,2,3,4,5,6,7,8,9,10), 2, 5,
+  layout(matrix(c(1:(3 * nmeth), 3 * nmeth + c(1, 1, 2)), 3, (nmeth + 1),
                 byrow = FALSE),
-         widths=c(2,2,2,2,1))
-  par(oma = res.factor*c(0,4,ifelse(fmt=="xxx",10,4),0), pty='s')
+         widths=c(rep(2, nmeth), 1), heights = c(4, 4, 4))
+#  widths=c(2,2,2,2,1))
+  par(oma = res.factor*c(0,3,ifelse(fmt=="xxx",10,6),0), pty='s')
   par(cex.main = res.factor*0.8*textsize, cex.axis=res.factor*0.8*textsize)
   par(mar = res.factor*(c(2,1,1,0.5)+0.1))
 #  par(bg = "lightgray") # Set colour for missing values
 
-  #	i <- methods["Tang"]
+  #	i <- 1
   for(i in methods[sel]) {
+    methlab <- longlab[i]
     # Run the unsmoothed plot and capture the output palette
     palette <- CPcontour(plotdata=plotdata,
                          alpha=alpha,
@@ -420,7 +433,7 @@ plotpanel <- function(plotdata,
                          nums=nums,
                          methlab=i,
                          lside=oneside,
-                         avg = smoothed,
+                         avg = FALSE,
                          lines=linesx,
                          locind = FALSE,
                          CIlen=CIlen,
@@ -430,35 +443,74 @@ plotpanel <- function(plotdata,
                          xlim=limits)
     mtext(side = 3,
           cex = res.factor*0.8*textsize,
-          line = 1*res.factor,
-          text = (paste(longlab[i],
-                        ifelse(oneside,
-                               paste0("\n",ifelse(sided=="R","maxRNCP=","maxLNCP="),
-                                     summaries[i,"maxLNCP"]),
-                               paste0("\n","meanCP=",summaries[i,"meanCP"],
-                                      "\n","minCP=",summaries[i,"minCP"])
-                        ),
-                        ifelse(any(sel=="SCcc"),
+          line = 5.5*res.factor,
+          text = latex2exp::TeX(paste0("\\textbf{",methlab,"}")))
+    mtext(side = 3,
+          cex = res.factor*0.8*textsize,
+          line = 0.5*res.factor,
+          text = paste0(
+      ifelse(oneside,
+             paste0("\n",ifelse(sided=="R","maxRNCP=","maxLNCP="),
+                    summaries[i,"maxLNCP"]),
+             paste0("\n","meanCP=",summaries[i,"meanCP"],
+                                     "\n","minCP=",summaries[i,"minCP"]
+             )
+      ),
+      ifelse(any(sel=="SCcc"),
+             paste0(("\n"),"pctCons=",(summaries[i,paste("pctCons",ifelse(oneside,".1side",""),sep="")]),"%"),
+             paste0("\n","within ±",
+                    (ifelse(oneside,
+                            format(0.1*alpha/2,scientific=F),
+                            format(0.1*alpha,scientific=F))
+                    ),
+                    "=",
+                    (summaries[i,paste("pctnear",ifelse(oneside,".1side",""),sep="")]),
+                    "%",
+                    "\n","below ",
+                    format(1-1.1*alpha,scientific=F),
+                    "=",(summaries[i,"pctBad"]),
+                    "%"
+             )
+      )))
+
+
+    # Run the smoothed plot
+    CPcontour(plotdata=plotdata,
+                         alpha=alpha,
+                         par3=par3,
+                         nums=nums,
+                         methlab=i,
+                         lside=oneside,
+                         avg = TRUE,
+                         lines=linesx,
+                         locind = FALSE,
+                         CIlen=CIlen,
+                         res.factor=res.factor,
+                         colour=colour,
+                         textsize=textsize,
+                         xlim=limits)
+    mtext(side = 3,
+          cex = res.factor*0.8*textsize,
+          line = 0.5*res.factor,
+          text = (paste0(#longlab[i],
+#                        ifelse(oneside,
+#                               paste0("\n",ifelse(sided=="R","maxRNCP=","maxLNCP="),
+#                                      summaries[i,"maxLNCP"]),
+#                               paste0("\n","meanCP=",summaries[i,"meanCP"],
+#                                      "\n","minCP=",summaries[i,"minCP"])
+#                        ),
+            "aveCons=",summaries[i,"pctAveCons"],"%",
+            ifelse(any(sel=="SCcc"),
                                paste0(("\n"),"pctCons=",(summaries[i,paste("pctCons",ifelse(oneside,".1side",""),sep="")]),"%"),
-                               paste0("\n","within ±",
+                               paste0("\n","ave within ±",
                                       (ifelse(oneside,
                                               format(0.1*alpha/2,scientific=F),
                                               format(0.1*alpha,scientific=F))
-                                       ),"=",
-                                      (summaries[i,paste("pctnear",ifelse(oneside,".1side",""),sep="")]),
-                                      "%" #,
-                                     # "\n","ave within ±",
-                                    #  ifelse(oneside,
-                                    #         format(0.1*alpha/2,scientific=F),
-                                    #         format(0.1*alpha,scientific=F)
-                                    #  ),
-                                    #  "=",(summaries[i,paste("pctAvenear",
-                                    #                         ifelse(oneside,".1side",""),
-                                    #                         sep="")]),
-                                    #  "%"
-                                      )
-                        ),
-                        sep=""))
+                                      ),"=",
+                                      (summaries[i,paste("pctAvenear",ifelse(oneside,".1side",""),sep="")]),
+                                      "%"
+                               )
+                        )))
     )
 
     # Run the location index plot
@@ -479,7 +531,7 @@ plotpanel <- function(plotdata,
           cex=res.factor*0.8*textsize,
           line=0.5*res.factor,
           text = (paste(
-                   paste("\n","mean location index=",summaries[i,"meanlocindex"],sep=""),
+                   paste("\n","mean loc. index=",summaries[i,"meanlocindex"],sep=""),
             "\n","within ±0.1=",
             (summaries[i,"pctgoodloc"]),
             "%",
@@ -490,6 +542,7 @@ plotpanel <- function(plotdata,
   par(pty="m", mar=res.factor*c(3,2,ifelse(fmt=="xxx",2,2),3)+0.1)
 
   # Add legend for colour palette
+
   if (alpha == 0.05) {
     if (oneside == T) {
       image(y = (1:20-0.5)/20,
@@ -606,6 +659,7 @@ plotpanel <- function(plotdata,
         cex=res.factor*0.6,
         line=2*res.factor/3)
 
+
   # Add legend for location index
   image(y = (1:20-0.5)/20,
         z = matrix(1:20,nrow=1),
@@ -646,14 +700,20 @@ plotpanel <- function(plotdata,
   }
   mtext(side=2,
         outer=TRUE,
+        text = "Location index\n for individual PSPs",
+        cex=textsize*0.8*res.factor,
+        at=0.167,
+        line=0.5*res.factor)
+  mtext(side=2,
+        outer=TRUE,
         text = paste("Contour plot of \n'Moving Average' ",
                      ifelse(oneside,
                             ifelse(sided=="R","RN","LN"),""),
                      "CP",
                      sep=""),
         cex=textsize*0.8*res.factor,
-        at=0.25,
-        line=1*res.factor)
+        at=0.5,
+        line=0.5*res.factor)
   mtext(side=2,
         outer=TRUE,
         text=paste("Plot of ",ifelse(oneside,
@@ -661,8 +721,8 @@ plotpanel <- function(plotdata,
                    "CP\n for individual PSPs",
                    sep=""),
         cex=textsize*0.8*res.factor,
-        at=0.75,
-        line=1*res.factor)
+        at=0.833,
+        line=0.5*res.factor)
 
   dev.off()
 }
@@ -694,8 +754,9 @@ plotpanel_old <- function(plotdata,
 	summaries <- plotdata[["summaries"]][paste(psi),,paste(100*(1-alpha)),,nums,]
 	longlab <- methods <- dimnames(plotdata[["mastercp"]])[[4]]
 	if (FALSE) {
-	longlab[longlab=="SC"] <- "SCAS"
-#	longlab[longlab=="SC"] <- "GNbc"
+	  longlab[longlab=="SC"] <- "SCAS"
+	  longlab[longlab=="MOVER-NJc"] <- "MOVER-NJ"
+	  #	longlab[longlab=="SC"] <- "GNbc"
 	longlab[longlab=="SCcc"] <- "SCAS-cc (\U0263=0.5)"
 	longlab[longlab=="SCcomp"] <- "SCAS-cc (\U0263=0.25)"
 	longlab[longlab=="Wald"] <- "AN"
@@ -990,6 +1051,7 @@ if(fmt=="xxx") {
 }
 }
 
+if (FALSE) {
 RRpairteam <- c("Tang", "Tang-bc", "Tang-sc", "Tang-scbc") 	#Paired RR
 RR2pairteam <- c("MOVER-w", "MOVER-nw", "MOVER-nj","MOVER-ns") 	#Paired RR
 RRccpairteam <- c("Tang-cc5", "Tang-cc125", "Tang-sccc", "MOVER-ccns") 	#Paired RR, cc
@@ -997,6 +1059,7 @@ RRccpairteam <- c("Tang-cc5", "Tang-cc125", "Tang-sccc", "MOVER-ccns") 	#Paired 
 RDpairteam <- c("Tango", "Tango-bc", "Tango-sc", "Tango-scbc") 	#Paired RD
 RD2pairteam <- c("MOVER-w", "MOVER-nw", "MOVER-nj","MOVER-ns") 	#Paired RD
 RDccpairteam <- c("Tango-cc5", "Tango-cc125", "Tango-sccc", "MOVER-ccns") 	#Paired RD, cc
+}
 
 if (FALSE) {
 
