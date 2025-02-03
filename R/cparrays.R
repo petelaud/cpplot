@@ -342,13 +342,13 @@ if (FALSE) {
                              paste(par3),
                              mymethods,
                              paste(100*(1-alph)),
-                             c("cp", "lncp", "rncp", "mncp", "avecp",
+                             c("cp", "lncp", "rncp", "dncp", "avecp",
                                "avelncp", "averncp", "len", "locindex", "avelocindex"),
                              paste(n))
 
   summarylist <- c("meanCP", "minCP", "pctCons", "pctBad", "pctBad2", "pctnear",
     "pctAveCons", "pctAvenear", "pctAvenearlo", "pctAvenearhi", "pctAveBad",
-    "meanMNCP", "meanDNCP", "maxLNCP", "pctCons.1side", "pctBad.1side",
+    "meanMNCP", "meanDNCP", "maxLNCP", "pctCons.1side", "pctBad.1side", "pctBad.DNCP",
     "pctnear.1side", "pctAvenear.1side", "typeI", "maxtypeI", "avetypeI",
     "meanlen", "meanlocindex", "pctgoodloc")
   summaries <- array(NA, dim = c(length(par3), length(mymethods), length(alph), length(summarylist), 1))
@@ -427,14 +427,14 @@ cpfun <- function(
                              paste(par3),
                              mymethods,
                              paste(100*(1-alph)),
-                             c("cp", "lncp", "rncp", "mncp", "avecp",
+                             c("cp", "lncp", "rncp", "dncp", "avecp",
                                "avelncp", "averncp", "len", "locindex", "avelocindex"),
                              paste(n),
                              contrast)
 
   summarylist <- c("meanCP", "minCP", "pctCons", "pctBad", "pctBad2", "pctnear",
                    "pctAveCons", "pctAvenear", "pctAvenearlo", "pctAvenearhi", "pctAveBad",
-                   "meanMNCP", "meanDNCP", "maxLNCP", "pctCons.1side", "pctBad.1side",
+                   "meanMNCP", "meanDNCP", "maxLNCP", "pctCons.1side", "pctBad.1side", "pctBad.DNCP",
                    "pctnear.1side", "pctAvenear.1side", "typeI", "maxtypeI", "avetypeI",
                    "meanlen", "meanlocindex", "pctgoodloc")
   summaries <- array(NA, dim = c(length(par3), length(mymethods), length(alph), length(summarylist), 1, 1))
@@ -576,17 +576,18 @@ if (FALSE) {
     lncp <- array(lncpl, dim = mydim)
     rncp <- array(rncpl, dim = mydim)
     mncp <- array(mncpl, dim = mydim)
+    dncp <- 1 - cp - mncp
     len <- array(lenl, dim = mydim)
     # Calculate Newcombe's location index
     locindex <- ifelse(cp == 1, 0, mncp / (1 - cp))
     dimnames(cp) <- dimnames(locindex) <- dimnames(lncp) <-
-      dimnames(rncp) <- dimnames(len) <- dimnames(mncp) <-
+      dimnames(rncp) <- dimnames(len) <- dimnames(dncp) <- dimnames(mncp) <-
       list(paste(p1), paste(p2), paste(par3), mymethods)
 
     arrays[["mastercp"]][, , , , paste(100 * (1 - alpha)), "cp", , ] <- cp
     arrays[["mastercp"]][, , , , paste(100 * (1 - alpha)), "lncp", , ] <- lncp
     arrays[["mastercp"]][, , , , paste(100 * (1 - alpha)), "rncp", , ] <- rncp
-#    arrays[["mastercp"]][, , , , paste(100 * (1 - alpha)), "mncp", , ] <- mncp
+    arrays[["mastercp"]][, , , , paste(100 * (1 - alpha)), "dncp", , ] <- dncp
     arrays[["mastercp"]][, , , , paste(100 * (1 - alpha)), "locindex", , ] <- locindex
     arrays[["mastercp"]][, , , , paste(100 * (1 - alpha)), "len", , ] <- len
 
@@ -604,6 +605,7 @@ if (FALSE) {
     meanDNCP <- format(round(apply((1 - cp - mncp), 3:4, mymean), 3), nsmall = 3)
     maxLNCP <- format(round(apply(lncp, 3:4, function(x) max(x, na.rm = TRUE)), 3), nsmall = 3)
     pctBad.1side <- format(100 * round(apply(lncp, 3:4, FUN = function(x) mymean(x > (1.1 * alpha / 2))), 3), nsmall = 1)
+    pctBad.DNCP <- format(100 * round(apply(1 - cp - mncp, 3:4, FUN = function(x) mymean(x > (1.2 * alpha / 2))), 3), nsmall = 1)
     pctCons.1side <- format(100 * round(apply(lncp, 3:4, FUN = function(x) mymean(x < (alpha / 2))), 3), nsmall = 1)
     pctnear.1side <- format(100 * round(apply(lncp, 3:4, FUN = function(x) mymean(x > 0.9 * (alpha / 2) & x < 1.1 * (alpha / 2))), 3), nsmall = 1)
 
@@ -655,7 +657,7 @@ if (FALSE) {
   # For reference
       c("meanCP", "minCP", "pctCons", "pctBad", "pctBad2", "pctnear",
         "pctAveCons", "pctAvenear", "pctAvenearlo", "pctAvenearhi", "pctAveBad",
-        "meanMNCP", "meanDNCP", "maxLNCP", "pctCons.1side", "pctBad.1side",
+        "meanMNCP", "meanDNCP", "maxLNCP", "pctCons.1side", "pctBad.1side", "pctBad.DNCP",
         "pctnear.1side", "pctAvenear.1side", "typeI", "maxtypeI", "avetypeI",
         "meanlen", "meanlocindex")
 }
@@ -678,7 +680,7 @@ if (FALSE) {
     arrays[["summaries"]][,, paste(100 * (1 - alpha)), , 1, 1] <-
       array(c(meanCP, minCP, pctCons, pctBad, pctBad2, pctnear,
               pctAveCons, pctAvenear, pctAvenearlo, pctAvenearhi, pctAveBad,
-              meanMNCP, meanDNCP, maxLNCP, pctCons.1side, pctBad.1side,
+              meanMNCP, meanDNCP, maxLNCP, pctCons.1side, pctBad.1side, pctBad.DNCP,
               pctnear.1side, pctAvenear.1side, typeI, maxtypeI, avetypeI,
               meanlen, meanlocindex, pctgoodloc),
             dim=c(max(length(psis), length(phis)), nmeth, length(summarylist)))

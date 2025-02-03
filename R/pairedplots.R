@@ -69,6 +69,7 @@ texsize=1
 		         rep(c(col2,col3),each=2),
 		         rep(colorRampPalette(c(col4,"WHITE"),space="Lab")(9),each=2))
 	)
+	# OScols to be updated for alpha=0.1 (and 0.01?)
 	oscols <- switch(as.character(alpha),
 	  "0.5" = rev(c(rep("#000000",160),
 	                rep(colorRampPalette(c("BLACK",col1))(10)[-1],each=2),
@@ -83,8 +84,9 @@ texsize=1
 		              col2,col3,
 		              rep(colorRampPalette(c(col4,"WHITE"),space="Lab")(9),each=1))),
 		"0.05" = rev(c(rep("#000000",380),
-		               colorRampPalette(c("BLACK",col1))(10)[-1],
-		               col2,col3,colorRampPalette(c(col4,"WHITE"),space="Lab")(9))),
+		               rep(colorRampPalette(c("BLACK",col1))(5)[-1],each=2),
+		               col2,col2,col3,col3,
+		               rep(colorRampPalette(c(col4,"WHITE"),space="Lab")(4),each=2))),
 		"0.01" = rev(c(rep("#000000",1980),
 		               rep(colorRampPalette(c("BLACK",col1))(10)[-1],each=1),
 		               col2,col3,
@@ -145,13 +147,22 @@ texsize=1
 		                                          nums,]
 		else cpdata <- avecpdata
 	} else {
-	  if(lside == TRUE) cpdata <- plotdata[["mastercp"]][paste(x),
-	                                            paste(y),
-	                                            paste(par3),
-	                                            methlab,
-	                                            paste(100*(1-alpha)),
-	                                            "rncp",
-	                                            nums,]
+	  lirev <- 1 - plotdata[["mastercp"]][paste(x),
+	                               paste(y),
+	                               paste(par3),
+	                               methlab,
+	                               paste(100*(1-alpha)),
+	                               "locindex",
+	                               nums,]
+	  ncpval <- 1 - plotdata[["mastercp"]][paste(x),
+	                               paste(y),
+	                               paste(par3),
+	                               methlab,
+	                               paste(100*(1-alpha)),
+	                               "cp",
+	                               nums,]
+
+	  if(lside == TRUE) cpdata <- lirev * ncpval
 	  else cpdata <- rawcpdata
 	}
 	if(CIlen) {
@@ -324,7 +335,7 @@ plotpanel <- function(plotdata,
                       par3,
 #                      nums,
                       sel,
-                      oneside,
+                      oneside = F,
                       plotlab,
                       linesx = F,
                       smoothed = F,
@@ -534,9 +545,45 @@ plotpanel <- function(plotdata,
                    paste("\n","mean loc. index=",summaries[i,"meanlocindex"],sep=""),
             "\n","within ±0.1=",
             (summaries[i,"pctgoodloc"]),
-            "%",
-            sep=""))
+            "%" #,
+  #          "\n","mean DNCP=",
+  #          summaries[i,"meanDNCP"]
+#            "\n","DNCP bad=",
+#            (summaries[i,"pctBad.DNCP"]),
+#            "%"
+#  "\n","DNCP above ",
+#  format(1.2*alpha/2,scientific=F),
+#  "=",(summaries[i,"pctBad.DNCP"]),
+#  "%"
+  #    "\n","1-sided prox=",
+        #    (summaries[i,"pctnear.1side"]),
+        #    "%" meanDNCP
+          ))
     )
+    # Run the DNCP plot
+    palettex <- CPcontour(plotdata = plotdata,
+                          alpha = alpha,
+                          par3 = par3,
+                          nums = nums,
+                          methlab = i,
+                          lside = TRUE,
+                          lines = linesx,
+#                          locind = TRUE,
+                          res.factor = res.factor,
+                          colour = colour,
+                          textsize = textsize,
+                          xlim = limits)
+    mtext(side=3,
+          cex=res.factor*0.8*textsize,
+          line=0.5*res.factor,
+          text = (paste0(
+            "\n","meanDNCP",
+            "=",(summaries[i,"meanDNCP"]),
+            "\n","DNCP above ",
+            format(1.2*alpha/2,scientific=F),
+            "=",(summaries[i,"pctBad.DNCP"]),
+            "%"
+          )))
   }
 
   par(pty="m", mar=res.factor*c(3,2,ifelse(fmt=="xxx",2,2),3)+0.1)
@@ -680,6 +727,63 @@ plotpanel <- function(plotdata,
         cex=res.factor*0.6,
         line=2*res.factor/3)
 
+  if (alpha == 0.05) {
+      image(y = (1:20-0.5)/20,
+            z = matrix(1:20,nrow=1),
+            col = rev(palettex)[381:400],
+#            col = rev(palettex)[181:200],
+            axes = F,
+            ylab = "")
+      text(x=1.2,
+           y=(c(190:200)-190)/10,
+           labels=(10:0)/200,
+           xpd=T,
+           cex=res.factor*textsize,
+           pos=4)
+  } else if (alpha == 0.1) {
+      image(y=(1:20-0.5)/20,
+            z=matrix(181:200,nrow=1),
+            col=rev(palettex)[181:200],
+            axes=F,
+            ylab="")
+      text(x=1.2,
+           y=(c(90:100)-90)/10,
+           labels=(10:0)/100,
+           xpd=T,
+           cex=res.factor*textsize,
+           pos=4)
+
+  } else if (alpha == 0.2) {
+      image(y=(1:40-0.5)/40,
+            z=matrix(161:200,nrow=1),
+            col=rev(palettex)[161:200],
+            axes=F,
+            ylab="")
+      text(x=1.2,
+           y=(c(80:100)-80)/20,
+           labels=(20:0)/100,
+           xpd=T,
+           cex=res.factor*textsize,
+           pos=4)
+  } else if (alpha == 0.01) {
+      image(y=(1:50-0.5)/50,
+            z=matrix(1951:2000,nrow=1),
+            col=rev(palettex)[1951:2000],
+            axes=F,
+            ylab="")
+      text(x=1.2,
+           y=(c(195:200)-195)/5,
+           labels=(5:0)/200,
+           xpd=T,
+           cex=res.factor*textsize,
+           pos=4)
+  }
+  box(lwd=0.6*textsize*res.factor)
+  mtext(text="DNCP",
+        side=3,
+        at=2,
+        cex=res.factor*0.6,
+        line=2*res.factor/3)
 
   if(fmt=="xxx") {
     mtext(paste(ifelse(oneside,
@@ -700,9 +804,15 @@ plotpanel <- function(plotdata,
   }
   mtext(side=2,
         outer=TRUE,
+        text = "DNCP\n for individual PSPs",
+        cex=textsize*0.8*res.factor,
+        at=1/(2*rows),
+        line=0.5*res.factor)
+  mtext(side=2,
+        outer=TRUE,
         text = "Location index\n for individual PSPs",
         cex=textsize*0.8*res.factor,
-        at=0.167,
+        at = (1 - 1/(2*rows) - 2/rows),
         line=0.5*res.factor)
   mtext(side=2,
         outer=TRUE,
@@ -712,7 +822,7 @@ plotpanel <- function(plotdata,
                      "CP",
                      sep=""),
         cex=textsize*0.8*res.factor,
-        at=0.5,
+        at=(1 - 1/(2*rows) - 1/rows),
         line=0.5*res.factor)
   mtext(side=2,
         outer=TRUE,
@@ -721,7 +831,7 @@ plotpanel <- function(plotdata,
                    "CP\n for individual PSPs",
                    sep=""),
         cex=textsize*0.8*res.factor,
-        at=0.833,
+        at=(1 - 1/(2*rows)),
         line=0.5*res.factor)
 
   dev.off()
