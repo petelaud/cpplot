@@ -432,13 +432,14 @@ plotpanel <- function(plotdata,
                 byrow = FALSE),
          widths = c(rep(2, nmeth), 1), heights = rep(4, rows))
 #  widths=c(2,2,2,2,1))
-  par(oma = res.factor*c(0,3,ifelse(fmt=="xxx",10,6),0), pty='s')
+  par(oma = res.factor*c(0,3,ifelse(fmt=="xxx",10,7),0), pty='s')
   par(cex.main = res.factor*0.8*textsize, cex.axis=res.factor*0.8*textsize)
   par(mar = res.factor*(c(2,1,1,0.5)+0.1))
 #  par(bg = "lightgray") # Set colour for missing values
 
   #	i <- 1
   for(i in methods[sel]) {
+    par(mar = res.factor*(c(2,1,1,0.5)+0.1))
     methlab <- longlab[i]
     # Run the unsmoothed plot and capture the output palette
     palette <- CPcontour(plotdata=plotdata,
@@ -457,7 +458,7 @@ plotpanel <- function(plotdata,
                          xlim=limits)
     mtext(side = 3,
           cex = res.factor*0.8*textsize,
-          line = 5.5*res.factor,
+          line = 7*res.factor,
           text = latex2exp::TeX(paste0("\\textbf{",methlab,"}")))
     mtext(side = 3,
           cex = res.factor*0.8*textsize,
@@ -467,7 +468,8 @@ plotpanel <- function(plotdata,
              paste0("\n",ifelse(sided=="R","maxRNCP=","maxLNCP="),
                     summaries[i,"maxLNCP"]),
              paste0("\n","meanCP=",summaries[i,"meanCP"],
-                                     "\n","minCP=",summaries[i,"minCP"]
+                    "\n","minCP=",summaries[i,"minCP"],
+                    "\n","pctCons=",summaries[i,"pctCons"],"%"
              )
       ),
       ifelse(any(sel=="SCcc"),
@@ -850,6 +852,14 @@ plotpanel <- function(plotdata,
         cex=textsize*0.8*res.factor,
         at=(1 - 1/(2*rows)),
         line=0.5*res.factor)
+  mtext(side = 3,
+        outer = TRUE,
+        text = latex2exp::TeX(paste0("\\textbf{",contrast, "\nN=", nums,"}")),
+        cex = textsize*0.8*res.factor,
+        at = -0.02,
+#        adj = 0,
+        line = 4.5*res.factor
+        )
 
   dev.off()
 }
