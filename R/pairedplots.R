@@ -384,6 +384,8 @@ plotpanel <- function(plotdata,
   n.grid <- dim(plotdata[["mastercp"]])[1]
   if (colour == F) collab=".bw" else collab=""
 
+  rows <- 4
+
   if(fmt=="tiff")  {
     tiff(file = paste(outpath,"_",fmt,"/","summary",
                       ifelse(sided=="L","L",""),plotlab,100*(1-alpha),"_",
@@ -401,7 +403,8 @@ plotpanel <- function(plotdata,
                      sep=""
     ),
     width = (120 * nmeth + 60) * res.factor,
-    height = 12 * 39 * res.factor,
+#    height = 12 * 40 * res.factor,
+    height = 4*rows * 38 * res.factor,
     type = "quartz"
     ) #,res=360,compression="none")  ## to create a png file ##   changed from 600x360
   } else if(fmt=="eps") {
@@ -425,9 +428,9 @@ plotpanel <- function(plotdata,
     height=400*res.factor
     )
   }
-  layout(matrix(c(1:(3 * nmeth), 3 * nmeth + c(1, 1, 2)), 3, (nmeth + 1),
+  layout(matrix(c(1:(rows * nmeth), rows * nmeth + c(1, 1:(rows-1))), rows, (nmeth + 1),
                 byrow = FALSE),
-         widths=c(rep(2, nmeth), 1), heights = c(4, 4, 4))
+         widths = c(rep(2, nmeth), 1), heights = rep(4, rows))
 #  widths=c(2,2,2,2,1))
   par(oma = res.factor*c(0,3,ifelse(fmt=="xxx",10,6),0), pty='s')
   par(cex.main = res.factor*0.8*textsize, cex.axis=res.factor*0.8*textsize)
