@@ -174,6 +174,7 @@ allpairci <- function(xs,
 cifun <- function( n,
                    contrast = "RD",
                    alph = c(0.01, 0.05, 0.1),
+                   methods = NULL,
                    prerun = FALSE
                    ) {
   # This function calculates all possible confidence intervals for a given n,
