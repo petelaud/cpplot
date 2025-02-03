@@ -97,7 +97,7 @@ texsize=1
 	lencols <- c(colorRampPalette(c("WHITE","WHITE"))(100),
 	             colorRampPalette(c("WHITE",col4))(100),
 	             colorRampPalette(c(col1,"BLACK"))(101))
-	loccols = rev(c(colorRampPalette(c("BLACK",col1))(5)[-1],
+	loccols = (c(colorRampPalette(c("BLACK",col1))(5)[-1],
 	              col2,col3,
 	              colorRampPalette(c(col4,"WHITE"),space="Lab")(4)))
 
@@ -541,8 +541,8 @@ plotpanel <- function(plotdata,
     mtext(side=3,
           cex=res.factor*0.8*textsize,
           line=0.5*res.factor,
-          text = (paste(
-                   paste("\n","mean loc. index=",summaries[i,"meanlocindex"],sep=""),
+          text = (paste0(
+                   paste0("\n","mean loc. index=",summaries[i,"meanlocindex"]),
             "\n","within ±0.1=",
             (summaries[i,"pctgoodloc"]),
             "%" #,
@@ -710,7 +710,7 @@ plotpanel <- function(plotdata,
   # Add legend for location index
   image(y = (1:20-0.5)/20,
         z = matrix(1:20,nrow=1),
-        col = rev(palette2),
+        col = (palette2),
         axes = F,
         ylab = "")
   text(x=1.2,
@@ -719,9 +719,23 @@ plotpanel <- function(plotdata,
        xpd=T,
        cex=res.factor*textsize,
        pos=4)
+  text(x=c(-2.5),
+       y=c(0),
+       labels=c("Too mesial"),
+       adj=c(0),
+       xpd=T,
+       srt=90,
+       cex=res.factor*textsize)
+  text(x=c(-2.5),
+       y=c(1),
+       labels=c("Too distal"),
+       adj=c(1),
+       xpd=T,
+       srt=90,
+       cex=res.factor*textsize)
 
   box(lwd=0.6*textsize*res.factor)
-  mtext(text="Location\nindex",
+  mtext(text="MNCP/NCP",
         side=3,
         at=2,
         cex=res.factor*0.6,
