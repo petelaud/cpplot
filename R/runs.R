@@ -2,14 +2,15 @@
 set.seed(2012) #ensure we use the same jitters for each run
 
 
-RRpairteam <- c("SCAS-bc", "AS", "MOVER-NJ", "MOVER-W", "BP-W") 	#Paired RR
+RRpairteam <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP") 	#Paired RR
 #RRpairteam <- c("SCAS", "SCAS-bc", "AS", "AS-bc") 	#Paired RR
 #RRpairteam <- c("SCAS", "AS", "MOVER-NJ", "MOVER-W") 	#Paired RR
 #RR2pairteam <- c("MOVER-NJ", "MOVER-W", "BP-J", "BP-W") 	#Paired RR
 #RR2pairteam <- c("MOVER-w", "MOVER-nw", "MOVER-nj","MOVER-ns") 	#Paired RR
 RRccpairteam <- c("SCAS-cc125", "SCAS-cc5", "MOVER-NJcc125", "MOVER-NJcc5") 	#Paired RR, cc
 
-RDpairteam <- c("SCAS-bc", "AS", "MOVER-NJ", "MOVER-W", "BP") 	#Paired RD
+#RDpairteam <- c("SCAS-bc", "AS", "MOVER-NJ", "MOVER-W", "BP") 	#Paired RD
+RDpairteam <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP") 	#Paired RD
 #RDpairteam <- c("SCAS", "SCAS-bc", "AS", "AS-bc" ) 	#Paired RD
 #RDpairteam <- c("SCAS", "Tango", "MOVER-nj", "MOVER-w") 	#Paired RD
 #RD2pairteam <- c("MOVER-NJ","MOVER-W", "MOVER-NW", "BP") 	#Paired RD
@@ -42,7 +43,7 @@ mycis <- ciarrays
 #system.time(mycis <- cifun(n=10, contrast="RR", n.grid=100,
                                  #alph = c(0.01, 0.05, 0.1), psis = c(1, 2, 10, 100)))[[3]]/60
 #                                 alph = c(0.01, 0.05, 0.1), psis = c(1, 2, 10, 100)))[[3]]/60
-system.time(mycis <- cifun(n=10, contrast="RD", alph = c(0.1, 0.05, 0.01)))[[3]]/60
+system.time(mycis <- cifun(n=40, contrast="RD", alph = c(0.1, 0.05, 0.01)))[[3]]/60
 #dimnames(mycis[[2]])
 Sys.time()
 system.time(
@@ -65,8 +66,66 @@ teamlabels <- c("RRpair", "RRccpair")
 teamlist <- list(RDpairteam, RDccpairteam)
 teamlabels <- c("RDpair", "RDccpair")
 
-# load(file=paste0(outpath, "cparrays.RR.", 40, ".",200,".Rdata"))
-dimnames(arrays[[3]])
+# N=40 plugged in: RD 3 mins per alpha with 5 methods, xx mins per phi with 200grid +smooth
+# Larger N
+# N=65 plugged in: RD 4 mins per alpha with (wrong) 5 methods, 41 mins per phi with 200grid +smooth
+# N=65 on battery: RD 12 mins per alpha with 6 methods, 45 min per phi
+# N=65 plugged in: RR 11 mins per alpha with 5 methods, 45 mins per phi with 200grid +smooth
+# N=105 46 mins per alpha with 5 methods
+
+system.time(mycis <- cifun(n=10, contrast="RD", alph = alphas, methods = RDpairteam))[[3]]/60
+mycis$cis[1:10,, "SCAS","95", "10", "RD"]
+dimnames(mycis$cis)
+
+
+RDpairteam <- RRpairteam <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP") 	#Paired RR
+alphas <- c(0.1, 0.05, 0.01)
+phis <- c(0.1, 0.25, 0.5, 0.75)
+if (FALSE) {
+system.time(mycis <- cifun(n=10, contrast="RD", alph = 0.05, methods = RDpairteam))[[3]]/60
+system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=0.25))[[3]]/60
+system.time(mycis <- cifun(n=10, contrast="RR", alph = 0.05, methods = RRpairteam))[[3]]/60
+system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=0.25))[[3]]/60
+}
+#load(file=paste0(outpath, "cis.RD.", 20,".Rdata"))
+#mycis <- ciarrays
+system.time(mycis <- cifun(n=20, contrast="RD", alph = alphas))[[3]]/60
+Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
+system.time(mycis <- cifun(n=20, contrast="RR", alph = alphas))[[3]]/60
+Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
+system.time(mycis <- cifun(n=40, contrast="RD", alph = alphas))[[3]]/60
+Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
+system.time(mycis <- cifun(n=40, contrast="RR", alph = alphas))[[3]]/60
+Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
+system.time(mycis <- cifun(n=65, contrast="RD", alph = alphas, methods = RDpairteam))[[3]]/60
+Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
+system.time(mycis <- cifun(n=65, contrast="RR", alph = alphas, methods = RRpairteam))[[3]]/60
+Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
+system.time(mycis <- cifun(n=105, contrast="RD", alph = 0.05, methods = RDpairteam))[[3]]/60
+# load(file=paste0(outpath, "cis.RD.", 105,".Rdata"))
+#mycis <- ciarrays
+# 9 hours
+Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
+system.time(mycis <- cifun(n=105, contrast="RR", alph = 0.05, methods = RRpairteam))[[3]]/60
+Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
+
+#Sys.time()
+#system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=c(0.25), smooth=TRUE))[[3]]/60
+teamlist <- list(RRpairteam); teamlabels <- c("RRpair")
+teamlist <- list(RDpairteam); teamlabels <- c("RDpair")
+plotpanel(plotdata=arrays, alpha=0.05, par3=0.25,
+          sel=teamlist[[1]], plotlab=teamlabels[1],
+          fmt="png")
+dev.off()
+#mycis$cis[1,,,,,]
+#allpairci(x=c(1,1,7,12), methods=RDpairteam)
+
+# load(file=paste0(outpath, "cparrays.RD.", 65, ".",200,".Rdata"))
+# load(file=paste0(outpath, "cis.RD.", 105,".Rdata"))
+dimnames(arrays$mastercp)
+mycis$cis[,,"SCAS","95",,]
+arrays$mastercp[100:110,100:110,"0.25","SCAS","95","cp",,]
+dimnames(mycis$cis)
 # cparrays_RD30 <- arrays
 # names(cparrays_RD30)
 # dimnames(cparrays_RD30)[3]
@@ -76,8 +135,10 @@ dimnames(arrays[[3]])
 
 #for (j in c(0.1, 0.25, 0.5, 0.75)) {
 for (j in c(0.1, 0.25, 0.5, 0.75)) {
-  for (i in c(0.05)) {
-    for (k in 1) {
+  for (i in c(0.05, 0.1, 0.01)) {
+#    for (j in c(0.25)) {
+#      for (i in c(0.05)) {
+        for (k in 1) {
       plotpanel(plotdata=arrays, alpha=i, par3=j,
                 limits=c(0,1), sel=teamlist[[k]], oneside=F, plotlab=teamlabels[k],
                 res.factor=6, fmt="png", linesx=F, colour=T, sided="R",
