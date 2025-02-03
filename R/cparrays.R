@@ -515,7 +515,11 @@ cpfun <- function(
 
       # can we improve efficiency here? -
       # not without creating an array which is too large for available RAM.
+
+      ########################################
       # - could loop by px and then by alpha?
+      # would need to increase dimensions of cpl etc
+      ########################################
 
       # exclude (0,0) CI from CP calcs by setting its probability to zero and
       # rescaling all other probabilities - not advisable
@@ -525,6 +529,11 @@ cpfun <- function(
 #      cbind(xs, prob[, i])
 #      prob[prob == 0] <- NA
 
+tryCatch(
+  error = function(cnd) {
+      message(paste("An error occurred for item", i, px[i, ],":\n"), cnd)
+
+  },
       if (any(!is.na(prob))) {
 
         cpl[i, ] <- t(ci[, 1, ] <= theta[i] & ci[, 2, ] >= theta[i] & ci[, 2, ] > ci[, 1, ]) %*% prob # 2-sided coverage probability. NB degenerate intervals excluded
@@ -561,6 +570,7 @@ if (FALSE) {
         lens[ci[, 2, ] == ci[, 1, ]] <- 0
         lenl[i, ] <- t(lens) %*% prob
       }
+  ) # End trycatch bracket
     }
 
     mncpl <- rncpl
