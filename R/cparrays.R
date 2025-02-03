@@ -112,42 +112,47 @@ pdfpair <- function(x,
 
 allpairci <- function(xs,
                       contrast = "RD",
-                      alpha = 0.05
+                      alpha = 0.05,
+                      methods = NULL
                       ) {
   # Force vector input to an array
   if (is.vector(xs)) dim(xs) <- c(1, length(xs))
   lenxs <- dim(xs)[1]
-  if (contrast %in% c("RD", "RR")) {
-    mymethods <- c("AS", "AS-bc", "SCAS", "SCAS-bc",
-                   "MOVER-W", "MOVER-NW", "MOVER-NJ", "MOVER-NS",
-                   "SCAS-cc5", "SCAS-cc25", "SCAS-cc125",
-                   "MOVER-NJcc5", "MOVER-NJcc125", "TDAS", "BP")
-    if (contrast == "RR") {
-      mymethods <- c(mymethods, "BP-J", "Tang-ccdr")
+  if (!is.null(methods)) {
+    mymethods <- methods
+  } else {
+    if (contrast %in% c("RD", "RR")) {
+      mymethods <- c("AS", "AS-bc", "SCAS", "SCAS-bc",
+                     "MOVER-W", "MOVER-NW", "MOVER-NJ", "MOVER-NS",
+                     "SCAS-cc5", "SCAS-cc25", "SCAS-cc125",
+                     "MOVER-NJcc5", "MOVER-NJcc125", "TDAS", "BP")
+      if (contrast == "RR") {
+        mymethods <- c(mymethods, "BP-J", "Tang-ccdr")
+      }
+    } else if (contrast == "OR") {
+      mymethods <- c("SCAS", "Jeffreys", "mid-p", "Wilson")
     }
-  } else if (contrast == "OR") {
-    mymethods <- c("SCAS", "Jeffreys", "mid-p", "Wilson")
   }
   ci <- array(NA, dim = c(lenxs, 2, length(mymethods)))
   dimnames(ci)[[3]] <- mymethods
   if (contrast %in% c("RD", "RR")) {
-    ci[, 1:2, "AS"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, level = 1-alpha)$estimates[,c(1,3)]))
-    ci[, 1:2, "AS-bc"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RR = "Score_closed", bcf=TRUE, level = 1-alpha)$estimates[,c(1,3)]))
-    ci[, 1:2, "SCAS"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RR = "Score", skew=TRUE, level = 1-alpha)$estimates[,c(1,3)]))
-    ci[, 1:2, "SCAS-bc"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RR = "Score", skew=TRUE, bcf=TRUE, level = 1-alpha)$estimates[,c(1,3)]))
-    ci[, 1:2, "SCAS-cc5"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RR = "Score", skew=TRUE, bcf=TRUE, cc=0.5, cctype="new", level = 1-alpha)$estimates[,c(1,3)]))
-    ci[, 1:2, "SCAS-cc25"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RR = "Score", skew=TRUE, bcf=TRUE, cc=0.25, cctype="new", level = 1-alpha)$estimates[,c(1,3)]))
-    ci[, 1:2, "SCAS-cc125"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RR = "Score", skew=TRUE, bcf=TRUE, cc=0.125, cctype="new", level = 1-alpha)$estimates[,c(1,3)]))
-    ci[, 1:2, "MOVER-W"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RR = "MOVER", moverbase = "wilson", level = 1-alpha)$estimates[,c(1,3)]))
-    ci[, 1:2, "MOVER-NW"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RR = "MOVER_newc", moverbase = "wilson", level = 1-alpha)$estimates[,c(1,3)]))
-    ci[, 1:2, "MOVER-NJ"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RR = "MOVER_newc", moverbase = "jeff", level = 1-alpha)$estimates[,c(1,3)]))
-    ci[, 1:2, "MOVER-NS"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RR = "MOVER_newc", moverbase = "SCAS", level = 1-alpha)$estimates[,c(1,3)]))
-    ci[, 1:2, "MOVER-NJcc5"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RR = "MOVER_newc", moverbase = "jeff", level = 1-alpha, cc=0.5)$estimates[,c(1,3)]))
-    ci[, 1:2, "MOVER-NJcc125"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RR = "MOVER_newc", moverbase = "jeff", level = 1-alpha, cc=0.125)$estimates[,c(1,3)]))
-    ci[, 1:2, "BP"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RR = "BP", moverbase = "wilson", level = 1-alpha)$estimates[,c(1,3)]))
+    if ("AS" %in% mymethods) ci[, 1:2, "AS"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RD = "Score_closed", method_RR = "Score_closed", level = 1-alpha)$estimates[,c(1,3)]))
+    if ("AS-bc" %in% mymethods)  ci[, 1:2, "AS-bc"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RD = "Score_closed", method_RR = "Score_closed", bcf=TRUE, level = 1-alpha)$estimates[,c(1,3)]))
+    if ("SCAS" %in% mymethods)  ci[, 1:2, "SCAS"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RD = "Score", method_RR = "Score", skew=TRUE, level = 1-alpha)$estimates[,c(1,3)]))
+    if ("SCAS-bc" %in% mymethods) ci[, 1:2, "SCAS-bc"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RD = "Score", method_RR = "Score", skew=TRUE, bcf=TRUE, level = 1-alpha)$estimates[,c(1,3)]))
+    if ("SCAS-cc5" %in% mymethods)  ci[, 1:2, "SCAS-cc5"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RD = "Score", method_RR = "Score", skew=TRUE, bcf=TRUE, cc=0.5, cctype="new", level = 1-alpha)$estimates[,c(1,3)]))
+    if ("SCAS-cc25" %in% mymethods)  ci[, 1:2, "SCAS-cc25"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RD = "Score", method_RR = "Score", skew=TRUE, bcf=TRUE, cc=0.25, cctype="new", level = 1-alpha)$estimates[,c(1,3)]))
+    if ("SCAS-cc125" %in% mymethods)  ci[, 1:2, "SCAS-cc125"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RD = "Score", method_RR = "Score", skew=TRUE, bcf=TRUE, cc=0.125, cctype="new", level = 1-alpha)$estimates[,c(1,3)]))
+    if ("MOVER-W" %in% mymethods) ci[, 1:2, "MOVER-W"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RD = "MOVER", method_RR = "MOVER", moverbase = "wilson", level = 1-alpha)$estimates[,c(1,3)]))
+    if ("MOVER-NW" %in% mymethods)  ci[, 1:2, "MOVER-NW"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RD = "MOVER_newc", method_RR = "MOVER_newc", moverbase = "wilson", level = 1-alpha)$estimates[,c(1,3)]))
+    if ("MOVER-NJ" %in% mymethods) ci[, 1:2, "MOVER-NJ"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RD = "MOVER_newc", method_RR = "MOVER_newc", moverbase = "jeff", level = 1-alpha)$estimates[,c(1,3)]))
+    if ("MOVER-NS" %in% mymethods)  ci[, 1:2, "MOVER-NS"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RD = "MOVER_newc", method_RR = "MOVER_newc", moverbase = "SCAS", level = 1-alpha)$estimates[,c(1,3)]))
+    if ("MOVER-NJcc5" %in% mymethods)  ci[, 1:2, "MOVER-NJcc5"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RD = "MOVER_newc", method_RR = "MOVER_newc", moverbase = "jeff", level = 1-alpha, cc=0.5)$estimates[,c(1,3)]))
+    if ("MOVER-NJcc125" %in% mymethods)  ci[, 1:2, "MOVER-NJcc125"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RD = "MOVER_newc", method_RR = "MOVER_newc", moverbase = "jeff", level = 1-alpha, cc=0.125)$estimates[,c(1,3)]))
+    if ("BP" %in% mymethods) ci[, 1:2, "BP"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RD = "BP", method_RR = "BP", moverbase = "wilson", level = 1-alpha)$estimates[,c(1,3)]))
     if (contrast == "RR") {
-      ci[, 1:2, "Tang-ccdr"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, level = 1-alpha, cc=0.5, cctype="delrocco")$estimates[,c(1,3)]))
-      ci[, 1:2, "BP-J"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RR = "BP", moverbase = "jeff", level = 1-alpha)$estimates[,c(1,3)]))
+      if ("Tang-ccdr" %in% mymethods)   ci[, 1:2, "Tang-ccdr"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, level = 1-alpha, cc=0.5, cctype="delrocco")$estimates[,c(1,3)]))
+      if ("BP-J" %in% mymethods)    ci[, 1:2, "BP-J"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RR = "BP", moverbase = "jeff", level = 1-alpha)$estimates[,c(1,3)]))
     }
     # TDAS takes a while - leave out for now
     #        if (alpha == 0.05) {
@@ -226,9 +231,14 @@ if (FALSE) {
   # 	g <- expand.grid(a=0:n,b=0:n,c=0:n,d=0:n)
   # 	g <- g[rowSums(g) == n,1:3]
 
-  tester <- allpairci(x = rep(10,4), contrast = contrast)
-  nmeth <- dim(tester)[3]
-  mymethods <- dimnames(tester)[[3]]
+  if (!is.null(methods)) {
+    mymethods <- methods
+  } else {
+    tester <- allpairci(x = rep(10,4), contrast = contrast)
+  #  nmeth <- dim(tester)[3]
+    mymethods <- dimnames(tester)[[3]]
+  }
+  nmeth <- length(mymethods)
 
   cis <- array(NA, dim = c(lenxs, 2, nmeth, length(alph), 1, 1))
   dimnames(cis)[[2]] <- c("LCL", "UCL")
@@ -312,7 +322,7 @@ if (FALSE) {
         ci[, 1:2, "Wilson"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_OR = "wilson", level = 1-alpha)$estimates[,c(1,3)]))
     }
 }
-    ci <- allpairci(xs = xs, contrast = contrast, alpha = alpha)
+    ci <- allpairci(xs = xs, contrast = contrast, alpha = alpha, methods = mymethods)
     cis[, , , paste(100 * (1 - alpha)), 1, 1] <- ci
 
   }
