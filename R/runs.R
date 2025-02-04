@@ -82,10 +82,14 @@ RDpairteam <- RRpairteam <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "B
 alphas <- c(0.1, 0.05, 0.01)
 phis <- c(0.1, 0.25, 0.5, 0.75)
 if (FALSE) {
-system.time(mycis <- cifun(n=10, contrast="RD", alph = 0.05, methods = RDpairteam))[[3]]/60
-system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=0.25))[[3]]/60
-system.time(mycis <- cifun(n=10, contrast="RR", alph = 0.05, methods = RRpairteam))[[3]]/60
-system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=0.25))[[3]]/60
+  system.time(mycis <- cifun(n=10, contrast="RD", alph = 0.05, methods = RDpairteam))[[3]]/60
+  system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=0.25))[[3]]/60
+  system.time(mycis <- cifun(n=10, contrast="RR", alph = 0.05, methods = RRpairteam))[[3]]/60
+  system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=0.25))[[3]]/60
+  system.time(mycis <- cifun(n=40, contrast="RD", alph = 0.05, methods = RDpairteam))[[3]]/60
+  system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=0.25))[[3]]/60
+  system.time(mycis <- cifun(n=40, contrast="RR", alph = 0.05, methods = RRpairteam))[[3]]/60
+  system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=0.25))[[3]]/60
 }
 #load(file=paste0(outpath, "cis.RD.", 20,".Rdata"))
 #mycis <- ciarrays
@@ -120,7 +124,7 @@ dev.off()
 #mycis$cis[1,,,,,]
 #allpairci(x=c(1,1,7,12), methods=RDpairteam)
 
-# load(file=paste0(outpath, "cparrays.RD.", 65, ".",200,".Rdata"))
+# load(file=paste0(outpath, "cparrays.RR.", 40, ".",200,".Rdata"))
 # load(file=paste0(outpath, "cis.RD.", 105,".Rdata"))
 dimnames(arrays$mastercp)
 mycis$cis[,,"SCAS","95",,]
@@ -202,7 +206,18 @@ for (phi in c("0.1", "0.25", "0.5")) {
        )
 }}
 
+# Large sample size examples
+onecpfun(0.3, 0.1, n=30, contrast = "RD", alph=0.05, phis=0.25, methods=RRpairteam)
+system.time(cp205RR <- onecpfun(0.4, 0.1, n=205, contrast = "RR", alph=0.05, phis=0.25, methods=RRpairteam))[[3]]/60
+system.time(cp205RD25 <- onecpfun(0.4, 0.1, n=205, contrast = "RD", alph=0.05, phis=0.25, methods=RRpairteam))[[3]]/60
+system.time(cp205RD75 <- onecpfun(0.3, 0.2, n=205, contrast = "RD", alph=0.05, phis=0.75, methods=RRpairteam))[[3]]/60
+system.time(cp205RD2599 <- onecpfun(0.4, 0.1, n=205, contrast = "RD", alph=0.01, phis=0.25, methods=RRpairteam))[[3]]/60
+system.time(cp205RD7599 <- onecpfun(0.3, 0.2, n=205, contrast = "RD", alph=0.01, phis=0.75, methods=RRpairteam))[[3]]/60
 
+round(cp205RD[,c(1, 4, 5),], 3)
+round(cp205RD75[,c(1, 4, 5),], 3)
+round(cp205RD2599[,c(1, 4, 5),], 3)
+round(cp205RD7599[,c(1, 4, 5),], 3)
 
 x <- c(1,1,7,12)
 round(pairbinci(x=x, contrast = "RR", method_RR = "Score_closed")$estimates[,c(1,3)], 3)
