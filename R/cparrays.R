@@ -709,17 +709,24 @@ if (FALSE) {
 }
 
 
+#alph <- 0.05
+#contrast <- "RD"
+#methods <- RDpairteam
+#n <- 205
+onecpfun(0.3, 0.1, n=30, contrast = "RD", alph=0.05, phis=0.25, methods=RRpairteam)
 
 onecpfun <- function(
-    p1 = c(0.3, 0.4),
-    p2 = c(0.1, 0.2),
-    ciarrays = myciarrays,
+    p1 = c(0.3),
+    p2 = c(0.1),
+    ciarrays = NULL,
+    n = 105,
+    contrast = NULL,
     alph = NULL,
     psis = NULL,
     phis = 0.25,
 #    n.grid = 200,
 #    res.factor = 6,
-#    methods = "All",
+    methods = "All",
 #    limits = c(0, 1),
 #    window = 0.08,
 #    square = TRUE,
@@ -729,14 +736,14 @@ onecpfun <- function(
 #    sided = "R"
 ) {
   # This function calculates coverage probabilities (raw and smoothed) and associated summaries
-
-  xs <- ciarrays[["xs"]]
-  cis <- ciarrays[["cis"]]
-  contrast <- dimnames(cis)[[6]]
-  mymethods <- longlab <- dimnames(cis)[[3]]
-#  alph <- 1 - (as.numeric(dimnames(cis)[[4]])/100)
-  nmeth <- length(mymethods)
-  n <- as.numeric(dimnames(cis)[[5]])
+if (!is.null(ciarrays)) {
+    xs <- ciarrays[["xs"]]
+    cis <- ciarrays[["cis"]]
+    contrast <- dimnames(cis)[[6]]
+    mymethods <- longlab <- dimnames(cis)[[3]]
+  #  alph <- 1 - (as.numeric(dimnames(cis)[[4]])/100)
+    nmeth <- length(mymethods)
+    n <- as.numeric(dimnames(cis)[[5]])
 
   #  p1 <- as.numeric(dimnames(arrays[["mastercp"]])[[1]])
   #  p2 <- as.numeric(dimnames(arrays[["mastercp"]])[[2]])
@@ -757,7 +764,7 @@ onecpfun <- function(
 #                             paste(par3),
                              mymethods,
                              paste(100*(1-alph)),
-                             c("cp", "lncp", "rncp", "mncp", "len", "locindex"),
+                             c("cp", "lncp", "rncp", "dncp", "len", "locindex"),
                              paste(n),
                              contrast)
 
@@ -868,10 +875,14 @@ onecpfun <- function(
     }
 
 
+
+
+
     mncpl <- rncpl
     thetagt <- px[,1] > px[,2]
     mncpl[thetagt, ] <- lncpl[thetagt, ]
     locindexl <- ifelse(cpl == 1, 0, mncpl / (1 - cpl))
+    dncpl <- 1 - cpl - mncpl
 
     # Free up some memory
     rm(ci)
@@ -890,7 +901,7 @@ onecpfun <- function(
 ##      dimnames(rncp) <- dimnames(len) <- dimnames(mncp) <-
 
     dimnames(cpl) <- dimnames(locindexl) <- dimnames(lncpl) <-
-      dimnames(rncpl) <- dimnames(lenl) <- dimnames(mncpl) <-
+      dimnames(rncpl) <- dimnames(lenl) <- dimnames(dncpl) <-
       list(p2, mymethods)
 
 
@@ -901,17 +912,78 @@ onecpfun <- function(
 #    arrays[["mastercp"]][, , , , paste(100 * (1 - alpha)), "locindex", , ] <- locindex
 #    arrays[["mastercp"]][, , , , paste(100 * (1 - alpha)), "len", , ] <- len
 
-    mastercp <- array(rbind(cpl, lncpl, rncpl, mncpl, locindexl, lenl), dim = c(length(p2), 6, nmeth))
-    dimnames(mastercp) <- list(p2, c("cp", "lncp", "rncp", "mncp", "locindex", "len") , mymethods)
+    mastercp <- array(rbind(cpl, lncpl, rncpl, dncpl, locindexl, lenl), dim = c(length(p2), 6, nmeth))
+    dimnames(mastercp) <- list(p2, c("cp", "lncp", "rncp", "dncp", "locindex", "len") , mymethods)
 
     # Free up some memory
     rm(
   #    cp, lncp, rncp, mncp, locindex, len,
-       cpl, lncpl, rncpl, mncpl, lenl, locindexl)
+       cpl, lncpl, rncpl, dncpl, lenl, locindexl)
 
   }
 
   aperm(mastercp, c(1,3,2))
+
+}
+
+
+  if (!is.null(n) && length(p1) == 1 && length(p2) == 1 && length(phis) == 1) {
+
+    # For a given N, find the set of outcomes with non-negligible probabilities
+    g <- (expand.grid(x11 = 0:n, x12 = 0:n, x21 = 0:n))
+    # reduce to possible combinations of a,b,c for paired data.
+    g <- g[(g$x12 <= n - g$x11) &
+             (g$x21 <= n - g$x11 - g$x12), ]
+    xs <- data.matrix(cbind(g, x22 = n - rowSums(g)))
+    lenxs <- dim(xs)[1]
+    row.names(xs) <- NULL
+    px <- array(c(p1, p2, phis), dim = c(1, 3))
+    i <- 1 # For now, only allow this for a single PSP
+    if (!is.null(psis)) {
+      prob <- pdfpair(p1 = px[i, 1],
+                      p2 = px[i, 2],
+                      psi = px[i, 3],
+                      x = xs)
+    } else if (!is.null(phis)) {
+      prob <- pdfpair(p1 = px[i, 1],
+                      p2 = px[i, 2],
+                      phi = px[i, 3],
+                      x = xs)
+    }
+
+    xsub <- xs[prob > 1E-10, ]
+    #    sum(prob[prob > 1E-10])
+    #    dim(xsub)
+    cpl <- lncpl <- rncpl <- lenl <- locindexl <-
+      array(NA, dim = c(dim(px)[1], nmeth))
+
+    tester <- allpairci(x = rep(10,4), contrast = contrast)
+    if (is.null(methods)) {
+      mymethods <- dimnames(tester)[[3]]
+    } else mymethods <- methods
+    nmeth <- length(mymethods)
+    system.time(ci <- allpairci(x = xsub, contrast = contrast, alpha = alph, methods = mymethods))[[3]]/60
+    if (contrast == "RD") theta <- p1 - p2
+    if (contrast == "RR") theta <- p1 / p2
+
+    cpl[i, ] <- t(ci[, 1, ] <= theta[i] & ci[, 2, ] >= theta[i] & ci[, 2, ] > ci[, 1, ]) %*% prob[prob > 1E-10] # 2-sided coverage probability. NB degenerate intervals excluded
+    lncpl[i, ] <- t(ci[, 1, ] > theta[i] | ci[, 2, ] == ci[, 1, ]) %*% prob[prob > 1E-10] # L-sided non-coverage (R-side is a mirror image)
+    rncpl[i, ] <- t(ci[, 2, ] < theta[i] | ci[, 2, ] == ci[, 1, ]) %*% prob[prob > 1E-10] # R-sided non-coverage
+
+    mncpl <- rncpl
+    thetagt <- px[,1] > px[,2]
+    mncpl[thetagt, ] <- lncpl[thetagt, ]
+    locindexl <- ifelse(cpl == 1, 0, mncpl / (1 - cpl))
+    dncpl <- 1 - cpl - mncpl
+
+    mastercp <- array(rbind(cpl, lncpl, rncpl, dncpl, locindexl, lenl), dim = c(length(p2), 6, nmeth))
+    dimnames(mastercp) <- list(p2, c("cp", "lncp", "rncp", "dncp", "locindex", "len") , mymethods)
+
+    aperm(mastercp, c(3,2,1))
+
+  }
+
+
 }
 
 
