@@ -4,9 +4,10 @@ if (FALSE) {
 
 
 
-load(file=paste0(outpath, "cparrays.RD.", 40, ".",200,".Rdata"))
+load(file=paste0(outpath, "cparrays.RD.", 65, ".",200,".Rdata"))
 p0 <- as.numeric(dimnames(arrays$mastercp)[[1]])
 del <- 0.2
+del <- 0
 length(p0)
 p0 <- seq(0,1-del,length.out=51)
 p2 <- p0
@@ -53,6 +54,31 @@ for(i in 1:length(dels)){
   )
 }
 
+
+# 2-D Type I error plot
+load(file=paste0(outpath, "cparrays.RD.", 65, ".",200,".Rdata"))
+p2 <- p1 <- seq(0,1-del,length.out=101)
+cp1 <- onecpfun(
+  p1 = p1,
+  p2 = p2,
+  ciarrays = arrays,
+  alph = 0.05,
+  phis = 0.25
+)
+par(pty='s')
+plot(p2,
+     1 - cp1[,"SCAS-bc","cp"],
+     type = "l",
+     ylim = c(0, 0.06),
+     ylab = "Type I error rate",
+     xlab = "p2 = p1",
+     main = paste0("N = 65, phi = 0.25"),
+     yaxt='n'
+)
+axis(side = 2, las = 2)
+abline(h=0.05, lty=3)
+lines(p2, 1 - cp1[,"SCAS-bc","cp"], lty=1, lwd = 2)
+lines(p2, 1 - cp1[,"AS","cp"], lty=2, lwd = 2)
 
 # 2-D interval width plot, RD
 load(file=paste0(outpath, "cparrays.RD.", 40, ".",200,".Rdata"))
