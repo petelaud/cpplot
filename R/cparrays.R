@@ -713,7 +713,6 @@ if (FALSE) {
 #contrast <- "RD"
 #methods <- RDpairteam
 #n <- 205
-onecpfun(0.3, 0.1, n=30, contrast = "RD", alph=0.05, phis=0.25, methods=RRpairteam)
 
 onecpfun <- function(
     p1 = c(0.3),
