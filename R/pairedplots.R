@@ -357,6 +357,7 @@ plotpanel <- function(plotdata,
 #  longlab[longlab=="Tang-cc5"] <- "Tang-cc (\U0263=0.5)"
 #  longlab[longlab=="Tang-cc25"] <- "Tang-cc (\U0263=0.25)"
 #  longlab[longlab=="Tang-cc125"] <- "Tang-cc (\U0263=0.125)"
+  longlab[longlab=="SCAS"] <- "SCASu"
   longlab[longlab=="SCAS-bc"] <- "SCAS"
   longlab[longlab=="MOVER-NJcc5"] <- "MOVER-NJcc (\U0263=0.5)"
   longlab[longlab=="MOVER-NJcc125"] <- "MOVER-NJcc (\U0263=0.125)"
@@ -856,7 +857,7 @@ plotpanel <- function(plotdata,
         outer = TRUE,
         text = latex2exp::TeX(paste0("\\textbf{",contrast, "\nN=", nums,"}")),
         cex = textsize*0.8*res.factor,
-        at = -0.02,
+        at = -0.01,
 #        adj = 0,
         line = 4.5*res.factor
         )
