@@ -141,8 +141,10 @@ pdfpair <- function(x,
       (lfactorial(x[, 1]) + lfactorial(x[, 2]) + lfactorial(x[, 3]) + lfactorial(x[, 4]))
     ) * p11^x[, 1] * p12^x[, 2] * p21^x[, 3] * (1 - p11 - p12 - p21)^(x[, 4])
 #  dens[p11 * p12 * p21 * (1 - p11 - p12 - p21) == 0] <- 0
-  dens[p21 <= 0 | p12 <= 0] <- NA
-#  dens[p21 < 0 | p12 < 0] <- NA
+  dens[(p21 <= 0 & p12 > 0) | (p12 <= 0 & p21 > 0)] <- NA
+#  dens[p1 == 0 & p2 == 0] <- 0
+#  dens[p1 == 1 & p2 == 1] <- 0
+  #  dens[p21 < 0 | p12 < 0] <- NA
   return(dens)
 }
 
