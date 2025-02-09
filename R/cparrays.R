@@ -54,10 +54,44 @@ params <- function(p1,
 if (FALSE) {
 p1s <- seq(0,1,0.05)
 par(mfrow=c(1,3), pty='s', mar=(c(2,4,2,0)+0.1))
-plot(p1s, params(p1=p1s, theta=4, psi=2)[,4], ylim = c(0, 0.9), type='n',
+
+dev.off()
+plot(p1s, params(p1=p1s, theta=0, psi=2, contrast="RD")[,4], ylim = c(0, 0.9), type='n',
+     main=expression(paste(theta["RD"], " = 0.2")), xlab = "p1",
+     ylab = expression(phi))
+lines(p1s, params(p1=p1s, theta=0.2, psi=2)[,4], lty=2)
+lines(p1s, params(p1=p1s, theta=0.2, psi=4)[,4], lty=1)
+abline(h=0.2, lty=3)
+plot(p1s, params(p1=p1s, theta=1, psi=2, contrast="RR")[,4], ylim = c(0, 0.9), type='n',
+     main=expression(paste(theta["RR"], " = 4")), xlab = "p1",
+     ylab = expression(phi))
+lines(p1s, params(p1=p1s, theta=4, psi=2, contrast="RR")[,4], lty=2)
+lines(p1s, params(p1=p1s, theta=4, psi=4, contrast="RR")[,4], lty=1)
+abline(h=0.2, lty=3)
+#lines(p1s, params(p1=p1s, theta=0, psi=10)[,4], lty=2)
+#lines(p1s, params(p1=p1s, theta=0, psi=100)[,4], lty=3)
+del <- 0.1
+plot(p1s[p1s >= del], params(p1s[p1s >= del], theta=0)[,4], ylim = c(0, 0.9), type='n',
+     main=expression(paste(theta["RD"], " = 0.1")), xlab = "p1",
+     ylab = expression(phi))
+lines(p1s, params(p1=p1s, theta=del, psi=2)[,4], lty=2)
+lines(p1s, params(p1=p1s, theta=del, psi=4)[,4], lty=1)
+del <- 0.2
+plot(p1s[p1s >= del], params(p1s[p1s >= del], theta=0)[,4], ylim = c(0, 0.9), type='n',
+     main=expression(paste(theta["RD"], " = 0.2")), xlab = "p1",
+     ylab = expression(phi))
+lines(p1s, params(p1=p1s, theta=del, psi=2)[,4], lty=2)
+lines(p1s, params(p1=p1s, theta=del, psi=4)[,4], lty=1)
+max(params(p1=p1s, theta=del, psi=2)[,4], na.rm=T)
+max(params(p1=p1s, theta=0, psi=4)[,4], na.rm=T)
+
+
+
+plot(p1s, params(p1=p1s, theta=1, psi=2)[,4], ylim = c(0, 0.9), type='n',
      main=expression(paste(theta["RR"], " = 1")), xlab = "p1",
      ylab = expression(phi))
 lines(p1s, params(p1=p1s, theta=1, psi=2)[,4], lty=1)
+lines(p1s, params(p1=p1s, theta=1, psi=4)[,4], lty=1)
 lines(p1s, params(p1=p1s, theta=1, psi=10)[,4], lty=2)
 lines(p1s, params(p1=p1s, theta=1, psi=100)[,4], lty=3)
 plot(p1s, params(p1=p1s, theta=4, psi=2)[,4], ylim = c(0, 0.9), type='n',
