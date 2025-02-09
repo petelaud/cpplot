@@ -761,7 +761,7 @@ onecpfun <- function(
     p1 = c(0.3),
     p2 = c(0.1),
     ciarrays = NULL,
-    n = 105,
+    n = NULL,
     contrast = NULL,
     alph = NULL,
     psis = NULL,
@@ -964,13 +964,13 @@ if (!is.null(ciarrays)) {
 
   }
 
-  aperm(mastercp, c(1,3,2))
+  myoutput <- aperm(mastercp, c(1,3,2))
 
 }
 
 
   if (!is.null(n) && length(p1) == 1 && length(p2) == 1 && length(phis) == 1) {
-
+    nmeth <- length(methods)
     # For a given N, find the set of outcomes with non-negligible probabilities
     g <- (expand.grid(x11 = 0:n, x12 = 0:n, x21 = 0:n))
     # reduce to possible combinations of a,b,c for paired data.
@@ -1021,11 +1021,11 @@ if (!is.null(ciarrays)) {
     mastercp <- array(rbind(cpl, lncpl, rncpl, dncpl, locindexl, lenl), dim = c(length(p2), 6, nmeth))
     dimnames(mastercp) <- list(p2, c("cp", "lncp", "rncp", "dncp", "locindex", "len") , mymethods)
 
-    aperm(mastercp, c(3,2,1))
+    myoutput <- aperm(mastercp, c(3,2,1))
 
   }
 
-
+  return(myoutput)
 }
 
 
