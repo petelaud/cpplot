@@ -391,18 +391,23 @@ plotpanel <- function(plotdata,
 
   if(fmt=="tiff")  {
     tiff(file = paste(outpath,"_",fmt,"/","summary",
-                      ifelse(sided=="L","L",""),plotlab,100*(1-alpha),"_",
-                      nums,ifelse(oneside,"os",""),collab,".tiff",
+                      ifelse(sided=="L","L",""),
+                      plotlab, nums, "_", 100*(1-alpha), "_", format(par3, nsmall=2),
+                      ifelse(oneside, "os", ""), collab, ".tiff",
                       sep=""
     ),
-    width=600*res.factor,
-    height=330*res.factor,
+#    width=600*res.factor,
+#    height=330*res.factor,
+    width = (120 * nmeth + 60) * res.factor,
+    height = 4*rows * 38 * res.factor,
     type="quartz"
     ) #,res=360,compression="none")  ## to create a tiff file ##   changed from 600x360
   } else if(fmt=="png") {
-    png(file = paste(outpath,"_","png","/","summary",ifelse(sided=="L","L",""),
-                     plotlab,nums,"_",par3,"_",100*(1-alpha),
-                     ifelse(oneside,"os",""),collab,".png",
+#    format(100*(1-alpha),scientific=F)
+    png(file = paste(outpath, "_", fmt, "/", "summary",
+                     ifelse(sided=="L","L",""),
+                     plotlab, nums, "_", 100*(1-alpha), "_", format(par3, nsmall=2),
+                     ifelse(oneside, "os", ""), collab, ".png",
                      sep=""
     ),
     width = (120 * nmeth + 60) * res.factor,
@@ -587,6 +592,8 @@ plotpanel <- function(plotdata,
           text = (paste0(
             "\n","meanDNCP",
             "=",(summaries[i,"meanDNCP"]),
+#            "\n","maxDNCP",
+#            "=",(summaries[i,"maxLNCP"]),
             "\n","DNCP above ",
             format(1.2*alpha/2,scientific=F),
             "=",(summaries[i,"pctBad.DNCP"]),
@@ -594,7 +601,8 @@ plotpanel <- function(plotdata,
           )))
   }
 
-  par(pty="m", mar=res.factor*c(3,2,ifelse(fmt=="xxx",2,2),3)+0.1)
+#  par(pty="m", mar=res.factor*c(3,2,ifelse(fmt=="xxx",2,2),3)+0.1)
+  par(pty="m", mar=res.factor*c(2.35, 1.5, ifelse(fmt=="xxx", 2, 1.35), 3)+0.1)
 
   # Add legend for colour palette
 
@@ -874,11 +882,15 @@ plotpanel <- function(plotdata,
         line=0.5*res.factor)
   mtext(side = 3,
         outer = TRUE,
-        text = latex2exp::TeX(paste0("\\textbf{",contrast, "\nN=", nums,"}")),
+        text = latex2exp::TeX(paste0("\\textbf{",contrast,
+                                     "\nN = ", nums,
+                                     "\n\u03b1 = ", format(alpha, nsmall=2),
+                                     "\n\u03D5 = ", format(par3, nsmall=2),
+                                     "}")),
         cex = textsize*0.8*res.factor,
         at = -0.01,
 #        adj = 0,
-        line = 4.5*res.factor
+        line = 2*res.factor
         )
 
   dev.off()
