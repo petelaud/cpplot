@@ -80,17 +80,19 @@ texsize=1
 		              col2,col2,col3,col3,
 		              rep(colorRampPalette(c(col4,"WHITE"),space="Lab")(9),each=2))),
 		"0.1" = rev(c(rep("#000000",180),
-		              rep(colorRampPalette(c("BLACK",col1))(10)[-1],each=1),
-		              col2,col3,
-		              rep(colorRampPalette(c(col4,"WHITE"),space="Lab")(9),each=1))),
+		              rep(colorRampPalette(c("BLACK",col1))(9)[-1],each=1),
+#		              col2,col3,
+                  col2,col2,col3,col3,
+		              rep(colorRampPalette(c(col4,"WHITE"),space="Lab")(8),each=1))),
 		"0.05" = rev(c(rep("#000000",380),
-		               rep(colorRampPalette(c("BLACK",col1))(5)[-1],each=2),
+		               rep(colorRampPalette(c("BLACK",col1))(9)[-1],each=1),
 		               col2,col2,col3,col3,
-		               rep(colorRampPalette(c(col4,"WHITE"),space="Lab")(4),each=2))),
+		               rep(colorRampPalette(c(col4,"WHITE"),space="Lab")(8),each=1))),
 		"0.01" = rev(c(rep("#000000",1980),
-		               rep(colorRampPalette(c("BLACK",col1))(10)[-1],each=1),
-		               col2,col3,
-		               rep(colorRampPalette(c(col4,"WHITE"),space="Lab")(9),each=1)))
+		               rep(colorRampPalette(c("BLACK",col1))(9)[-1],each=1),
+#		               col2,col3,
+		               col2,col2,col3,col3,
+		               rep(colorRampPalette(c(col4,"WHITE"),space="Lab")(8),each=1)))
 	)
 	lencols1 <- c(colorRampPalette(c("WHITE",col4))(100),
 	              colorRampPalette(c(col4,col1))(201))
@@ -679,9 +681,12 @@ plotpanel <- function(plotdata,
     }
   } else if (alpha == 0.01) {
     if (oneside == T) {
-      image(y=(1:50-0.5)/50,
-            z=matrix(1951:2000,nrow=1),
-            col=rev(palette)[1951:2000],
+#      image(y=(1:50-0.5)/50,
+#            z=matrix(1951:2000,nrow=1),
+#            col=rev(palette)[1951:2000],
+      image(y=(1:20-0.5)/20,
+            z=matrix(1981:2000,nrow=1),
+            col=rev(palette)[1981:2000],
             axes=F,
             ylab="")
       text(x=1.2,
@@ -691,14 +696,19 @@ plotpanel <- function(plotdata,
            cex=res.factor*textsize,
            pos=4)
     } else {
-      image(y=(1:100-0.5)/100,
-            z=matrix(1901:2000,nrow=1),
-            col=palette[1901:2000],
+      image(y=(1:40-0.5)/40,
+            z=matrix(1961:2000,nrow=1),
+            col=palette[1961:2000],
+#      image(y=(1:100-0.5)/100,
+#            z=matrix(1901:2000,nrow=1),
+#            col=palette[1901:2000],
             axes=F,
             ylab="")
       text(x=1.2,
-           y=(c(190:200)-190)/10,
-           labels=(190:200)/200,
+           y = c(0:10/10, 0.45, 0.55),
+#           y=(c(190:200)-190)/10,
+#           labels=(190:200)/200,
+           labels = c(((5*98):(5*100))/(5*100), 0.985, 0.995),
            xpd=T,
            cex=res.factor*textsize,
            pos=4)
@@ -707,8 +717,9 @@ plotpanel <- function(plotdata,
   box(lwd=0.6*textsize*res.factor)
   mtext(text=ifelse(oneside,
                     ifelse(sided=="R","RNCP","LNCP"),"CP"),
-        side=3,
-        at=2,
+        side = 3,
+        at = 0,
+        adj = 0.5,
         cex=res.factor*0.6,
         line=2*res.factor/3)
 
@@ -725,14 +736,14 @@ plotpanel <- function(plotdata,
        xpd=T,
        cex=res.factor*textsize,
        pos=4)
-  text(x=c(-2.5),
+  text(x=c(-2),
        y=c(0),
        labels=c("Too mesial"),
        adj=c(0),
        xpd=T,
        srt=90,
        cex=res.factor*textsize)
-  text(x=c(-2.5),
+  text(x=c(-2),
        y=c(1),
        labels=c("Too distal"),
        adj=c(1),
@@ -743,10 +754,12 @@ plotpanel <- function(plotdata,
   box(lwd=0.6*textsize*res.factor)
   mtext(text="MNCP/NCP",
         side=3,
-        at=2,
+        at = 0,
+        adj = 0.5,
         cex=res.factor*0.6,
         line=2*res.factor/3)
 
+  # Add legend for DNCP
   if (alpha == 0.05) {
       image(y = (1:20-0.5)/20,
             z = matrix(1:20,nrow=1),
@@ -786,14 +799,19 @@ plotpanel <- function(plotdata,
            cex=res.factor*textsize,
            pos=4)
   } else if (alpha == 0.01) {
-      image(y=(1:50-0.5)/50,
-            z=matrix(1951:2000,nrow=1),
-            col=rev(palettex)[1951:2000],
+    image(y=(1:20-0.5)/20,
+          z=matrix(1981:2000,nrow=1),
+          col=rev(palettex)[1981:2000],
+#      image(y=(1:50-0.5)/50,
+#            z=matrix(1951:2000,nrow=1),
+#            col=rev(palettex)[1951:2000],
             axes=F,
             ylab="")
       text(x=1.2,
-           y=(c(195:200)-195)/5,
-           labels=(5:0)/200,
+           y = c(0:10/10),
+#           labels = c(((5*98):(5*100))/(5*100)),
+#           y=(c(195:200)-195)/5,
+           labels=(10:0)/(1000),
            xpd=T,
            cex=res.factor*textsize,
            pos=4)
@@ -801,7 +819,8 @@ plotpanel <- function(plotdata,
   box(lwd=0.6*textsize*res.factor)
   mtext(text="DNCP",
         side=3,
-        at=2,
+        at = 0,
+        adj = 0.5,
         cex=res.factor*0.6,
         line=2*res.factor/3)
 
