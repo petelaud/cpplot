@@ -8,7 +8,7 @@ RRpairteam <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP") 	#Paired R
 #RRpairteam <- c("SCAS", "AS", "MOVER-NJ", "MOVER-W") 	#Paired RR
 #RR2pairteam <- c("MOVER-NJ", "MOVER-W", "BP-J", "BP-W") 	#Paired RR
 #RR2pairteam <- c("MOVER-w", "MOVER-nw", "MOVER-nj","MOVER-ns") 	#Paired RR
-RRccpairteam <- c("SCAS-cc125", "SCAS-cc5", "MOVER-NJcc125", "MOVER-NJcc5") 	#Paired RR, cc
+RRcpairteam <- c("SCAS-cc125", "SCAS-cc5", "MOVER-NJcc125", "MOVER-NJcc5") 	#Paired RR, cc
 
 #RDpairteam <- c("SCAS-bc", "AS", "MOVER-NJ", "MOVER-W", "BP") 	#Paired RD
 RDpairteam <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP") #, "TDAS", "SCASstrat") 	#Paired RD
@@ -16,7 +16,7 @@ RDpairteam <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP") #, "TDAS",
 #RDpairteam <- c("SCAS", "Tango", "MOVER-nj", "MOVER-w") 	#Paired RD
 #RD2pairteam <- c("MOVER-NJ","MOVER-W", "MOVER-NW", "BP") 	#Paired RD
 #RDccpairteam <- c("Tango-cc5", "Tango-cc125", "SCAS-cc", "MOVER-NJcc") 	#Paired RD, cc
-RDccpairteam <- c("SCAS-cc125", "SCAS-cc5", "MOVER-NJcc125", "MOVER-NJcc5") 	#Paired RD, cc
+RDcpairteam <- c("SCAS-cc125", "SCAS-cc25", "SCAS-cc5", "MOVER-NJcc125", "MOVER-NJcc5") 	#Paired RD, cc
 
 #Remotes:
 #  petelaud/ratesci-dev
