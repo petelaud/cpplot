@@ -157,9 +157,17 @@ dev.off()
 
 load(file=paste0(outpath, "cis.RD.", 40,".Rdata"))
 mycis <- ciarrays
+teamlist <- list(RDpairteam, RDcpairteam)
+teamlabels <- c("RDpair", "RDcpair")
+load(file=paste0(outpath, "cparrays.RD.", 20, ".",200,".Rdata"))
 load(file=paste0(outpath, "cparrays.RD.", 40, ".",200,".Rdata"))
+load(file=paste0(outpath, "cparrays.RD.", 65, ".",200,".Rdata"))
 #cparrays_RD30 <- arrays
+teamlist <- list(RRpairteam, RRcpairteam)
+teamlabels <- c("RRpair", "RRcpair")
+load(file=paste0(outpath, "cparrays.RR.", 20, ".",200,".Rdata"))
 load(file=paste0(outpath, "cparrays.RR.", 40, ".",200,".Rdata"))
+load(file=paste0(outpath, "cparrays.RR.", 65, ".",200,".Rdata"))
 #cparrays_RR30 <- arrays$summaries[,-12,,,,]
 
 dim(cparrays_RD30$summaries)
@@ -187,8 +195,9 @@ as.data.table(mysummary)
 install.packages("Unicode")
 #φ
 special_char <- "ϕ"
+special_char <- "𝛼"
 Unicode::as.u_char(utf8ToInt(special_char))
-
+"\u03b1"
 
 par(pty = 's')
 for (contrast in c("RD", "RR")) {
