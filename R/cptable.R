@@ -110,6 +110,14 @@ for (summ in c("pctnear", "pctAvenear", "pctgoodloc", "meanlocindex")) {
 
 
 
+load(file=paste(outpath,"bignsummary.Rdata"))
+mytable2 <- ftable(bignsummary[,"dncp",,,,], col.vars = c(3,2), row.vars = c(4,1))
+write.ftable(mytable2, sep=',', quote=TRUE, file = paste0(outpath, "bigntable205.csv"))
+
+
+
+
+
 
 
 #methods<-outorder

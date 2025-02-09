@@ -208,16 +208,81 @@ for (phi in c("0.1", "0.25", "0.5")) {
 
 # Large sample size examples
 onecpfun(0.3, 0.1, n=30, contrast = "RD", alph=0.05, phis=0.25, methods=RRpairteam)
-system.time(cp205RR <- onecpfun(0.4, 0.1, n=205, contrast = "RR", alph=0.05, phis=0.25, methods=RRpairteam))[[3]]/60
-system.time(cp205RD25 <- onecpfun(0.4, 0.1, n=205, contrast = "RD", alph=0.05, phis=0.25, methods=RRpairteam))[[3]]/60
-system.time(cp205RD75 <- onecpfun(0.3, 0.2, n=205, contrast = "RD", alph=0.05, phis=0.75, methods=RRpairteam))[[3]]/60
-system.time(cp205RD2599 <- onecpfun(0.4, 0.1, n=205, contrast = "RD", alph=0.01, phis=0.25, methods=RRpairteam))[[3]]/60
-system.time(cp205RD7599 <- onecpfun(0.3, 0.2, n=205, contrast = "RD", alph=0.01, phis=0.75, methods=RRpairteam))[[3]]/60
+system.time(cp205RD25 <- onecpfun(0.4, 0.1, n=205, contrast = "RD", alph=0.05, phis=0.25, methods=RDpairteam))[[3]]/60
+system.time(cp205RD75 <- onecpfun(0.3, 0.2, n=205, contrast = "RD", alph=0.05, phis=0.75, methods=RDpairteam))[[3]]/60
+system.time(cp205RD2599 <- onecpfun(0.4, 0.1, n=205, contrast = "RD", alph=0.01, phis=0.25, methods=RDpairteam))[[3]]/60
+system.time(cp205RD7599 <- onecpfun(0.3, 0.2, n=205, contrast = "RD", alph=0.01, phis=0.75, methods=RDpairteam))[[3]]/60
+system.time(cp205RD10 <- onecpfun(0.4, 0.1, n=205, contrast = "RD", alph=0.05, phis=0.10, methods=RDpairteam))[[3]]/60
+system.time(cp205RD50 <- onecpfun(0.4, 0.2, n=205, contrast = "RD", alph=0.05, phis=0.50, methods=RDpairteam))[[3]]/60
+system.time(cp205RD1099 <- onecpfun(0.4, 0.1, n=205, contrast = "RD", alph=0.01, phis=0.10, methods=RDpairteam))[[3]]/60
+system.time(cp205RD5099 <- onecpfun(0.4, 0.2, n=205, contrast = "RD", alph=0.01, phis=0.50, methods=RDpairteam))[[3]]/60
 
-round(cp205RD[,c(1, 4, 5),], 3)
+round(cp205RD25[,c(1, 4, 5),], 3)
 round(cp205RD75[,c(1, 4, 5),], 3)
 round(cp205RD2599[,c(1, 4, 5),], 3)
 round(cp205RD7599[,c(1, 4, 5),], 3)
+round(cp205RD10[,c(1, 4, 5),], 3)
+round(cp205RD50[,c(1, 4, 5),], 3)
+round(cp205RD1099[,c(1, 4, 5),], 3)
+round(cp205RD5099[,c(1, 4, 5),], 3)
+
+system.time(cp205RR25 <- onecpfun(0.4, 0.1, n=205, contrast = "RR", alph=0.05, phis=0.25, methods=RRpairteam))[[3]]/60
+system.time(cp205RR75 <- onecpfun(0.3, 0.2, n=205, contrast = "RR", alph=0.05, phis=0.75, methods=RRpairteam))[[3]]/60
+system.time(cp205RR2599 <- onecpfun(0.4, 0.1, n=205, contrast = "RR", alph=0.01, phis=0.25, methods=RRpairteam))[[3]]/60
+system.time(cp205RR7599 <- onecpfun(0.3, 0.2, n=205, contrast = "RR", alph=0.01, phis=0.75, methods=RRpairteam))[[3]]/60
+system.time(cp205RR10 <- onecpfun(0.4, 0.1, n=205, contrast = "RR", alph=0.05, phis=0.10, methods=RDpairteam))[[3]]/60
+system.time(cp205RR50 <- onecpfun(0.4, 0.2, n=205, contrast = "RR", alph=0.05, phis=0.50, methods=RDpairteam))[[3]]/60
+system.time(cp205RR1099 <- onecpfun(0.4, 0.1, n=205, contrast = "RR", alph=0.01, phis=0.10, methods=RDpairteam))[[3]]/60
+system.time(cp205RR5099 <- onecpfun(0.4, 0.2, n=205, contrast = "RR", alph=0.01, phis=0.50, methods=RDpairteam))[[3]]/60
+
+round(cp205RR25[,c(1, 4, 5),], 3)
+round(cp205RR75[,c(1, 4, 5),], 3)
+round(cp205RR2599[,c(1, 4, 5),], 3)
+round(cp205RR7599[,c(1, 4, 5),], 3)
+round(cp205RR10[,c(1, 4, 5),], 3)
+round(cp205RR50[,c(1, 4, 5),], 3)
+round(cp205RR1099[,c(1, 4, 5),], 3)
+round(cp205RR5099[,c(1, 4, 5),], 3)
+
+bignsummary <- array(NA, dim=c(6, 6, 4, 2, 2, 1))
+dimnames(bignsummary) <-
+  c(dimnames(cp205RD10)[c(1,2)],
+    list(c("0.4|0.1|0.1","0.4|0.1|0.25","0.4|0.2|0.5","0.3|0.2|0.75"),
+                 paste(c(0.05, 0.01)),
+                 c("RD", "RR"),
+                 "205"
+))
+
+for (i in c(0.05, 0.01)) {
+  for (k in contrasts) {
+      bignsummary[,,"0.4|0.1|0.1", paste(i), paste(k), "205"] <-
+        eval(parse(text=paste0("cp205", paste(k), "10", ifelse(i == 0.05, "", "99"))))
+      bignsummary[,,"0.4|0.1|0.25", paste(i), paste(k), "205"] <-
+        eval(parse(text=paste0("cp205", paste(k), "25", ifelse(i == 0.05, "", "99"))))
+    bignsummary[,,"0.4|0.2|0.5", paste(i), paste(k), "205"] <-
+      eval(parse(text=paste0("cp205", paste(k), "50", ifelse(i == 0.05, "", "99"))))
+    bignsummary[,,"0.3|0.2|0.75", paste(i), paste(k), "205"] <-
+      eval(parse(text=paste0("cp205", paste(k), "75", ifelse(i == 0.05, "", "99"))))
+  }
+}
+
+bignsummary[,"dncp",,"0.05",,]
+save(bignsummary, file = paste(outpath, "bignsummary.Rdata"))
+
+
+
+round(cbind(
+  cp205RR10[,4,],
+  cp205RR25[,4,],
+  cp205RR50[,4,],
+  cp205RR75[,4,],
+  cp205RR1099[,4,],
+  cp205RR2599[,4,],
+  cp205RR5099[,4,],
+  cp205RR7599[,4,]
+), 4)
+
+
 
 x <- c(1,1,7,12)
 round(pairbinci(x=x, contrast = "RR", method_RR = "Score_closed")$estimates[,c(1,3)], 3)
