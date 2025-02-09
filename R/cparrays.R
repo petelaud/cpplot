@@ -21,11 +21,13 @@ mymean <- function(x) mean(x,na.rm=T)
 # Conversion of parameters for RR
 params <- function(p1,
                    theta,
+                   contrast = "RD",
                    psi=NULL,
                    phi=NULL
                    ) {
   # convert phi to psi, or vice versa
-  p2 <- p1 / theta
+  if (contrast == "RR") p2 <- p1 / theta
+  if (contrast == "RD") p2 <- p1 - theta
   if (is.null(phi)) {
     A <- psi-1
     B <- p1+p2-1-psi*(p1+p2)
