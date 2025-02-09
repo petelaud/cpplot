@@ -65,6 +65,12 @@ cp1 <- onecpfun(
   alph = 0.05,
   phis = 0.25
 )
+
+
+#p <- 0.1
+# Attempt to loop onecpfun without reading in an array - slow?
+#sapply(seq(0.1,0.3,0.1), function(p) onecpfun(contrast="RD", n=10, p1=p, p2=p, alph=0.05, phis=0.25, methods=c("SCAS", "AS")))
+
 par(pty='s')
 plot(p2,
      1 - cp1[,"SCAS-bc","cp"],
@@ -79,6 +85,8 @@ axis(side = 2, las = 2)
 abline(h=0.05, lty=3)
 lines(p2, 1 - cp1[,"SCAS-bc","cp"], lty=1, lwd = 2)
 lines(p2, 1 - cp1[,"AS","cp"], lty=2, lwd = 2)
+lines(p2, 1 - cp1[,"TDAS","cp"], lty=3, lwd = 2)
+lines(p2, 1 - cp1[,"SCASstrat","cp"], lty=4, lwd = 2)
 
 # 2-D interval width plot, RD
 load(file=paste0(outpath, "cparrays.RD.", 40, ".",200,".Rdata"))
