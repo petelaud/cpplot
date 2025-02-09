@@ -32,4 +32,19 @@ round(rbind(
 ), 3)[, c(1, 3)]
 
 
+
+# Equivalence illustration
+
+x <- c(240, 37, 18, 40)
+x <- c(240, 30, 11, 40)
+x <- c(240, 31, 12, 40)
+x <- c(217, 30, 13, 40)
+sum(x)
+pairbinci(x = x, contrast = "RD", method_RD = "Score", bcf = TRUE, skew = TRUE)$estimates[,1:3] # SCAS-bc
+pairbinci(x = x, contrast = "RD", method_RD = "Score", bcf = TRUE, skew = FALSE)$estimates[,1:3] # SCAS-bc
+pairbinci(x = x, contrast = "RD", method_RD = "MOVER")$estimates[,1:3] #
+
+
+
+
 }
