@@ -188,6 +188,11 @@ allpairci <- function(xs,
     if ("MOVER-NJcc5" %in% mymethods)  ci[, 1:2, "MOVER-NJcc5"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RD = "MOVER_newc", method_RR = "MOVER_newc", moverbase = "jeff", level = 1-alpha, cc=0.5)$estimates[,c(1,3)]))
     if ("MOVER-NJcc125" %in% mymethods)  ci[, 1:2, "MOVER-NJcc125"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RD = "MOVER_newc", method_RR = "MOVER_newc", moverbase = "jeff", level = 1-alpha, cc=0.125)$estimates[,c(1,3)]))
     if ("BP" %in% mymethods) ci[, 1:2, "BP"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RD = "BP", method_RR = "BP", moverbase = "wilson", level = 1-alpha)$estimates[,c(1,3)]))
+    # Also stratified SCAS - to be added to pairbinci?
+            if (alpha == 0.05) {
+              if ("SCASstrat" %in% mymethods)  ci[, 1:2, "SCASstrat"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RD = "SCASstrat", method_RR = "SCASstrat")$estimates[c(1,3)]))
+              if ("TDAS" %in% mymethods)  ci[, 1:2, "TDAS"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RD = "TDAS", method_RR = "TDAS")$estimates[c(1,3)]))
+            }
     if (contrast == "RR") {
       if ("Tang-ccdr" %in% mymethods)   ci[, 1:2, "Tang-ccdr"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, level = 1-alpha, cc=0.5, cctype="delrocco")$estimates[,c(1,3)]))
       if ("BP-J" %in% mymethods)    ci[, 1:2, "BP-J"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RR = "BP", moverbase = "jeff", level = 1-alpha)$estimates[,c(1,3)]))

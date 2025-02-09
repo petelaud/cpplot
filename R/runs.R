@@ -3,6 +3,7 @@ set.seed(2012) #ensure we use the same jitters for each run
 
 
 RRpairteam <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP") 	#Paired RR
+#RRpairteam <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP", "TDAS", "SCASstrat") 	#Paired RR
 #RRpairteam <- c("SCAS", "SCAS-bc", "AS", "AS-bc") 	#Paired RR
 #RRpairteam <- c("SCAS", "AS", "MOVER-NJ", "MOVER-W") 	#Paired RR
 #RR2pairteam <- c("MOVER-NJ", "MOVER-W", "BP-J", "BP-W") 	#Paired RR
@@ -10,7 +11,7 @@ RRpairteam <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP") 	#Paired R
 RRccpairteam <- c("SCAS-cc125", "SCAS-cc5", "MOVER-NJcc125", "MOVER-NJcc5") 	#Paired RR, cc
 
 #RDpairteam <- c("SCAS-bc", "AS", "MOVER-NJ", "MOVER-W", "BP") 	#Paired RD
-RDpairteam <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP") 	#Paired RD
+RDpairteam <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP") #, "TDAS", "SCASstrat") 	#Paired RD
 #RDpairteam <- c("SCAS", "SCAS-bc", "AS", "AS-bc" ) 	#Paired RD
 #RDpairteam <- c("SCAS", "Tango", "MOVER-nj", "MOVER-w") 	#Paired RD
 #RD2pairteam <- c("MOVER-NJ","MOVER-W", "MOVER-NW", "BP") 	#Paired RD
@@ -20,10 +21,10 @@ RDccpairteam <- c("SCAS-cc125", "SCAS-cc5", "MOVER-NJcc125", "MOVER-NJcc5") 	#Pa
 #Remotes:
 #  petelaud/ratesci-dev
 
-#source("/Users/ssu/Documents/Main/GitHub/ratesci/R/pairbinci.R")
-#source("/Users/ssu/Documents/Main/GitHub/ratesci/R/moverci.R")
-#source("/Users/ssu/Documents/Main/GitHub/ratesci/R/scoreci.R")
-#source("/Users/ssu/Documents/Main/GitHub/ratesci/R/rateci.R")
+source("/Users/ssu/Documents/Main/GitHub/ratesci/R/pairbinci.R")
+source("/Users/ssu/Documents/Main/GitHub/ratesci/R/moverci.R")
+source("/Users/ssu/Documents/Main/GitHub/ratesci/R/scoreci.R")
+source("/Users/ssu/Documents/Main/GitHub/ratesci/R/rateci.R")
 
 root <- "/Users/ssu/Documents/"
 outpath <- paste(root, "Main/Courses_papers/skewscore/paired/", sep = "")
