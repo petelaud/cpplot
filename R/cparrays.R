@@ -169,9 +169,9 @@ allpairci <- function(xs,
   ci <- array(NA, dim = c(lenxs, 2, length(mymethods)))
   dimnames(ci)[[3]] <- mymethods
   if (contrast %in% c("RD", "RR")) {
-    if ("AS" %in% mymethods) ci[, 1:2, "AS"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RD = "Score_closed", method_RR = "Score_closed", level = 1-alpha)$estimates[,c(1,3)]))
+    if ("AS" %in% mymethods) ci[, 1:2, "AS"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RD = "Score_closed", method_RR = "Score_closed", bcf = FALSE, level = 1-alpha)$estimates[,c(1,3)]))
     if ("AS-bc" %in% mymethods)  ci[, 1:2, "AS-bc"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RD = "Score_closed", method_RR = "Score_closed", bcf=TRUE, level = 1-alpha)$estimates[,c(1,3)]))
-    if ("SCAS" %in% mymethods)  ci[, 1:2, "SCAS"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RD = "Score", method_RR = "Score", skew=TRUE, level = 1-alpha)$estimates[,c(1,3)]))
+    if ("SCAS" %in% mymethods)  ci[, 1:2, "SCAS"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RD = "Score", method_RR = "Score", skew=TRUE, bcf = FALSE, level = 1-alpha)$estimates[,c(1,3)]))
     if ("SCAS-bc" %in% mymethods) ci[, 1:2, "SCAS-bc"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RD = "Score", method_RR = "Score", skew=TRUE, bcf=TRUE, level = 1-alpha)$estimates[,c(1,3)]))
     if ("SCAS-cc5" %in% mymethods)  ci[, 1:2, "SCAS-cc5"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RD = "Score", method_RR = "Score", skew=TRUE, bcf=TRUE, cc=0.5, cctype="new", level = 1-alpha)$estimates[,c(1,3)]))
     if ("SCAS-cc25" %in% mymethods)  ci[, 1:2, "SCAS-cc25"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RD = "Score", method_RR = "Score", skew=TRUE, bcf=TRUE, cc=0.25, cctype="new", level = 1-alpha)$estimates[,c(1,3)]))
@@ -203,6 +203,7 @@ allpairci <- function(xs,
     ci[, 1:2, "Wilson-c"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_OR = "wilson", level = 1-alpha, cc = TRUE)$estimates[,c(1,3)]))
     # (Add conditional logistic regression CI)
   }
+  dimnames(ci)[[2]] <- c("LCL", "UCL")
   ci
 }
 
