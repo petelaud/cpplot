@@ -1,7 +1,7 @@
 if (FALSE) {
 x <- c(1, 1, 7, 12)
 
-# Example CIs for RD
+# TABLE 5.1 Example CIs for RD
 round(rbind(
   pairbinci(x = x, contrast = "RD", method_RD = "Score", bcf = TRUE, skew = TRUE)$estimates[,1:3], # SCAS-bc
   pairbinci(x = x, contrast = "RD", method_RD = "Score", bcf = FALSE, skew = TRUE)$estimates[,1:3], # SCAS(no bc)
@@ -16,7 +16,7 @@ round(rbind(
   pairbinci(x = x, contrast = "RD", method_RD = "MOVER_newc", moverbase = 'jeff', cc=0.5)$estimates # MOVER-NJcc
 ), 3)[, c(1, 3)]
 
-# Example CIs for RR
+# TABLE 5.2 Example CIs for RR
 round(rbind(
   pairbinci(x = x, contrast = "RR", method_RR = "Score", bcf = TRUE, skew = TRUE)$estimates[,1:3], # SCAS-bc
   pairbinci(x = x, contrast = "RR", method_RR = "Score", bcf = FALSE, skew = TRUE)$estimates[,1:3], # SCAS(no bc)
