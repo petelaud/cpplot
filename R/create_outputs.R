@@ -6,8 +6,8 @@ if (FALSE) {
 
   # The following code reproduces the results in the manuscript
   # 'Equal-tailed confidence intervals for paired binomial proportions' by Peter J. Laud
-  pak::pak("petelaud/ratesci-dev") # Will need updating to the public repository
-  library(ratesci)
+#  pak::pak("petelaud/ratesci-dev") # Will need updating to the public repository
+#  library(ratesci)
 
   # Set path for output files as required
 #  outpath <- '/'
