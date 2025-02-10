@@ -1,24 +1,26 @@
 set.seed(2012) #ensure we use the same jitters for each run
 
-
-
 if (FALSE) {
 
   # The following code reproduces the results in the manuscript
   # 'Equal-tailed confidence intervals for paired binomial proportions' by Peter J. Laud
-#  pak::pak("petelaud/ratesci-dev") # Will need updating to the public repository
-#  library(ratesci)
+  #
+  # Open the cpplot.Rproject file, then:
+  # > devtools::load.all(".")
+  # then run selected code from within 'create_outputs.R'
 
-  # Set path for output files as required
+  ### NOTE methods have been re-labelled in the manuscript:
+  ### SCAS --> 'SCASu' (method without the 'N-1' variance bias correction)
+  ### SCAS-bc --> 'SCAS' (including the 'N-1' biascorrection)
+
+  # Set path for output files as required by user
 #  outpath <- '/'
 
   root <- "/Users/ssu/Documents/"
-  outpath <- paste(root, "Main/Courses_papers/skewscore/paired/", sep = "")
+  outpath <- paste0(root, "Main/Courses_papers/skewscore/paired/")
 
-
-  ### OPTIONAL:
   ### Run the CP calculation function for N=20, N=40 and N=65
-  ### WARNING: for N=65, these take several hours to run!
+  ### WARNING: for N=40 and 65, these take several hours to run!
   RDpairteam <- RRpairteam <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP")
   alphas <- c(0.1, 0.05, 0.01)
   phis <- c(0.1, 0.25, 0.5, 0.75)
@@ -39,7 +41,8 @@ if (FALSE) {
   mynums <- c(20, 40, 65)
   mymethods <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP")
   nmeth <- length(mymethods)
-  load(file=paste0('data/', "cparrays.RD.", 40, ".",200,".Rdata"))
+# Tried to include an example data file in the GitHub repository, but it was too big
+#  load(file=paste0('data/', "cparrays.RD.", 40, ".",200,".Rdata"))
   mydims <- dim(arrays$summaries)
   mydims[5] <- length(mynums)
   mydims[6] <- 2
@@ -105,13 +108,15 @@ if (FALSE) {
 
 
   ### FIGURE 1: CP, MACP, location index and DNCP for selected methods for RD, with N = 40, \alpha=0.05 and \phi=0.25
-  load(file = paste0('data/', "cparrays.RD.", 40, ".",200,".Rdata"))
+# Tried to include the data file in the GitHub repository, but it was too big
+#  load(file = paste0('data/', "cparrays.RD.", 40, ".",200,".Rdata"))
   plotpanel(plotdata = arrays, alpha = 0.05, par3 = 0.25,
             sel = c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP"),
             plotlab = "RDpair", fmt="tiff")
 
   ### FIGURE 2: CP, MACP, location index and DNCP for selected methods for RR, with N = 40, \alpha=0.05 and \phi=0.25
-  load(file = paste0('data/', "cparrays.RR.", 40, ".",200,".Rdata"))
+# Tried to include the data file in the GitHub repository, but it was too big
+#  load(file = paste0('data/', "cparrays.RR.", 40, ".",200,".Rdata"))
   plotpanel(plotdata = arrays, alpha = 0.05, par3 = 0.25,
             sel = c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP"),
             plotlab = "RRpair", fmt="tiff")
@@ -196,7 +201,7 @@ if (FALSE) {
   ### Table 5.1: Example confidence intervals for RD, with (a, b, c, d) = (1, 1, 7, 12)
   x <- c(1, 1, 7, 12)
   egCI <- allpairci(x = x, contrast = "RD",
-                    methods <- c("SCAS", "SCAS-bc", "AS", "MOVER-NJ", "MOVER-NW", "MOVER-W", "BP",
+                    methods <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-NW", "MOVER-W", "BP",
                                  "SCAS-cc125", "SCAS-cc5", "MOVER-NJcc125", "MOVER-NJcc5"),
                     alpha=0.05)
   dimnames(egCI)[[1]] <- ""
@@ -205,7 +210,7 @@ if (FALSE) {
   ### Table 5.2: Example confidence intervals for RR, with (a, b, c, d) = (1, 1, 7, 12)
   x <- c(1, 1, 7, 12)
   egCI <- allpairci(x = x, contrast = "RR",
-                    methods <- c("SCAS", "SCAS-bc", "AS", "MOVER-NJ", "MOVER-NW", "MOVER-W", "BP",
+                    methods <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-NW", "MOVER-W", "BP",
                                  "SCAS-cc125", "SCAS-cc5", "MOVER-NJcc125", "MOVER-NJcc5"),
                     alpha=0.05)
   dimnames(egCI)[[1]] <- ""
