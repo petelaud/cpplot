@@ -45,12 +45,23 @@ mycis <- ciarrays
                                  #alph = c(0.01, 0.05, 0.1), psis = c(1, 2, 10, 100)))[[3]]/60
 #                                 alph = c(0.01, 0.05, 0.1), psis = c(1, 2, 10, 100)))[[3]]/60
 system.time(mycis <- cifun(n=40, contrast="RD", alph = c(0.1, 0.05, 0.01)))[[3]]/60
+
+
+# OR evaluation exploring Wald-based methods
+system.time(mycis <- cifun(n=20, contrast = "OR", alph = 0.05))[[3]]/60
+#mycis$cis[,,"Wald",,,]
 #dimnames(mycis[[2]])
 Sys.time()
 system.time(
   arrays <- cpfun(ciarrays = mycis,
-                      n.grid=200, phis=c(0.1, 0.25, 0.5, 0.75), smooth=TRUE)
+                      n.grid=200, phis=c(0.1, 0.25), smooth=TRUE)
           )[[3]]/60
+ORpairteam <- c("Wilson", "mid-p", "SCASp", "Jeffreys", "Wald", "Laplace", "C-P", "Wilson-c")
+teamlist <- list(ORpairteam)
+teamlabels <- c("ORpair")
+plotpanel(plotdata=arrays, alpha=0.05, par3=0.1,
+          sel=teamlist[[1]], plotlab=teamlabels[1],
+          fmt="png")
 
 teamlist <- list(RDpairteam,  RD2pairteam)
 teamlabels <- c("RDpair", "RD2pair")
