@@ -330,10 +330,16 @@ cpfun <- function(
     px <- pxg
   }
 
+  if (!is.null(phis)) pij <- params(p1 = px[, 1], p2 = px[, 2], phi = px[, 3])[, 5:8]
+  if (!is.null(psis)) pij <- params(p1 = px[, 1], p2 = px[, 2], psi = px[, 3])[, 5:8]
+
   if (contrast %in% c("RR")) {
     theta <- (px[, 1] / px[, 2])
   } else if (contrast == "OR") {
-    theta <- (px[, 1] * (1 - px[, 2]) / (px[, 2] * (1 - px[, 1])))
+    # Note this is the marginal OR, not conditional
+    # so probably not suitable for evaluation of methods for conditional OR?
+#    theta <- (px[, 1] * (1 - px[, 2]) / (px[, 2] * (1 - px[, 1])))
+    theta <- pij[, 2] / pij[, 3] # Conditional OR
   } else if (contrast == "RD") {
     theta <- px[, 1] - px[, 2]
   } # theta estimate for every p1,p2 pair
