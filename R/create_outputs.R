@@ -291,5 +291,23 @@ if (FALSE) {
   apply(mytiers[,4:5], 2, function(x) mean(x < 0.03))
   dim(mytiers)
 
+  #############################################################################
+  ### Conditional odds ratio
+  #############################################################################
+
+  system.time(mycis <- cifun(n=65, contrast = "OR", alph = c(0.05)))[[3]]/60
+  Sys.time()
+  system.time(
+    arrays <- cpfun(ciarrays = mycis,
+                    n.grid=200, phis=c(0.1, 0.25), smooth=TRUE)
+  )[[3]]/60
+  #ORpairteam <- c("Wilson", "mid-p", "SCASp", "Jeffreys", "Wald", "Laplace", "C-P", "Wilson-c")
+  ORpairteam <- c("SCASp", "SCASpu", "mid-p", "Jeffreys", "Wilson")
+  teamlist <- list(ORpairteam)
+  teamlabels <- c("ORpair")
+  plotpanel(plotdata=arrays, alpha=0.05, par3=0.25,
+            sel=teamlist[[1]], plotlab=teamlabels[1],
+            fmt="png")
+
 
 }

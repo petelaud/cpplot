@@ -166,7 +166,7 @@ allpairci <- function(xs,
         mymethods <- c(mymethods, "BP-J", "Tang-ccdr")
       }
     } else if (contrast == "OR") {
-      mymethods <- c("SCASp", "Jeffreys", "mid-p", "Wilson", "Wald", "Laplace", "C-P", "Wilson-c")
+      mymethods <- c("SCASp", "SCASpu", "Jeffreys", "mid-p", "Wilson", "C-P", "Wilson-c")
     }
   }
   ci <- array(NA, dim = c(lenxs, 2, length(mymethods)))
@@ -182,7 +182,7 @@ allpairci <- function(xs,
     if ("MOVER-W" %in% mymethods) ci[, 1:2, "MOVER-W"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RD = "MOVER", method_RR = "MOVER", moverbase = "wilson", level = 1-alpha)$estimates[,c(1,3)]))
     if ("MOVER-NW" %in% mymethods)  ci[, 1:2, "MOVER-NW"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RD = "MOVER_newc", method_RR = "MOVER_newc", moverbase = "wilson", level = 1-alpha)$estimates[,c(1,3)]))
     if ("MOVER-NJ" %in% mymethods) ci[, 1:2, "MOVER-NJ"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RD = "MOVER_newc", method_RR = "MOVER_newc", moverbase = "jeff", level = 1-alpha)$estimates[,c(1,3)]))
-    if ("MOVER-NS" %in% mymethods)  ci[, 1:2, "MOVER-NS"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RD = "MOVER_newc", method_RR = "MOVER_newc", moverbase = "SCAS", level = 1-alpha)$estimates[,c(1,3)]))
+    if ("MOVER-NS" %in% mymethods)  ci[, 1:2, "MOVER-NS"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RD = "MOVER_newc", method_RR = "MOVER_newc", moverbase = "SCASp", level = 1-alpha)$estimates[,c(1,3)]))
     if ("MOVER-NJcc5" %in% mymethods)  ci[, 1:2, "MOVER-NJcc5"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RD = "MOVER_newc", method_RR = "MOVER_newc", moverbase = "jeff", level = 1-alpha, cc=0.5)$estimates[,c(1,3)]))
     if ("MOVER-NJcc125" %in% mymethods)  ci[, 1:2, "MOVER-NJcc125"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RD = "MOVER_newc", method_RR = "MOVER_newc", moverbase = "jeff", level = 1-alpha, cc=0.125)$estimates[,c(1,3)]))
     if ("BP" %in% mymethods) ci[, 1:2, "BP"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RD = "BP", method_RR = "BP", moverbase = "wilson", level = 1-alpha)$estimates[,c(1,3)]))
@@ -196,15 +196,14 @@ allpairci <- function(xs,
       if ("BP-J" %in% mymethods)    ci[, 1:2, "BP-J"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RR = "BP", moverbase = "jeff", level = 1-alpha)$estimates[,c(1,3)]))
     }
   } else if (contrast == "OR") {
-    ci[, 1:2, "SCASp"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_OR = "SCAS", level = 1-alpha)$estimates[,c(1,3)]))
-    ci[, 1:2, "Jeffreys"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_OR = "jeff", level = 1-alpha)$estimates[,c(1,3)]))
-    ci[, 1:2, "mid-p"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_OR = "midp", level = 1-alpha)$estimates[,c(1,3)]))
-    ci[, 1:2, "Wilson"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_OR = "wilson", level = 1-alpha)$estimates[,c(1,3)]))
-    ci[, 1:2, "Wald"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_OR = "Wald", level = 1-alpha)$estimates[,c(1,3)]))
-    ci[, 1:2, "Laplace"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_OR = "Laplace", level = 1-alpha)$estimates[,c(1,3)]))
-    ci[, 1:2, "C-P"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_OR = "jeff", level = 1-alpha, cc = TRUE)$estimates[,c(1,3)]))
-    ci[, 1:2, "Wilson-c"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_OR = "wilson", level = 1-alpha, cc = TRUE)$estimates[,c(1,3)]))
-    # (Add conditional logistic regression CI)
+    if ("SCASp" %in% mymethods) ci[, 1:2, "SCASp"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_OR = "SCASp", bcf = TRUE, level = 1-alpha)$estimates[,c(1,3)]))
+    if ("SCASpu" %in% mymethods) ci[, 1:2, "SCASpu"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_OR = "SCASp", bcf = FALSE, level = 1-alpha)$estimates[,c(1,3)]))
+    if ("Jeffreys" %in% mymethods) ci[, 1:2, "Jeffreys"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_OR = "jeff", level = 1-alpha)$estimates[,c(1,3)]))
+    if ("mid-p" %in% mymethods) ci[, 1:2, "mid-p"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_OR = "midp", level = 1-alpha)$estimates[,c(1,3)]))
+    if ("Wilson" %in% mymethods) ci[, 1:2, "Wilson"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_OR = "wilson", level = 1-alpha)$estimates[,c(1,3)]))
+    if ("C-P" %in% mymethods) ci[, 1:2, "C-P"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_OR = "jeff", level = 1-alpha, cc = TRUE)$estimates[,c(1,3)]))
+    if ("Wilson-c" %in% mymethods) ci[, 1:2, "Wilson-c"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_OR = "wilson", level = 1-alpha, cc = TRUE)$estimates[,c(1,3)]))
+    # (Add conditional logistic regression CI?)
   }
   dimnames(ci)[[2]] <- c("LCL", "UCL")
   ci
