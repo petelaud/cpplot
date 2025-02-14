@@ -14,16 +14,20 @@ if (FALSE) {
   ### SCAS-bc --> 'SCAS' (including the 'N-1' biascorrection)
 
   # Set path for output files as required by user
-#  outpath <- '/'
+#  outpath <- '/myoutputpath'
 
   root <- "/Users/ssu/Documents/"
   outpath <- paste0(root, "Main/Courses_papers/skewscore/paired/")
 
+  #############################################################################
   ### Run the CP calculation function for N=20, N=40 and N=65
   ### WARNING: for N=40 and 65, these take several hours to run!
+  #############################################################################
   RDpairteam <- RRpairteam <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP")
   alphas <- c(0.1, 0.05, 0.01)
   phis <- c(0.1, 0.25, 0.5, 0.75)
+#  alphas <- c(0.05)
+#  phis <- c(0.25)
   system.time(mycis <- cifun(n=20, contrast="RD", alph = alphas))[[3]]/60
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
   system.time(mycis <- cifun(n=20, contrast="RR", alph = alphas))[[3]]/60
@@ -37,7 +41,9 @@ if (FALSE) {
   system.time(mycis <- cifun(n=65, contrast="RR", alph = alphas, methods = RRpairteam))[[3]]/60
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
 
+  #############################################################################
   # Combine output arrays for summarising across different Ns
+  #############################################################################
   mynums <- c(20, 40, 65)
   mymethods <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP")
   nmeth <- length(mymethods)
@@ -64,7 +70,9 @@ if (FALSE) {
     bigarray[,submethods,,,paste(num), "RR"] <- arrays$summaries[,submethods,,,paste(num),]
   }
 
+  #############################################################################
   ### OPTIONAL: re-run calculations for large sample size
+  #############################################################################
   # For RD
   system.time(cp205RD25 <- onecpfun(0.4, 0.1, n=205, contrast = "RD", alph=0.05, phis=0.25, methods=RDpairteam))[[3]]/60
   system.time(cp205RD75 <- onecpfun(0.3, 0.2, n=205, contrast = "RD", alph=0.05, phis=0.75, methods=RDpairteam))[[3]]/60
@@ -107,21 +115,27 @@ if (FALSE) {
   save(bignsummary, file = paste(outpath, "bignsummary.Rdata"))
 
 
+  #############################################################################
   ### FIGURE 1: CP, MACP, location index and DNCP for selected methods for RD, with N = 40, \alpha=0.05 and \phi=0.25
-# Tried to include the data file in the GitHub repository, but it was too big
-#  load(file = paste0('data/', "cparrays.RD.", 40, ".",200,".Rdata"))
+  #############################################################################
+  # Tried to include the data file in the GitHub repository, but it was too big
+  #  load(file = paste0('data/', "cparrays.RD.", 40, ".",200,".Rdata"))
   plotpanel(plotdata = arrays, alpha = 0.05, par3 = 0.25,
             sel = c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP"),
             plotlab = "RDpair", fmt="tiff")
 
+  #############################################################################
   ### FIGURE 2: CP, MACP, location index and DNCP for selected methods for RR, with N = 40, \alpha=0.05 and \phi=0.25
-# Tried to include the data file in the GitHub repository, but it was too big
-#  load(file = paste0('data/', "cparrays.RR.", 40, ".",200,".Rdata"))
+  #############################################################################
+  # Tried to include the data file in the GitHub repository, but it was too big
+  #  load(file = paste0('data/', "cparrays.RR.", 40, ".",200,".Rdata"))
   plotpanel(plotdata = arrays, alpha = 0.05, par3 = 0.25,
             sel = c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP"),
             plotlab = "RRpair", fmt="tiff")
 
+  #############################################################################
   ### FIGURE 3: Type I error for McNemar test and 'N-1' test
+  #############################################################################
   # 2-D Type I error plot
   load(file=paste0(outpath, "cparrays.RD.", 65, ".",200,".Rdata"))
   p2 <- p1 <- seq(0, 1, length.out=201)
@@ -167,7 +181,9 @@ if (FALSE) {
   lines(p2, 1 - cp1[,"AS","cp"], lty=2, lwd = 2*res.factor)
   dev.off()
 
+  #############################################################################
   ### TABLE 2.1 & TABLE 3.1: Summary of % proximate for selected methods for RD & RR
+  #############################################################################
   load(file = paste0('data/', "allsummaries.Rdata"))
   mysummaries <-
     bigarray[, , c('95', '90'), c("meanCP", "pctCons", "pctnear", "pctgoodloc", "meanlocindex"),,]
@@ -185,20 +201,26 @@ if (FALSE) {
   write.ftable(mytable1, sep=',', quote=TRUE, file = paste0(outpath, "tablecp2065.csv"))
 
 
+  #############################################################################
   ### TABLE 2.2 & TABLE 3.2: Summary of % central for selected methods for RD & RR
+  #############################################################################
   mytable2 <-
     ftable((mysummaries[, , , c("pctgoodloc"),,]), col.vars = c(3,1), row.vars = c(5,4,2))
   write.ftable(mytable2, sep=',', quote=TRUE, file = paste0(outpath, "tableloc2065.csv"))
 
 
+  #############################################################################
   ### Table 4: DNCP (One-sided type I error) for selected PSPs with larger sample size: N=205. Target DNCP=\ \alpha/2
+  #############################################################################
   load(file=paste0('data/',"bignsummary.Rdata"))
   mytable2 <-
     ftable(bignsummary[,"dncp",,,,], col.vars = c(3,2), row.vars = c(4,1))
   write.ftable(round(mytable2, 4), sep=',', quote=TRUE, file = paste0(outpath, "bigntable205.csv"))
 
 
+  #############################################################################
   ### Table 5.1: Example confidence intervals for RD, with (a, b, c, d) = (1, 1, 7, 12)
+  #############################################################################
   x <- c(1, 1, 7, 12)
   egCI <- allpairci(x = x, contrast = "RD",
                     methods <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-NW", "MOVER-W", "BP",
@@ -207,7 +229,9 @@ if (FALSE) {
   dimnames(egCI)[[1]] <- ""
   ftable(round(egCI, 3), row.vars = 3)
 
+  #############################################################################
   ### Table 5.2: Example confidence intervals for RR, with (a, b, c, d) = (1, 1, 7, 12)
+  #############################################################################
   x <- c(1, 1, 7, 12)
   egCI <- allpairci(x = x, contrast = "RR",
                     methods <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-NW", "MOVER-W", "BP",
@@ -217,7 +241,9 @@ if (FALSE) {
   ftable(round(egCI, 3), row.vars = 3)
 
 
+  #############################################################################
   ### p.5 footnote: MOVER-NJ intervals discrepancy vs M-L Tang et al
+  #############################################################################
   xs <- rbind(c(43, 0, 1, 0),
              c(8, 3, 1, 2),
              c(4, 9, 3, 16))
@@ -227,10 +253,10 @@ if (FALSE) {
   ftable(round(egCI, 4), row.vars = 1, col.vars=c(3, 2))
 
 
+  #############################################################################
   ### p.12 evaluation of type I error rate (TIER) for test for association
+  #############################################################################
   load(file=paste0('data/',"tiers.Rdata"))
-
-
 
   tier <- function(params) {
     n <- c(params[1])
