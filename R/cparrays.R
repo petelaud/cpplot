@@ -759,9 +759,25 @@ onecpfun <- function(
       mymethods <- dimnames(tester)[[3]]
     } else mymethods <- methods
     nmeth <- length(mymethods)
-    system.time(ci <- allpairci(x = xsub, contrast = contrast, alpha = alph, methods = mymethods))[[3]]/60
+
+#    ci <- allpairci(x = xsub, contrast = contrast, alpha = alph, methods = mymethods)
+    ci <- array(NA, dim=c(dim(xsub)[1], 2, nmeth))
+    # Process one x at a time so we can show progress and expected time
+    pb <- pbapply::timerProgressBar(min = 0, max = dim(xsub)[1], width = 50, char = '=', style = 1) #timer bar
+    on.exit(pbapply::closepb(pb))
+    for (j in 1:dim(xsub)[[1]]) {
+      pbapply::setTimerProgressBar(pb, j)
+      ci1 <- allpairci(xs = xsub[j, ], contrast = contrast, alpha = alph, methods = mymethods)
+      ci[j, , ] <- ci1
+    }
+    pbapply::closepb(pb)
+
     if (contrast == "RD") theta <- p1 - p2
     if (contrast == "RR") theta <- p1 / p2
+    if (contrast == "OR") {
+      pij <- params(p1 = p1, p2 = p2, phi = phis, psi = psis)[, 5:8]
+      theta <- pij[2] / pij[3] # Conditional OR
+    }
 
     cpl[i, ] <- t(ci[, 1, ] <= theta[i] & ci[, 2, ] >= theta[i] & ci[, 2, ] > ci[, 1, ]) %*% prob[prob > 1E-10] # 2-sided coverage probability. NB degenerate intervals excluded
     lncpl[i, ] <- t(ci[, 1, ] > theta[i] | ci[, 2, ] == ci[, 1, ]) %*% prob[prob > 1E-10] # L-sided non-coverage (R-side is a mirror image)
