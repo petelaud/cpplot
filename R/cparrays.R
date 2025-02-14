@@ -1,9 +1,9 @@
 # Evaluation of confidence intervals for RD or RR from paired data
-# 2025 update using parameter p11p22/p12p21 from Fagerland instead of rho(=phi)
+# 2025 update using phi correlation parameter
 # and adding MOVER methods
-#install.packages("zoo")
 
 rm(list = ls())
+#install.packages("zoo")
 library(zoo)
 pak::pak("petelaud/ratesci")
 library(ratesci)
@@ -17,6 +17,8 @@ mysum <- function(x) sum(x,na.rm=T)
 mymean <- function(x) mean(x,na.rm=T)
 
 # Conversion of parameters for RR
+# convert phi to psi, or vice versa, for a given p1 and (p2 or theta)
+# also output p11, p12, p21, p22 for a given p1, p2 and (phi or psi)
 params <- function(p1,
                    p2 = NULL,
                    theta = NULL,
@@ -24,7 +26,6 @@ params <- function(p1,
                    psi = NULL,
                    phi = NULL
                    ) {
-  # convert phi to psi, or vice versa
   if (is.null(p2)) {
     if (contrast == "RR") p2 <- p1 / theta
     if (contrast == "RD") p2 <- p1 - theta
@@ -36,7 +37,7 @@ params <- function(p1,
     p11 <- (-B - sqrt(B^2-4*A*C))/(2*A)
   }
   if (is.null(psi)) {
-    p11 <- p1 * p2 + phi*sqrt(p1*(1-p1)*p2*(1-p2)) # with DelRocco parameterisation using rho(=phi)
+    p11 <- p1 * p2 + phi*sqrt(p1*(1-p1)*p2*(1-p2))
   }
   p12 <- p1 - p11
   p21 <- p2 - p11
@@ -117,7 +118,8 @@ mtext(expression(paste("at selected values of ", theta["RR"])),
 }
 
 # For a given parameter combination: p1, p2, (psi or phi)
-# calculate the probability density function for each combination
+# calculate the probability density function for each combination x = c(a, b, c, d)
+# vectorized so x can be input as an array with 4 columns
 pdfpair <- function(x,
                     p1 = NULL,
                     p2 = NULL,
@@ -125,9 +127,9 @@ pdfpair <- function(x,
                     psi = NULL
                     ) {
   if (!is.null(phi)) {
-    p11 <- p1 * p2 + phi * sqrt(p1 * (1 - p1) * p2 * (1 - p2)) # with DelRocco parameterisation using rho(=phi)
+    p11 <- p1 * p2 + phi * sqrt(p1 * (1 - p1) * p2 * (1 - p2)) # with parameterisation using phi
   }
-  # Or Fagerland parameterisation using psi=(p11*p22)/(p12*p21) (labelled as theta in Fagerland)
+  # Or using psi=(p11*p22)/(p12*p21) (labelled as theta in Fagerland)
   if (!is.null(psi)) {
     A <- psi - 1
     B <- p1 + p2 - 1 - psi * (p1 + p2)
@@ -172,35 +174,55 @@ allpairci <- function(xs,
   ci <- array(NA, dim = c(lenxs, 2, length(mymethods)))
   dimnames(ci)[[3]] <- mymethods
   if (contrast %in% c("RD", "RR")) {
+    # "AS" is Tango asymptotic score method for RD, and Tang for RR
     if ("AS" %in% mymethods) ci[, 1:2, "AS"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RD = "Score_closed", method_RR = "Score_closed", bcf = FALSE, level = 1-alpha)$estimates[,c(1,3)]))
     if ("AS-bc" %in% mymethods)  ci[, 1:2, "AS-bc"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RD = "Score_closed", method_RR = "Score_closed", bcf=TRUE, level = 1-alpha)$estimates[,c(1,3)]))
+    # "SCAS" adds the skewness correction
     if ("SCAS" %in% mymethods)  ci[, 1:2, "SCAS"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RD = "Score", method_RR = "Score", skew=TRUE, bcf = FALSE, level = 1-alpha)$estimates[,c(1,3)]))
+    # plus the 'N-1' variance bias correction
     if ("SCAS-bc" %in% mymethods) ci[, 1:2, "SCAS-bc"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RD = "Score", method_RR = "Score", skew=TRUE, bcf=TRUE, level = 1-alpha)$estimates[,c(1,3)]))
+    # Explore continuity adjustments
     if ("SCAS-cc5" %in% mymethods)  ci[, 1:2, "SCAS-cc5"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RD = "Score", method_RR = "Score", skew=TRUE, bcf=TRUE, cc=0.5, cctype="new", level = 1-alpha)$estimates[,c(1,3)]))
     if ("SCAS-cc25" %in% mymethods)  ci[, 1:2, "SCAS-cc25"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RD = "Score", method_RR = "Score", skew=TRUE, bcf=TRUE, cc=0.25, cctype="new", level = 1-alpha)$estimates[,c(1,3)]))
     if ("SCAS-cc125" %in% mymethods)  ci[, 1:2, "SCAS-cc125"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RD = "Score", method_RR = "Score", skew=TRUE, bcf=TRUE, cc=0.125, cctype="new", level = 1-alpha)$estimates[,c(1,3)]))
+    # MOVER methods, first without modification
     if ("MOVER-W" %in% mymethods) ci[, 1:2, "MOVER-W"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RD = "MOVER", method_RR = "MOVER", moverbase = "wilson", level = 1-alpha)$estimates[,c(1,3)]))
+    # "-N" adds Newcombe's correlation correction
     if ("MOVER-NW" %in% mymethods)  ci[, 1:2, "MOVER-NW"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RD = "MOVER_newc", method_RR = "MOVER_newc", moverbase = "wilson", level = 1-alpha)$estimates[,c(1,3)]))
+    # then try different input methods: Jeffreys & SCASp
     if ("MOVER-NJ" %in% mymethods) ci[, 1:2, "MOVER-NJ"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RD = "MOVER_newc", method_RR = "MOVER_newc", moverbase = "jeff", level = 1-alpha)$estimates[,c(1,3)]))
     if ("MOVER-NS" %in% mymethods)  ci[, 1:2, "MOVER-NS"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RD = "MOVER_newc", method_RR = "MOVER_newc", moverbase = "SCASp", level = 1-alpha)$estimates[,c(1,3)]))
+    # Explore continuity adjustments
     if ("MOVER-NJcc5" %in% mymethods)  ci[, 1:2, "MOVER-NJcc5"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RD = "MOVER_newc", method_RR = "MOVER_newc", moverbase = "jeff", level = 1-alpha, cc=0.5)$estimates[,c(1,3)]))
     if ("MOVER-NJcc125" %in% mymethods)  ci[, 1:2, "MOVER-NJcc125"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RD = "MOVER_newc", method_RR = "MOVER_newc", moverbase = "jeff", level = 1-alpha, cc=0.125)$estimates[,c(1,3)]))
+    # Bonett-Price hybrid method for RR, or their adjusted Wald method for RD
     if ("BP" %in% mymethods) ci[, 1:2, "BP"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RD = "BP", method_RR = "BP", moverbase = "wilson", level = 1-alpha)$estimates[,c(1,3)]))
-            if (alpha == 0.05) {
-              if ("TDAS" %in% mymethods)  ci[, 1:2, "TDAS"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RD = "TDAS", method_RR = "TDAS")$estimates[c(1,3)]))
-              # Also stratified SCAS - not good, abandon
-              if ("SCASstrat" %in% mymethods)  ci[, 1:2, "SCASstrat"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RD = "SCASstrat", method_RR = "SCASstrat")$estimates[c(1,3)]))
-            }
+    if (alpha == 0.05) {
+      # Further evaluation of TDAS method proposed for paired analysis in Laud2017
+      # doesn't compare favourably with new paired SCAS method
+      if ("TDAS" %in% mymethods)  ci[, 1:2, "TDAS"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RD = "TDAS", method_RR = "TDAS")$estimates[c(1,3)]))
+      # Also stratified SCAS - not good, ABANDON
+      # if ("SCASstrat" %in% mymethods)  ci[, 1:2, "SCASstrat"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RD = "SCASstrat", method_RR = "SCASstrat")$estimates[c(1,3)]))
+    }
     if (contrast == "RR") {
+      # DelRocco's version of continuity correction for RR - not equivariant so ruled out
       if ("Tang-ccdr" %in% mymethods)   ci[, 1:2, "Tang-ccdr"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, level = 1-alpha, cc=0.5, cctype="delrocco")$estimates[,c(1,3)]))
+      # Proposed variation of Bonett-Price hybrid method, incorporating Jeffreys intervals
       if ("BP-J" %in% mymethods)    ci[, 1:2, "BP-J"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RR = "BP", moverbase = "jeff", level = 1-alpha)$estimates[,c(1,3)]))
     }
   } else if (contrast == "OR") {
+    # Explore various options for transformed binomial intervals for conditional OR
+    # Transformed SCASp with experimental bcf using N/(N-1) to match 'N-1' test for association
     if ("SCASp" %in% mymethods) ci[, 1:2, "SCASp"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_OR = "SCASp", bcf = TRUE, level = 1-alpha)$estimates[,c(1,3)]))
+    # Transformed Uncorrected SCAS (i.e. skewness-corrected Wilson)
     if ("SCASpu" %in% mymethods) ci[, 1:2, "SCASpu"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_OR = "SCASp", bcf = FALSE, level = 1-alpha)$estimates[,c(1,3)]))
+    # Transformed Jeffreys equal-tailed interval
     if ("Jeffreys" %in% mymethods) ci[, 1:2, "Jeffreys"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_OR = "jeff", level = 1-alpha)$estimates[,c(1,3)]))
+    # Transformed Clopper-Pearson mid-p
     if ("mid-p" %in% mymethods) ci[, 1:2, "mid-p"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_OR = "midp", level = 1-alpha)$estimates[,c(1,3)]))
+    # Transformed Wilson score
     if ("Wilson" %in% mymethods) ci[, 1:2, "Wilson"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_OR = "wilson", level = 1-alpha)$estimates[,c(1,3)]))
+    # Explore continuity adjustments - could also try reduced gamma variations, e.g. cc=0.125
     if ("C-P" %in% mymethods) ci[, 1:2, "C-P"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_OR = "jeff", level = 1-alpha, cc = TRUE)$estimates[,c(1,3)]))
     if ("Wilson-c" %in% mymethods) ci[, 1:2, "Wilson-c"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_OR = "wilson", level = 1-alpha, cc = TRUE)$estimates[,c(1,3)]))
     # (Add conditional logistic regression CI?)
@@ -329,19 +351,18 @@ cpfun <- function(
     px <- pxg
   }
 
-  if (!is.null(phis)) pij <- params(p1 = px[, 1], p2 = px[, 2], phi = px[, 3])[, 5:8]
-  if (!is.null(psis)) pij <- params(p1 = px[, 1], p2 = px[, 2], psi = px[, 3])[, 5:8]
-
+  # theta estimate for every p1,p2 pair
   if (contrast %in% c("RR")) {
     theta <- (px[, 1] / px[, 2])
   } else if (contrast == "OR") {
-    # Note this is the marginal OR, not conditional
-    # so probably not suitable for evaluation of methods for conditional OR?
-#    theta <- (px[, 1] * (1 - px[, 2]) / (px[, 2] * (1 - px[, 1])))
+    # Note this is the conditional OR, p12/p21, not the marginal OR
+    # So need to get p12 and p21 from the PSP values of p1, p2 and phi/psi
+    if (!is.null(phis)) pij <- params(p1 = px[, 1], p2 = px[, 2], phi = px[, 3])[, 5:8]
+    if (!is.null(psis)) pij <- params(p1 = px[, 1], p2 = px[, 2], psi = px[, 3])[, 5:8]
     theta <- pij[, 2] / pij[, 3] # Conditional OR
   } else if (contrast == "RD") {
     theta <- px[, 1] - px[, 2]
-  } # theta estimate for every p1,p2 pair
+  }
 
   # can we improve efficiency here? -
   # - not without creating an array which is too large for available RAM.
@@ -398,18 +419,6 @@ tryCatch(
         lncpl[i, ] <- t(ci[, 1, ] > theta[i] | ci[, 2, ] == ci[, 1, ]) %*% prob # L-sided non-coverage (R-side is a mirror image)
         rncpl[i, ] <- t(ci[, 2, ] < theta[i] | ci[, 2, ] == ci[, 1, ]) %*% prob # R-sided non-coverage
 
-if (FALSE) {
-# Exploration of OR issues
-#      rmiss <- ci[, 2, ] < theta[i] | ci[, 2, ] == ci[, 1, ]
-#      cbind(xs,rmiss,ci[,2,], prob)[rowSums(rmiss) > 0 & rowSums(rmiss) < 4 & prob > 1e-2, ]
-#       Jeffreys misses c(6,0,7,7)
-#       True OR = 0.444 p1*(1-p2)/(p2*(1-p1))
-#      pairbinci(x=c(6,0,7,7), contrast="OR", method_OR="jeff")
-#      pairbinci(x=c(6,0,7,7), contrast="OR", method_OR="SCAS")
-#      pairbinci(x=c(6,0,7,7), contrast="OR", method_OR="wilson")
-# Margin where rncp=0 is bigger because the conditional method is working with less data?
-}
-
         # not really interested in length, I think location is more important
         # - and its complicated to explain on log scale
         # but included as reviewers might request it
@@ -419,11 +428,11 @@ if (FALSE) {
         # 		lens[lens>100]<-100 #workaround for infinite lengths with RR
         if (contrast %in% c("RR")) {
           # for RR, use length on the log scale. Still an issue with infinite lengths though
-     #     lens <- log(ci[, 2, ]) - log(pmax(0.0000000001, ci[, 1, ]))
+          lens <- log(ci[, 2, ]) - log(pmax(0.0000000001, ci[, 1, ]))
           # Try Newcombe's book suggestion to use U/(1+U) - L/(1+L) - also doesn't resolve the issue
-          lens <- ci[, 2, ]/(1 + ci[, 2, ]) - ci[, 1, ]/(1 + ci[, 1, ])
+          #lens <- ci[, 2, ]/(1 + ci[, 2, ]) - ci[, 1, ]/(1 + ci[, 1, ])
         }
-#        lens[lens > 10] <- 10 # workaround for infinite lengths with RR
+        lens[lens > 10] <- 10 # workaround for infinite lengths with RR
         lens[ci[, 2, ] == ci[, 1, ]] <- 0
         lenl[i, ] <- t(lens) %*% prob
       }
@@ -747,30 +756,3 @@ onecpfun <- function(
   return(myoutput)
 }
 
-
-
-# to retrieve a previously run array:
-# outpath <- "/Users/ssu/Documents/Main/Courses_papers/skewscore/paired/"
-# load(file=paste(outpath, "cparrays.RR.", 60, ".",100,".Rdata",sep=""))
-# arr <- myarrays
-
-if(FALSE) {
-
-#combine plots for publication
-#install.packages("png")
-library(png)
-fig1a <- readPNG(paste0(outpath,"_png/summaryRD95_150,50os.png"), TRUE)
-fig1b <- readPNG(paste0(outpath,"_png/summaryID95_150,50os.png"), TRUE)
-res.factor <- 6
-tiff(file=paste0(outpath,"_tiff/Figure1.tiff"),width=600*res.factor,height=2*330*res.factor,type="quartz")
-#png(file=paste0(outpath,"_png/Figure1.png"),width=600*res.factor,height=2*330*res.factor,type="quartz")
-par(mar=c(0,0,0,0),oma=c(0,0,0,0))
-plot(0:1,0:1, type='n',axes=F, xaxs="i", yaxs="i")
-#plot(0:1,0:1, axes=F, xaxs="i", yaxs="i")
-rasterImage(fig1a, 0, 0.5, 1, 1)
-rasterImage(fig1b, 0, 0, 1, 0.5)
-text(0.02,0.98,"(a)",cex=1.5*res.factor)
-text(0.02,0.48,"(b)",cex=1.5*res.factor)
-dev.off()
-
-}

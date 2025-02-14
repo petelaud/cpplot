@@ -297,6 +297,10 @@ CPcontour <- function(plotdata,
 
 ###
 # New version of plotpanel, showing unsmoothed cp and location index together
+# Note: Contains some redundant code left over from previous version, which
+# had an option to plot either two-sided or on-sided coverage, where
+# now we show both in the same panel
+# Legend code is repetitive but gets the job done
 plotpanel <- function(plotdata,
                       alpha,
                       par3,
@@ -320,6 +324,8 @@ plotpanel <- function(plotdata,
   contrast <- dimnames(plotdata[["summaries"]])[[6]]
   summaries <- plotdata[["summaries"]][paste(par3),,paste(100*(1-alpha)),,nums,]
   longlab <- methods <- dimnames(plotdata[["mastercp"]])[[4]]
+  # Update labels as preference for nomenclature evolved since starting the code
+  # and it would take too long to go back and re-run everything
   longlab[longlab=="SCAS"] <- "SCASu"
   longlab[longlab=="SCAS-bc"] <- "SCAS"
   longlab[longlab=="MOVER-NJcc5"] <- "MOVER-c (\U0263=0.5)"
@@ -331,10 +337,11 @@ plotpanel <- function(plotdata,
   n.grid <- dim(plotdata[["mastercp"]])[1]
   if (colour == F) collab=".bw" else collab=""
 
-  # Set up for 4 rows of plots
+  # Set up to adjust number 4 rows of plots
   rows <- 4
 
-  if(fmt=="tiff")  {
+  # Select plot output format depending on journal requirements
+  if (fmt=="tiff")  {
     tiff(file = paste(outpath,"_",fmt,"/","summary",
                       ifelse(sided=="L","L",""),
                       plotlab, nums, "_", 100*(1-alpha), "_", format(par3, nsmall=2),
@@ -345,7 +352,7 @@ plotpanel <- function(plotdata,
     height = 4*rows * 38 * res.factor,
     type="quartz"
     )
-  } else if(fmt=="png") {
+  } else if (fmt=="png") {
     png(file = paste(outpath, "_", fmt, "/", "summary",
                      ifelse(sided=="L","L",""),
                      plotlab, nums, "_", 100*(1-alpha), "_", format(par3, nsmall=2),
@@ -356,7 +363,10 @@ plotpanel <- function(plotdata,
     height = 4*rows * 38 * res.factor,
     type = "quartz"
     )
-  } else if(fmt=="eps") {
+  }
+  if (FALSE) { # Left-over code not checked for this application
+  #else
+    if(fmt=="eps") {
     setEPS()
     postscript(file = paste(outpath,"_","png","/","summary",
                             ifelse(sided=="L","L",""),plotlab,100*(1-alpha),"_",
@@ -377,6 +387,8 @@ plotpanel <- function(plotdata,
     height=400*res.factor
     )
   }
+  }
+
   layout(matrix(c(1:(rows * nmeth), rows * nmeth + c(1, 1:(rows-1))), rows, (nmeth + 1),
                 byrow = FALSE),
          widths = c(rep(2, nmeth), 1), heights = rep(4, rows))
