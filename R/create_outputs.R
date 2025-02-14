@@ -24,7 +24,7 @@ if (FALSE) {
   ### WARNING: for N=40 and 65, these take several hours to run!
   #############################################################################
   RDpairteam <- RRpairteam <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP")
-  ORpairteam <- c("SCASp", "SCASpu", "mid-p", "jeff", "wilson")
+  ORpairteam <- c("SCASp", "SCASpu", "mid-p", "Jeffreys", "Wilson")
   alphas <- c(0.1, 0.05, 0.01)
   alphas <- c(0.05)
   phis <- c(0.1, 0.25, 0.5, 0.75)
@@ -38,12 +38,15 @@ if (FALSE) {
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
   system.time(mycis <- cifun(n=40, contrast="RR", alph = alphas, methods = RDpairteam))[[3]]/60
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
-  system.time(mycis <- cifun(n=40, contrast="OR", alph = alphas, methods = ORpairteam))[[3]]/60
+
+    system.time(mycis <- cifun(n=40, contrast="OR", alph = alphas, methods = ORpairteam))[[3]]/60
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
-  system.time(mycis <- cifun(n=65, contrast="RD", alph = alphas, methods = RDpairteam))[[3]]/60
+
+    system.time(mycis <- cifun(n=65, contrast="RD", alph = alphas, methods = RDpairteam))[[3]]/60
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
   system.time(mycis <- cifun(n=65, contrast="RR", alph = alphas, methods = RRpairteam))[[3]]/60
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
+
 
   #############################################################################
   # Combine output arrays for summarising across different Ns
@@ -136,15 +139,18 @@ if (FALSE) {
             plotlab = "RRpair", fmt="png", res.factor = 4)
 
   #############################################################################
-  ### FIGURE 2: CP, MACP, location index and DNCP for selected methods for OR, with N = 40, \alpha=0.05 and \phi=0.25
+  ### FIGURE 3: CP, MACP, location index and DNCP for selected methods for OR, with N = 40, \alpha=0.05 and \phi=0.25
   #############################################################################
   load(file = paste0('data/', "cparrays.OR.", 40, ".",200,".Rdata"))
   plotpanel(plotdata = arrays, alpha = 0.05, par3 = 0.25,
-            sel = c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP"),
-            plotlab = "RRpair", fmt="png", res.factor = 4)
+            sel = c("SCASp", "SCASpu", "mid-p", "Jeffreys", "Wilson"),
+            plotlab = "ORpair", fmt="tiff", res.factor = 6)
+  plotpanel(plotdata = arrays, alpha = 0.05, par3 = 0.25,
+            sel = c("SCASp", "SCASpu", "mid-p", "Jeffreys", "Wilson"),
+            plotlab = "ORpair", fmt="png", res.factor = 4)
 
   #############################################################################
-  ### FIGURE 3: Type I error for McNemar test and 'N-1' test
+  ### FIGURE 4: Type I error for McNemar test and 'N-1' test
   #############################################################################
   # 2-D Type I error plot
   load(file=paste0(outpath, "cparrays.RD.", 65, ".",200,".Rdata"))
@@ -246,6 +252,17 @@ if (FALSE) {
   egCI <- allpairci(x = x, contrast = "RR",
                     methods <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-NW", "MOVER-W", "BP",
                                  "SCAS-cc125", "SCAS-cc5", "MOVER-NJcc125", "MOVER-NJcc5"),
+                    alpha=0.05)
+  dimnames(egCI)[[1]] <- ""
+  ftable(round(egCI, 3), row.vars = 3)
+
+  #############################################################################
+  ### Table 5.3: Example confidence intervals for OR, with (a, b, c, d) = (1, 1, 7, 12)
+  #############################################################################
+  x <- c(1, 1, 7, 12)
+#  x <- c(7, 25, 2, 68)
+  egCI <- allpairci(x = x, contrast = "OR",
+                    methods <- c("SCASp", "SCASpu", "mid-p", "Jeffreys", "Wilson", "SCASp-c125", "SCASp-c5", "C-P"),
                     alpha=0.05)
   dimnames(egCI)[[1]] <- ""
   ftable(round(egCI, 3), row.vars = 3)
