@@ -321,19 +321,76 @@ if (FALSE) {
   ### Conditional odds ratio
   #############################################################################
 
-  system.time(mycis <- cifun(n=65, contrast = "OR", alph = c(0.05)))[[3]]/60
+  system.time(mycis <- cifun(n=40, contrast = "OR", alph = c(0.05, 0.1)))[[3]]/60
   Sys.time()
   system.time(
     arrays <- cpfun(ciarrays = mycis,
-                    n.grid=200, phis=c(0.1, 0.25), smooth=TRUE)
+                    n.grid=200, phis=c(0.1, 0.25, 0.5, 0.75), smooth=TRUE)
   )[[3]]/60
-  #ORpairteam <- c("Wilson", "mid-p", "SCASp", "Jeffreys", "Wald", "Laplace", "C-P", "Wilson-c")
   ORpairteam <- c("SCASp", "SCASpu", "mid-p", "Jeffreys", "Wilson")
   teamlist <- list(ORpairteam)
   teamlabels <- c("ORpair")
   plotpanel(plotdata=arrays, alpha=0.05, par3=0.25,
             sel=teamlist[[1]], plotlab=teamlabels[1],
             fmt="png")
+
+
+  #############################################################################
+  ### SUPPLEMENTARY FIGURES:
+  ### CP, MACP, location index and DNCP for selected methods for RD, with N = 40, \alpha=0.05 and \phi=0.25
+  #############################################################################
+  # RD
+  RDpairteam <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP")  	#Paired RD
+  RDcpairteam <- c("SCAS-cc125", "SCAS-cc25", "SCAS-cc5", "MOVER-NJcc125", "MOVER-NJcc5") 	#Paired RD, cc
+  teamlist <- list(RDpairteam, RDcpairteam)
+  teamlabels <- c("RDpair", "RDcpair")
+  load(file=paste0(outpath, "cparrays.RD.", 40, ".",200,".Rdata"))
+  for (j in c(0.1, 0.25, 0.5, 0.75)) {
+  #  for (i in c(0.05, 0.1, 0.01)) {
+    for (i in c(0.05)) {
+      for (k in 1:2) {
+        plotpanel(plotdata=arrays, alpha=i, par3=j,
+                  limits=c(0,1), sel=teamlist[[k]], plotlab=teamlabels[k],
+                  fmt="png", res.factor = 4)
+      }
+    }
+  }
+  teamlabels <- c("RRpair", "RRcpair")
+  load(file=paste0(outpath, "cparrays.RR.", 40, ".",200,".Rdata"))
+  for (j in c(0.1, 0.25, 0.5, 0.75)) {
+    for (i in c(0.05)) {
+      for (k in 1:2) {
+        plotpanel(plotdata=arrays, alpha=i, par3=j,
+                  limits=c(0,1), sel=teamlist[[k]], plotlab=teamlabels[k],
+                  fmt="png", res.factor = 4)
+      }
+    }
+  }
+
+
+
+  if(FALSE) {
+    # Sample code in case need to combine plots for publication
+    # install.packages("png")
+    library(png)
+    fig1a <- readPNG(paste0(outpath,"_png/summaryRD95_150,50os.png"), TRUE)
+    fig1b <- readPNG(paste0(outpath,"_png/summaryID95_150,50os.png"), TRUE)
+    res.factor <- 6
+    tiff(file=paste0(outpath,"_tiff/Figure1.tiff"),width=600*res.factor,height=2*330*res.factor,type="quartz")
+    # png(file=paste0(outpath,"_png/Figure1.png"),width=600*res.factor,height=2*330*res.factor,type="quartz")
+    par(mar=c(0,0,0,0),oma=c(0,0,0,0))
+    plot(0:1,0:1, type='n',axes=F, xaxs="i", yaxs="i")
+    # plot(0:1,0:1, axes=F, xaxs="i", yaxs="i")
+    rasterImage(fig1a, 0, 0.5, 1, 1)
+    rasterImage(fig1b, 0, 0, 1, 0.5)
+    text(0.02,0.98,"(a)",cex=1.5*res.factor)
+    text(0.02,0.48,"(b)",cex=1.5*res.factor)
+    dev.off()
+  }
+
+  # Sample code to retrieve a previously run array:
+  # load(file=paste(outpath, "cparrays.RR.", 40, ".",200,".Rdata",sep=""))
+  # arr <- myarrays
 
 
 }
