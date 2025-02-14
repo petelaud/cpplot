@@ -572,7 +572,9 @@ if (smooth == TRUE) {
            cpl, lncpl, rncpl, mncpl, lenl, locindexl)
 
     save(arrays,
-         file = paste(outpath, "cparrays.", contrast, ".",
+#         file = paste(outpath, "cparrays.", contrast, ".",
+#                      n, ".", n.grid, ".Rdata", sep = "")
+         file = paste("data/", "cparrays.", contrast, ".",
                       n, ".", n.grid, ".Rdata", sep = "")
     )
   }
