@@ -120,18 +120,20 @@ if (FALSE) {
   #############################################################################
   # Tried to include the data file in the GitHub repository, but it was too big
   #  load(file = paste0('data/', "cparrays.RD.", 40, ".",200,".Rdata"))
+  # load(file=paste0(outpath, "cparrays.RD.", 40, ".",200,".Rdata"))
   plotpanel(plotdata = arrays, alpha = 0.05, par3 = 0.25,
             sel = c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP"),
-            plotlab = "RDpair", fmt="tiff")
+            plotlab = "RDpair", fmt="png", res.factor = 4)
 
   #############################################################################
   ### FIGURE 2: CP, MACP, location index and DNCP for selected methods for RR, with N = 40, \alpha=0.05 and \phi=0.25
   #############################################################################
   # Tried to include the data file in the GitHub repository, but it was too big
   #  load(file = paste0('data/', "cparrays.RR.", 40, ".",200,".Rdata"))
+  # load(file=paste0(outpath, "cparrays.RR.", 40, ".",200,".Rdata"))
   plotpanel(plotdata = arrays, alpha = 0.05, par3 = 0.25,
             sel = c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP"),
-            plotlab = "RRpair", fmt="tiff")
+            plotlab = "RRpair", fmt="png", res.factor = 4)
 
   #############################################################################
   ### FIGURE 3: Type I error for McNemar test and 'N-1' test
@@ -330,10 +332,13 @@ if (FALSE) {
   ORpairteam <- c("SCASp", "SCASpu", "mid-p", "Jeffreys", "Wilson")
   teamlist <- list(ORpairteam)
   teamlabels <- c("ORpair")
-  plotpanel(plotdata=arrays, alpha=0.05, par3=0.25,
+  for (j in c(0.1, 0.25, 0.5, 0.75)) {
+    for (i in c(0.05, 0.1)) {
+      plotpanel(plotdata=arrays, alpha=i, par3=j,
             sel=teamlist[[1]], plotlab=teamlabels[1],
-            fmt="png")
-
+            fmt="png", res.factor = 4)
+    }
+    }
 
   #############################################################################
   ### SUPPLEMENTARY FIGURES:
