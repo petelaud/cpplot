@@ -353,7 +353,7 @@ plotpanel <- function(plotdata,
     type="quartz"
     )
   } else if (fmt=="png") {
-    png(file = paste(outpath, "_", fmt, "/", "summary",
+    png(file = paste("plots/",
                      ifelse(sided=="L","L",""),
                      plotlab, nums, "_", 100*(1-alpha), "_", format(par3, nsmall=2),
                      ifelse(oneside, "os", ""), collab, ".png",
