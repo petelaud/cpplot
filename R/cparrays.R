@@ -5,8 +5,8 @@
 
 rm(list = ls())
 library(zoo)
-#pak::pak("petelaud/ratesci-dev")
-#library(ratesci)
+pak::pak("petelaud/ratesci")
+library(ratesci)
 
 set.seed(2012) #ensure we use the same jitters for each run
 
