@@ -137,12 +137,18 @@ if (FALSE) {
   load(file = paste0('data/', "cparrays.RD.", 40, ".",200,".Rdata"))
   plotpanel(plotdata = arrays, alpha = 0.05, par3 = 0.25,
             sel = c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP"),
+            plotlab = "RDpair", fmt="tiff", res.factor = 6)
+  plotpanel(plotdata = arrays, alpha = 0.05, par3 = 0.25,
+            sel = c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP"),
             plotlab = "RDpair", fmt="png", res.factor = 4)
 
   #############################################################################
   ### FIGURE 2: CP, MACP, location index and DNCP for selected methods for RR, with N = 40, \alpha=0.05 and \phi=0.25
   #############################################################################
   load(file = paste0('data/', "cparrays.RR.", 40, ".",200,".Rdata"))
+  plotpanel(plotdata = arrays, alpha = 0.05, par3 = 0.25,
+            sel = c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP"),
+            plotlab = "RRpair", fmt="tiff", res.factor = 6)
   plotpanel(plotdata = arrays, alpha = 0.05, par3 = 0.25,
             sel = c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP"),
             plotlab = "RRpair", fmt="png", res.factor = 4)
