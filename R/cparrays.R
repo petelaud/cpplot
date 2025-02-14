@@ -165,7 +165,7 @@ allpairci <- function(xs,
         mymethods <- c(mymethods, "BP-J", "Tang-ccdr")
       }
     } else if (contrast == "OR") {
-      mymethods <- c("SCASp", "SCASpu", "Jeffreys", "mid-p", "Wilson", "C-P", "Wilson-c")
+      mymethods <- c("SCASp", "SCASpu", "jeff", "mid-p", "wilson", "SCASp-c", "C-P", "wilson-c")
     }
   }
   ci <- array(NA, dim = c(lenxs, 2, length(mymethods)))
@@ -214,14 +214,16 @@ allpairci <- function(xs,
     # Transformed Uncorrected SCAS (i.e. skewness-corrected Wilson)
     if ("SCASpu" %in% mymethods) ci[, 1:2, "SCASpu"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_OR = "SCASp", bcf = FALSE, level = 1-alpha)$estimates[,c(1,3)]))
     # Transformed Jeffreys equal-tailed interval
-    if ("Jeffreys" %in% mymethods) ci[, 1:2, "Jeffreys"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_OR = "jeff", level = 1-alpha)$estimates[,c(1,3)]))
+    if ("jeff" %in% mymethods) ci[, 1:2, "jeff"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_OR = "jeff", level = 1-alpha)$estimates[,c(1,3)]))
     # Transformed Clopper-Pearson mid-p
     if ("mid-p" %in% mymethods) ci[, 1:2, "mid-p"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_OR = "midp", level = 1-alpha)$estimates[,c(1,3)]))
     # Transformed Wilson score
-    if ("Wilson" %in% mymethods) ci[, 1:2, "Wilson"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_OR = "wilson", level = 1-alpha)$estimates[,c(1,3)]))
+    if ("wilson" %in% mymethods) ci[, 1:2, "wilson"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_OR = "wilson", level = 1-alpha)$estimates[,c(1,3)]))
     # Explore continuity adjustments - could also try reduced gamma variations, e.g. cc=0.125
     if ("C-P" %in% mymethods) ci[, 1:2, "C-P"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_OR = "jeff", level = 1-alpha, cc = TRUE)$estimates[,c(1,3)]))
-    if ("Wilson-c" %in% mymethods) ci[, 1:2, "Wilson-c"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_OR = "wilson", level = 1-alpha, cc = TRUE)$estimates[,c(1,3)]))
+    if ("wilson-c" %in% mymethods) ci[, 1:2, "wilson-c"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_OR = "wilson", level = 1-alpha, cc = TRUE)$estimates[,c(1,3)]))
+    if ("SCASp-c5" %in% mymethods) ci[, 1:2, "SCASp"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_OR = "SCASp", bcf = TRUE, cc = 0.5, level = 1-alpha)$estimates[,c(1,3)]))
+    if ("SCASp-c125" %in% mymethods) ci[, 1:2, "SCASp"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_OR = "SCASp", bcf = TRUE, cc = 0.125, level = 1-alpha)$estimates[,c(1,3)]))
     # (Add conditional logistic regression CI?)
   }
   dimnames(ci)[[2]] <- c("LCL", "UCL")

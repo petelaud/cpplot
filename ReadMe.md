@@ -2,7 +2,7 @@
 
 This is an R project containing the code required to recreate an evaluation of 
 coverage probability for selected confidence intervals for paired binomial 
-risk difference or relative risk.
+risk difference, relative risk, and conditional odds ratio.
 Includes complete enumeration of coverage probability, left and right sided 
 non-coverage, interval location index (MNCP/NCP), plus associated summary statistics
 and plots
