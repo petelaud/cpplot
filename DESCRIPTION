@@ -5,7 +5,7 @@ Authors@R:
     person("Pete", "Laud", , "p.j.laud@sheffield.ac.uk", role = c("aut", "cre"))
 Description: Complete enumeration of coverage probability, left and right sided 
     non-coverage, interval location etc, for selected methods for confidence
-    intervals for paired binomial RD and RR.
+    intervals for paired binomial RD and RR, and conditional OR.
 License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
@@ -13,5 +13,8 @@ RoxygenNote: 7.3.2
 URL: https://github.com/petelaud/cpplot
 BugReports: https://github.com/petelaud/cpplot/issues
 Imports: 
-    zoo
+    ratesci,
+    zoo,
+    pbapply
 Remotes:
+    petelaud/ratesci
