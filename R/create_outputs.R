@@ -24,7 +24,9 @@ if (FALSE) {
   ### WARNING: for N=40 and 65, these take several hours to run!
   #############################################################################
   RDpairteam <- RRpairteam <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP")
+  ORpairteam <- c("SCASp", "SCASpu", "mid-p", "jeff", "wilson")
   alphas <- c(0.1, 0.05, 0.01)
+  alphas <- c(0.05)
   phis <- c(0.1, 0.25, 0.5, 0.75)
 #  alphas <- c(0.05)
 #  phis <- c(0.25)
@@ -32,9 +34,11 @@ if (FALSE) {
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
   system.time(mycis <- cifun(n=20, contrast="RR", alph = alphas))[[3]]/60
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
-  system.time(mycis <- cifun(n=40, contrast="RD", alph = alphas))[[3]]/60
+  system.time(mycis <- cifun(n=40, contrast="RD", alph = alphas, methods = RDpairteam))[[3]]/60
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
-  system.time(mycis <- cifun(n=40, contrast="RR", alph = alphas))[[3]]/60
+  system.time(mycis <- cifun(n=40, contrast="RR", alph = alphas, methods = RDpairteam))[[3]]/60
+  Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
+  system.time(mycis <- cifun(n=40, contrast="OR", alph = alphas, methods = ORpairteam))[[3]]/60
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
   system.time(mycis <- cifun(n=65, contrast="RD", alph = alphas, methods = RDpairteam))[[3]]/60
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
@@ -118,9 +122,7 @@ if (FALSE) {
   #############################################################################
   ### FIGURE 1: CP, MACP, location index and DNCP for selected methods for RD, with N = 40, \alpha=0.05 and \phi=0.25
   #############################################################################
-  # Tried to include the data file in the GitHub repository, but it was too big
-  #  load(file = paste0('data/', "cparrays.RD.", 40, ".",200,".Rdata"))
-  # load(file=paste0(outpath, "cparrays.RD.", 40, ".",200,".Rdata"))
+  load(file = paste0('data/', "cparrays.RD.", 40, ".",200,".Rdata"))
   plotpanel(plotdata = arrays, alpha = 0.05, par3 = 0.25,
             sel = c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP"),
             plotlab = "RDpair", fmt="png", res.factor = 4)
@@ -128,9 +130,15 @@ if (FALSE) {
   #############################################################################
   ### FIGURE 2: CP, MACP, location index and DNCP for selected methods for RR, with N = 40, \alpha=0.05 and \phi=0.25
   #############################################################################
-  # Tried to include the data file in the GitHub repository, but it was too big
-  #  load(file = paste0('data/', "cparrays.RR.", 40, ".",200,".Rdata"))
-  # load(file=paste0(outpath, "cparrays.RR.", 40, ".",200,".Rdata"))
+  load(file = paste0('data/', "cparrays.RR.", 40, ".",200,".Rdata"))
+  plotpanel(plotdata = arrays, alpha = 0.05, par3 = 0.25,
+            sel = c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP"),
+            plotlab = "RRpair", fmt="png", res.factor = 4)
+
+  #############################################################################
+  ### FIGURE 2: CP, MACP, location index and DNCP for selected methods for OR, with N = 40, \alpha=0.05 and \phi=0.25
+  #############################################################################
+  load(file = paste0('data/', "cparrays.OR.", 40, ".",200,".Rdata"))
   plotpanel(plotdata = arrays, alpha = 0.05, par3 = 0.25,
             sel = c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP"),
             plotlab = "RRpair", fmt="png", res.factor = 4)
