@@ -81,23 +81,32 @@ if (FALSE) {
   ### OPTIONAL: re-run calculations for large sample size
   #############################################################################
   # For RD
-  system.time(cp205RD25 <- onecpfun(0.4, 0.1, n=205, contrast = "RD", alph=0.05, phis=0.25, methods=RDpairteam))[[3]]/60
-  system.time(cp205RD75 <- onecpfun(0.3, 0.2, n=205, contrast = "RD", alph=0.05, phis=0.75, methods=RDpairteam))[[3]]/60
-  system.time(cp205RD2599 <- onecpfun(0.4, 0.1, n=205, contrast = "RD", alph=0.01, phis=0.25, methods=RDpairteam))[[3]]/60
-  system.time(cp205RD7599 <- onecpfun(0.3, 0.2, n=205, contrast = "RD", alph=0.01, phis=0.75, methods=RDpairteam))[[3]]/60
   system.time(cp205RD10 <- onecpfun(0.4, 0.1, n=205, contrast = "RD", alph=0.05, phis=0.10, methods=RDpairteam))[[3]]/60
+  system.time(cp205RD25 <- onecpfun(0.4, 0.1, n=205, contrast = "RD", alph=0.05, phis=0.25, methods=RDpairteam))[[3]]/60
   system.time(cp205RD50 <- onecpfun(0.4, 0.2, n=205, contrast = "RD", alph=0.05, phis=0.50, methods=RDpairteam))[[3]]/60
+  system.time(cp205RD75 <- onecpfun(0.3, 0.2, n=205, contrast = "RD", alph=0.05, phis=0.75, methods=RDpairteam))[[3]]/60
   system.time(cp205RD1099 <- onecpfun(0.4, 0.1, n=205, contrast = "RD", alph=0.01, phis=0.10, methods=RDpairteam))[[3]]/60
+  system.time(cp205RD2599 <- onecpfun(0.4, 0.1, n=205, contrast = "RD", alph=0.01, phis=0.25, methods=RDpairteam))[[3]]/60
   system.time(cp205RD5099 <- onecpfun(0.4, 0.2, n=205, contrast = "RD", alph=0.01, phis=0.50, methods=RDpairteam))[[3]]/60
+  system.time(cp205RD7599 <- onecpfun(0.3, 0.2, n=205, contrast = "RD", alph=0.01, phis=0.75, methods=RDpairteam))[[3]]/60
   # For RR
-  system.time(cp205RR25 <- onecpfun(0.4, 0.1, n=205, contrast = "RR", alph=0.05, phis=0.25, methods=RRpairteam))[[3]]/60
-  system.time(cp205RR75 <- onecpfun(0.3, 0.2, n=205, contrast = "RR", alph=0.05, phis=0.75, methods=RRpairteam))[[3]]/60
-  system.time(cp205RR2599 <- onecpfun(0.4, 0.1, n=205, contrast = "RR", alph=0.01, phis=0.25, methods=RRpairteam))[[3]]/60
-  system.time(cp205RR7599 <- onecpfun(0.3, 0.2, n=205, contrast = "RR", alph=0.01, phis=0.75, methods=RRpairteam))[[3]]/60
   system.time(cp205RR10 <- onecpfun(0.4, 0.1, n=205, contrast = "RR", alph=0.05, phis=0.10, methods=RDpairteam))[[3]]/60
+  system.time(cp205RR25 <- onecpfun(0.4, 0.1, n=205, contrast = "RR", alph=0.05, phis=0.25, methods=RRpairteam))[[3]]/60
   system.time(cp205RR50 <- onecpfun(0.4, 0.2, n=205, contrast = "RR", alph=0.05, phis=0.50, methods=RDpairteam))[[3]]/60
+  system.time(cp205RR75 <- onecpfun(0.3, 0.2, n=205, contrast = "RR", alph=0.05, phis=0.75, methods=RRpairteam))[[3]]/60
   system.time(cp205RR1099 <- onecpfun(0.4, 0.1, n=205, contrast = "RR", alph=0.01, phis=0.10, methods=RDpairteam))[[3]]/60
+  system.time(cp205RR2599 <- onecpfun(0.4, 0.1, n=205, contrast = "RR", alph=0.01, phis=0.25, methods=RRpairteam))[[3]]/60
   system.time(cp205RR5099 <- onecpfun(0.4, 0.2, n=205, contrast = "RR", alph=0.01, phis=0.50, methods=RDpairteam))[[3]]/60
+  system.time(cp205RR7599 <- onecpfun(0.3, 0.2, n=205, contrast = "RR", alph=0.01, phis=0.75, methods=RRpairteam))[[3]]/60
+  # For OR
+  system.time(cp205OR10 <- onecpfun(0.4, 0.2, n=205, contrast = "OR", alph=0.05, phis=0.10, methods=ORpairteam))[[3]]/60
+  system.time(cp205OR25 <- onecpfun(0.4, 0.2, n=205, contrast = "OR", alph=0.05, phis=0.25, methods=ORpairteam))[[3]]/60
+  system.time(cp205OR50 <- onecpfun(0.4, 0.2, n=205, contrast = "OR", alph=0.05, phis=0.50, methods=ORpairteam))[[3]]/60
+  system.time(cp205OR75 <- onecpfun(0.3, 0.2, n=205, contrast = "OR", alph=0.05, phis=0.75, methods=ORpairteam))[[3]]/60
+  system.time(cp205OR1099 <- onecpfun(0.4, 0.2, n=205, contrast = "OR", alph=0.01, phis=0.10, methods=ORpairteam))[[3]]/60
+  system.time(cp205OR2599 <- onecpfun(0.4, 0.2, n=205, contrast = "OR", alph=0.01, phis=0.25, methods=ORpairteam))[[3]]/60
+  system.time(cp205OR5099 <- onecpfun(0.4, 0.2, n=205, contrast = "OR", alph=0.01, phis=0.50, methods=ORpairteam))[[3]]/60
+  system.time(cp205OR7599 <- onecpfun(0.3, 0.2, n=205, contrast = "OR", alph=0.01, phis=0.75, methods=ORpairteam))[[3]]/60
   # Combine results into a data object
   bignsummary <- array(NA, dim=c(6, 6, 4, 2, 2, 1))
   dimnames(bignsummary) <-
