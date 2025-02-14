@@ -4,9 +4,6 @@
 
 rm(list = ls())
 #install.packages("zoo")
-library(zoo)
-pak::pak("petelaud/ratesci")
-library(ratesci)
 
 set.seed(2012) #ensure we use the same jitters for each run
 
@@ -266,11 +263,22 @@ cifun <- function( n,
   dimnames(cis)[[5]] <- paste(n)
   dimnames(cis)[[6]] <- contrast
 
+  cat("Step 1 of 3: Calculate selected CIs for all possible outcomes for the selected N\n")
   for (alpha in alph) {
+    cat(paste0("alpha=", alpha,"\n"))
     # For the given sample size N, we calculate confidence intervals,
     # for each method, for every possible combination of observed frequencies
-    ci <- allpairci(xs = xs, contrast = contrast, alpha = alpha, methods = mymethods)
-    cis[, , , paste(100 * (1 - alpha)), 1, 1] <- ci
+#    ci <- allpairci(xs = xs, contrast = contrast, alpha = alpha, methods = mymethods)
+#    cis[, , , paste(100 * (1 - alpha)), 1, 1] <- ci
+    # Process one x at a time so we can show progress and expected time
+    pb <- pbapply::timerProgressBar(min = 0, max = dim(xs)[1], width = 50, char = '=', style = 1) #timer bar
+    on.exit(pbapply::closepb(pb))
+    for (i in 1:dim(xs)[[1]]) {
+      pbapply::setTimerProgressBar(pb, i)
+      ci <- allpairci(xs = xs[i, ], contrast = contrast, alpha = alpha, methods = mymethods)
+      cis[i, , , paste(100 * (1 - alpha)), 1, 1] <- ci
+    }
+    pbapply::closepb(pb)
   }
 
   ciarrays <- list(xs = xs, cis = cis)
@@ -367,9 +375,12 @@ cpfun <- function(
   # can we improve efficiency here? -
   # - not without creating an array which is too large for available RAM.
 
+  cat(paste0("Step 2 of 3: calculate coverage probabilities for each alpha\n"))
+
   for (alpha in alph) {
-    print(paste0("alpha=", alpha))
-      ci <- cis[,,, paste(100 * (1 - alpha)),,]
+    cat(paste0("alpha=", alpha,"\n"))
+    cat(paste0("Coverage probabilities\n"))
+    ci <- cis[,,, paste(100 * (1 - alpha)),,]
 
     # To obtain coverage probability for n,p1,p2, we determine the probability
     # of each possible pair of observed frequencies a,b given p1,p2 using
@@ -385,9 +396,10 @@ cpfun <- function(
     # - pdfpair function updated to give prob=NA for such impossible combinations
     # First switched to parameterisation using psi instead.
     # Then revisited in order to produce plots based on phi (more interpretable)
-    pb <- txtProgressBar(min = 0, max = dim(px)[1], style = 3) #text based bar
+    pb <- pbapply::timerProgressBar(min = 0, max = dim(px)[1], width = 50, char = '=', style = 1) #timer bar
+    on.exit(pbapply::closepb(pb))
     for (i in 1:dim(px)[1]) {
-      setTxtProgressBar(pb, i)
+      pbapply::setTimerProgressBar(pb, i)
 
       if (!is.null(psis)) {
         prob <- pdfpair(p1 = px[i, 1],
@@ -438,6 +450,7 @@ tryCatch(
       }
   ) # End trycatch bracket
     }
+    pbapply::closepb(pb)
 
     mncpl <- rncpl
     thetagt <- px[,1] > px[,2]
@@ -491,6 +504,7 @@ tryCatch(
 
 if (smooth == TRUE) {
 #  option to add smoothed averages, but increases runtimes
+  cat(paste0("Moving average coverage probabilities\n"))
 
       ## For a 'smoothed' surface plot, we can calculate the local average CP
       ## in the region (p1-avedelta, p1+avedelta, p2-avedelta, p2+avedelta)
@@ -500,9 +514,12 @@ if (smooth == TRUE) {
       avecp <- avelncp <- averncp <- avelocindex <- arraytemp
 
       # Calculate moving averages
-        pb <- txtProgressBar(min = 0, max = nmeth, style = 3) #text based bar
+#      pb <- txtProgressBar(min = 0, max = nmeth, style = 3) #text based bar
+      pb <- pbapply::timerProgressBar(min = 0, max = nmeth, width = 50, char = "=", style = 1) #text based bar
+      on.exit(pbapply::closepb(pb))
         for (meth in 1:nmeth) {
-          setTxtProgressBar(pb, meth)
+#          setTxtProgressBar(pb, meth)
+          pbapply::setTimerProgressBar(pb, meth)
           for (p3 in par3) {
             avecp[-c(1:ma.win, (dim(cp)[1] - (ma.win - 1)):(dim(cp)[1])),
                   -c(1:ma.win, (dim(cp)[2] - (ma.win - 1)):(dim(cp)[2])),
@@ -522,6 +539,7 @@ if (smooth == TRUE) {
               t(rollapply(zoo(t(rollapply(zoo(locindex[, , paste(p3), meth]), 2 * ma.win + 1, mymean))), 2 * ma.win + 1, mymean))
           }
         }
+      pbapply::closepb(pb)
 
       arrays[["mastercp"]][, , , , paste(100 * (1 - alpha)), "avecp", , ] <- avecp
       arrays[["mastercp"]][, , , , paste(100 * (1 - alpha)), "avelncp", , ] <- avelncp
@@ -608,8 +626,9 @@ onecpfun <- function(
     theta <- px[, 1] - px[, 2]
   } # theta estimate for every p1,p2 pair
 
+  cat(paste0("\nStep 2 of 3: calculate coverage probabilities for each alpha"))
+
   for (alpha in alph) {
-    print(paste0("alpha=", alpha))
     ci <- cis[,,, paste(100 * (1 - alpha)),,]
 
     # To obtain coverage probability for n,p1,p2, we determine the probability
@@ -626,9 +645,13 @@ onecpfun <- function(
     # - pdfpair function updated to give prob=NA for such impossible combinations
     # First switched to parameterisation using psi instead.
     # Then revisited in order to produce plots based on phi (more interpretable)
-    pb <- txtProgressBar(min = 0, max = dim(px)[1], style = 3) #text based bar
+    cat(paste0("\nalpha=", alpha))
+#    pb <- txtProgressBar(min = 0, max = dim(px)[1], style = 3) #text based bar
+    pb <- pbapply::timerProgressBar(min = 0, max = dim(px)[1], width = 50, char = '=', style = 1) #text based bar
+    on.exit(pbapply::closepb(pb))
     for (i in 1:dim(px)[1]) {
-      setTxtProgressBar(pb, i)
+#      setTxtProgressBar(pb, i)
+      pbapply::setTimerProgressBar(pb, i)
       if (!is.null(psis)) {
         prob <- pdfpair(p1 = px[i, 1],
                         p2 = px[i, 2],
