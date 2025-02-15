@@ -308,7 +308,7 @@ plotpanel <- function(plotdata,
                       oneside = F,
                       plotlab,
                       linesx = F,
-                      smoothed = F,
+                      smoothed = TRUE,
                       CIlen = F,
                       res.factor = 6,
                       fmt = "png",
@@ -333,12 +333,19 @@ plotpanel <- function(plotdata,
   longlab[longlab=="SCAS-cc5"] <- "SCAS-c (\U0263=0.5)"
   longlab[longlab=="SCAS-cc25"] <- "SCAS-c (\U0263=0.25)"
   longlab[longlab=="SCAS-cc125"] <- "SCAS-c (\U0263=0.125)"
+
+  longlab[longlab=="SCASp"] <- "T-SCASp"
+  longlab[longlab=="SCASpu"] <- "T-SCASpu"
+  longlab[longlab=="mid-p"] <- "T-mid-p"
+  longlab[longlab=="Jeffreys"] <- "T-Jeffreys"
+  longlab[longlab=="Wilson"] <- "T-Wilson"
+
   names(longlab) <- names(methods) <- methods
   n.grid <- dim(plotdata[["mastercp"]])[1]
   if (colour == F) collab=".bw" else collab=""
 
   # Set up to adjust number 4 rows of plots
-  rows <- 4
+  rows <- ifelse(smoothed == TRUE, 4, 3)
 
   # Select plot output format depending on journal requirements
   if (fmt=="tiff")  {
@@ -360,7 +367,8 @@ plotpanel <- function(plotdata,
                      sep=""
     ),
     width = (120 * nmeth + 60) * res.factor,
-    height = 4*rows * 38 * res.factor,
+#    height = (4*rows) * 38 * res.factor,
+    height = (4*rows+0.2) * 40 * res.factor,
     type = "quartz"
     )
   }
@@ -389,9 +397,12 @@ plotpanel <- function(plotdata,
   }
   }
 
-  layout(matrix(c(1:(rows * nmeth), rows * nmeth + c(1, 1:(rows-1))), rows, (nmeth + 1),
-                byrow = FALSE),
-         widths = c(rep(2, nmeth), 1), heights = rep(4, rows))
+  if (smoothed == TRUE) {
+    matr <- matrix(c(1:(rows * nmeth), rows * nmeth + c(1, 1:(rows-1))),
+                   rows, (nmeth + 1), byrow = FALSE)
+  } else matr <- matrix(c(1:(rows * nmeth), rows * nmeth + c(1:rows)),
+                          rows, (nmeth + 1), byrow = FALSE)
+  layout(matr, widths = c(rep(2, nmeth), 1), heights = rep(4, rows))
   par(oma = res.factor*c(0,3,ifelse(fmt=="xxx",10,7),0), pty='s')
   par(cex.main = res.factor*0.8*textsize, cex.axis=res.factor*0.8*textsize)
   par(mar = res.factor*(c(2,1,1,0.5)+0.1))
@@ -447,7 +458,7 @@ plotpanel <- function(plotdata,
              )
       )))
 
-
+  if (smoothed == TRUE) {
     # Run the smoothed plot
     CPcontour(plotdata=plotdata,
                          alpha=alpha,
@@ -480,7 +491,7 @@ plotpanel <- function(plotdata,
                                )
                         )))
     )
-
+  }
     # Run the location index plot
     palette2 <- CPcontour(plotdata = plotdata,
               alpha = alpha,
@@ -764,15 +775,17 @@ plotpanel <- function(plotdata,
         outer=TRUE,
         text = "DNCP\n for individual PSPs",
         cex=textsize*0.8*res.factor,
-        at=1/(2*rows),
+        at = 1/(2*rows),
         line=0.5*res.factor)
   mtext(side=2,
         outer=TRUE,
         text = "Location index\n for individual PSPs",
         cex=textsize*0.8*res.factor,
-        at = (1 - 1/(2*rows) - 2/rows),
+        at = 1/(2*rows) + 1/rows,
+#        at = (1 - 1/(2*rows) - 2/rows),
         line=0.5*res.factor)
-  mtext(side=2,
+  if (smoothed == TRUE) {
+    mtext(side=2,
         outer=TRUE,
         text = paste("Contour plot of \n'Moving Average' ",
                      ifelse(oneside,
@@ -782,6 +795,7 @@ plotpanel <- function(plotdata,
         cex=textsize*0.8*res.factor,
         at=(1 - 1/(2*rows) - 1/rows),
         line=0.5*res.factor)
+  }
   mtext(side=2,
         outer=TRUE,
         text=paste("Plot of ",ifelse(oneside,
