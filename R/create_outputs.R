@@ -26,7 +26,7 @@ if (FALSE) {
   RDpairteam <- RRpairteam <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP")
   ORpairteam <- c("SCASp", "SCASpu", "mid-p", "Jeffreys", "Wilson")
   alphas <- c(0.1, 0.05, 0.01)
-  alphas <- c(0.05)
+#  alphas <- c(0.05)
   phis <- c(0.1, 0.25, 0.5, 0.75)
 #  alphas <- c(0.05)
 #  phis <- c(0.25)
@@ -34,9 +34,9 @@ if (FALSE) {
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
   system.time(mycis <- cifun(n=20, contrast="RR", alph = alphas))[[3]]/60
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
-  system.time(mycis <- cifun(n=40, contrast="RD", alph = alphas, methods = RDpairteam))[[3]]/60
+  system.time(mycis <- cifun(n=40, contrast="RD", alph = alphas))[[3]]/60
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
-  system.time(mycis <- cifun(n=40, contrast="RR", alph = alphas, methods = RDpairteam))[[3]]/60
+  system.time(mycis <- cifun(n=40, contrast="RR", alph = alphas))[[3]]/60
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
 
   system.time(mycis <- cifun(n=65, contrast="RD", alph = alphas, methods = RDpairteam))[[3]]/60
@@ -421,38 +421,50 @@ if (FALSE) {
   RDcpairteam <- c("SCAS-cc125", "SCAS-cc25", "SCAS-cc5", "MOVER-NJcc125", "MOVER-NJcc5") 	#Paired RD, cc
   teamlist <- list(RDpairteam, RDcpairteam)
   teamlabels <- c("RDpair", "RDcpair")
-  load(file=paste0(outpath, "cparrays.RD.", 40, ".",200,".Rdata"))
-  for (j in c(0.1, 0.25, 0.5, 0.75)) {
-  #  for (i in c(0.05, 0.1, 0.01)) {
-    for (i in c(0.05)) {
-      for (k in 1:2) {
-        plotpanel(plotdata=arrays, alpha=i, par3=j,
-                  limits=c(0,1), sel=teamlist[[k]], plotlab=teamlabels[k],
-                  fmt="png", res.factor = 4)
+  load(file = paste0(outpath, "cparrays.RD.", 20, ".", 200, ".Rdata"))
+  load(file = paste0(outpath, "cparrays.RD.", 40, ".", 200, ".Rdata"))
+  load(file = paste0(outpath, "cparrays.RD.", 65, ".", 200, ".Rdata"))
+  for (n in c(20, 40, 65)) {
+    load(file = paste0(outpath, "cparrays.RD.", n, ".", 200, ".Rdata"))
+    for (j in c(0.1, 0.25, 0.5, 0.75)) {
+      for (i in c(0.05, 0.1, 0.01)) {
+        #  for (i in c(0.05)) {
+        for (k in 1) {
+          plotpanel(
+            plotdata = arrays, alpha = i, par3 = j,
+            limits = c(0, 1), sel = teamlist[[k]], plotlab = teamlabels[k],
+            fmt = "png", res.factor = 4
+          )
+        }
       }
     }
   }
   teamlabels <- c("RRpair", "RRcpair")
+  load(file=paste0(outpath, "cparrays.RR.", 20, ".",200,".Rdata"))
   load(file=paste0(outpath, "cparrays.RR.", 40, ".",200,".Rdata"))
-  for (j in c(0.1, 0.25, 0.5, 0.75)) {
-    for (i in c(0.05)) {
-      for (k in 1:2) {
-        plotpanel(plotdata=arrays, alpha=i, par3=j,
-                  limits=c(0,1), sel=teamlist[[k]], plotlab=teamlabels[k],
-                  fmt="png", res.factor = 4)
+  load(file=paste0(outpath, "cparrays.RR.", 65, ".",200,".Rdata"))
+  for (n in c(20, 40, 65)) {
+    load(file=paste0(outpath, "cparrays.RR.", n, ".",200,".Rdata"))
+    for (j in c(0.1, 0.25, 0.5, 0.75)) {
+      for (i in c(0.05, 0.1, 0.01)) {
+        for (k in 1) {
+          plotpanel(plotdata=arrays, alpha=i, par3=j,
+                    limits=c(0,1), sel=teamlist[[k]], plotlab=teamlabels[k],
+                    fmt="png", res.factor = 4)
+        }
       }
     }
   }
-
   teamlist <- list(ORpairteam)
   teamlabels <- c("ORpair")
-  load(file=paste0("data/cparrays.OR.", 105, ".",20,".Rdata"))
+  load(file=paste0("data/cparrays.OR.", 40, ".",200,".Rdata"))
+  load(file=paste0(outpath, "cparrays.OR.", 40, ".",200,".Rdata"))
   for (j in c(0.1, 0.25, 0.5, 0.75)) {
     for (i in c(0.05, 0.1)) {
       for (k in 1) {
         plotpanel(plotdata=arrays, alpha=i, par3=j,
                   limits=c(0,1), sel=teamlist[[k]], plotlab=teamlabels[k],
-                  fmt="png", res.factor = 4, smoothed=F)
+                  fmt="png", res.factor = 4, smoothed=T)
       }
     }
   }

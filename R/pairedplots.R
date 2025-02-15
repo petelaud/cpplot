@@ -366,9 +366,9 @@ plotpanel <- function(plotdata,
                      ifelse(oneside, "os", ""), collab, ".png",
                      sep=""
     ),
-    width = (120 * nmeth + 60) * res.factor,
+    width = (115 * nmeth + 60) * res.factor,
 #    height = (4*rows) * 38 * res.factor,
-    height = (4*rows+0.2) * 40 * res.factor,
+    height = (4*rows+0) * 38 * res.factor,
     type = "quartz"
     )
   }
