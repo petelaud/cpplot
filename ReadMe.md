@@ -1,4 +1,8 @@
 # cpplot
+<!-- badges: start -->
+[![DOI](https://zenodo.org/badge/917390039.svg)](https://doi.org/10.5281/zenodo.14876575)
+
+<!-- badges: end -->
 
 This is an R project containing the code required to recreate an evaluation of 
 coverage probability for selected confidence intervals for paired binomial 
