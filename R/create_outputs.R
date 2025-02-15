@@ -39,13 +39,17 @@ if (FALSE) {
   system.time(mycis <- cifun(n=40, contrast="RR", alph = alphas, methods = RDpairteam))[[3]]/60
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
 
-    system.time(mycis <- cifun(n=40, contrast="OR", alph = alphas, methods = ORpairteam))[[3]]/60
-  Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
-
-    system.time(mycis <- cifun(n=65, contrast="RD", alph = alphas, methods = RDpairteam))[[3]]/60
+  system.time(mycis <- cifun(n=65, contrast="RD", alph = alphas, methods = RDpairteam))[[3]]/60
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
   system.time(mycis <- cifun(n=65, contrast="RR", alph = alphas, methods = RRpairteam))[[3]]/60
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
+
+  system.time(mycis <- cifun(n=40, contrast="OR", alph = alphas, methods = ORpairteam))[[3]]/60
+  Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
+  alphas <- c(0.05, 0.1)
+  system.time(mycis <- cifun(n=105, contrast="OR", alph = alphas, methods = ORpairteam))[[3]]/60
+  # load(file=paste(outpath, "cis.OR.", 105, ".Rdata",sep=""))
+  Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=20, jitt=F, smooth=F, phis=phis))[[3]]/60
 
 
   #############################################################################
@@ -84,51 +88,74 @@ if (FALSE) {
   system.time(cp205RD10 <- onecpfun(0.4, 0.1, n=205, contrast = "RD", alph=0.05, phis=0.10, methods=RDpairteam))[[3]]/60
   system.time(cp205RD25 <- onecpfun(0.4, 0.1, n=205, contrast = "RD", alph=0.05, phis=0.25, methods=RDpairteam))[[3]]/60
   system.time(cp205RD50 <- onecpfun(0.4, 0.2, n=205, contrast = "RD", alph=0.05, phis=0.50, methods=RDpairteam))[[3]]/60
-  system.time(cp205RD75 <- onecpfun(0.3, 0.2, n=205, contrast = "RD", alph=0.05, phis=0.75, methods=RDpairteam))[[3]]/60
+  system.time(cp205RD75 <- onecpfun(0.4, 0.3, n=205, contrast = "RD", alph=0.05, phis=0.75, methods=RDpairteam))[[3]]/60
   system.time(cp205RD1099 <- onecpfun(0.4, 0.1, n=205, contrast = "RD", alph=0.01, phis=0.10, methods=RDpairteam))[[3]]/60
   system.time(cp205RD2599 <- onecpfun(0.4, 0.1, n=205, contrast = "RD", alph=0.01, phis=0.25, methods=RDpairteam))[[3]]/60
   system.time(cp205RD5099 <- onecpfun(0.4, 0.2, n=205, contrast = "RD", alph=0.01, phis=0.50, methods=RDpairteam))[[3]]/60
-  system.time(cp205RD7599 <- onecpfun(0.3, 0.2, n=205, contrast = "RD", alph=0.01, phis=0.75, methods=RDpairteam))[[3]]/60
+  system.time(cp205RD7599 <- onecpfun(0.4, 0.3, n=205, contrast = "RD", alph=0.01, phis=0.75, methods=RDpairteam))[[3]]/60
   # For RR
   system.time(cp205RR10 <- onecpfun(0.4, 0.1, n=205, contrast = "RR", alph=0.05, phis=0.10, methods=RDpairteam))[[3]]/60
   system.time(cp205RR25 <- onecpfun(0.4, 0.1, n=205, contrast = "RR", alph=0.05, phis=0.25, methods=RRpairteam))[[3]]/60
   system.time(cp205RR50 <- onecpfun(0.4, 0.2, n=205, contrast = "RR", alph=0.05, phis=0.50, methods=RDpairteam))[[3]]/60
-  system.time(cp205RR75 <- onecpfun(0.3, 0.2, n=205, contrast = "RR", alph=0.05, phis=0.75, methods=RRpairteam))[[3]]/60
+  system.time(cp205RR75 <- onecpfun(0.4, 0.3, n=205, contrast = "RR", alph=0.05, phis=0.75, methods=RRpairteam))[[3]]/60
   system.time(cp205RR1099 <- onecpfun(0.4, 0.1, n=205, contrast = "RR", alph=0.01, phis=0.10, methods=RDpairteam))[[3]]/60
   system.time(cp205RR2599 <- onecpfun(0.4, 0.1, n=205, contrast = "RR", alph=0.01, phis=0.25, methods=RRpairteam))[[3]]/60
   system.time(cp205RR5099 <- onecpfun(0.4, 0.2, n=205, contrast = "RR", alph=0.01, phis=0.50, methods=RDpairteam))[[3]]/60
-  system.time(cp205RR7599 <- onecpfun(0.3, 0.2, n=205, contrast = "RR", alph=0.01, phis=0.75, methods=RRpairteam))[[3]]/60
-  # For OR
-  system.time(cp205OR10 <- onecpfun(0.4, 0.2, n=205, contrast = "OR", alph=0.05, phis=0.10, methods=ORpairteam))[[3]]/60
-  system.time(cp205OR25 <- onecpfun(0.4, 0.2, n=205, contrast = "OR", alph=0.05, phis=0.25, methods=ORpairteam))[[3]]/60
-  system.time(cp205OR50 <- onecpfun(0.4, 0.2, n=205, contrast = "OR", alph=0.05, phis=0.50, methods=ORpairteam))[[3]]/60
-  system.time(cp205OR75 <- onecpfun(0.3, 0.2, n=205, contrast = "OR", alph=0.05, phis=0.75, methods=ORpairteam))[[3]]/60
-  system.time(cp205OR1099 <- onecpfun(0.4, 0.2, n=205, contrast = "OR", alph=0.01, phis=0.10, methods=ORpairteam))[[3]]/60
-  system.time(cp205OR2599 <- onecpfun(0.4, 0.2, n=205, contrast = "OR", alph=0.01, phis=0.25, methods=ORpairteam))[[3]]/60
-  system.time(cp205OR5099 <- onecpfun(0.4, 0.2, n=205, contrast = "OR", alph=0.01, phis=0.50, methods=ORpairteam))[[3]]/60
-  system.time(cp205OR7599 <- onecpfun(0.3, 0.2, n=205, contrast = "OR", alph=0.01, phis=0.75, methods=ORpairteam))[[3]]/60
+  system.time(cp205RR7599 <- onecpfun(0.4, 0.3, n=205, contrast = "RR", alph=0.01, phis=0.75, methods=RRpairteam))[[3]]/60
   # Combine results into a data object
   bignsummary <- array(NA, dim=c(6, 6, 4, 2, 2, 1))
   dimnames(bignsummary) <-
-    c(dimnames(cp205RD10)[c(1,2)],
-      list(c("0.4|0.1|0.1","0.4|0.1|0.25","0.4|0.2|0.5","0.3|0.2|0.75"),
+    c(dimnames(cp205RD75)[c(1,2)],
+      list(c("0.4|0.1|0.1","0.4|0.1|0.25","0.4|0.2|0.5","0.4|0.3|0.75"),
            paste(c(0.05, 0.01)),
            c("RD", "RR"),
            "205"
       ))
   for (i in c(0.05, 0.01)) {
-    for (k in contrasts) {
+    for (k in c("RD", "RR")) {
       bignsummary[,,"0.4|0.1|0.1", paste(i), paste(k), "205"] <-
         eval(parse(text=paste0("cp205", paste(k), "10", ifelse(i == 0.05, "", "99"))))
       bignsummary[,,"0.4|0.1|0.25", paste(i), paste(k), "205"] <-
         eval(parse(text=paste0("cp205", paste(k), "25", ifelse(i == 0.05, "", "99"))))
       bignsummary[,,"0.4|0.2|0.5", paste(i), paste(k), "205"] <-
         eval(parse(text=paste0("cp205", paste(k), "50", ifelse(i == 0.05, "", "99"))))
-      bignsummary[,,"0.3|0.2|0.75", paste(i), paste(k), "205"] <-
+      bignsummary[,,"0.4|0.3|0.75", paste(i), paste(k), "205"] <-
         eval(parse(text=paste0("cp205", paste(k), "75", ifelse(i == 0.05, "", "99"))))
     }
   }
-  save(bignsummary, file = paste(outpath, "bignsummary.Rdata"))
+  save(bignsummary, file = paste("data/bignsummary.Rdata"))
+  load(file = paste0("data/", "bignsummary.Rdata"))
+
+  # For OR
+  system.time(cp205OR10 <- onecpfun(0.4, 0.1, n=205, contrast = "OR", alph=0.05, phis=0.10, methods=ORpairteam))[[3]]/60
+  system.time(cp205OR25 <- onecpfun(0.4, 0.1, n=205, contrast = "OR", alph=0.05, phis=0.25, methods=ORpairteam))[[3]]/60
+  system.time(cp205OR50 <- onecpfun(0.4, 0.2, n=205, contrast = "OR", alph=0.05, phis=0.50, methods=ORpairteam))[[3]]/60
+  system.time(cp205OR75 <- onecpfun(0.4, 0.3, n=205, contrast = "OR", alph=0.05, phis=0.75, methods=ORpairteam))[[3]]/60
+  system.time(cp205OR1099 <- onecpfun(0.4, 0.1, n=205, contrast = "OR", alph=0.01, phis=0.10, methods=ORpairteam))[[3]]/60
+  system.time(cp205OR2599 <- onecpfun(0.4, 0.1, n=205, contrast = "OR", alph=0.01, phis=0.25, methods=ORpairteam))[[3]]/60
+  system.time(cp205OR5099 <- onecpfun(0.4, 0.2, n=205, contrast = "OR", alph=0.01, phis=0.50, methods=ORpairteam))[[3]]/60
+  system.time(cp205OR7599 <- onecpfun(0.4, 0.3, n=205, contrast = "OR", alph=0.01, phis=0.75, methods=ORpairteam))[[3]]/60
+  bignsummaryOR <- array(NA, dim=c(5, 6, 4, 2, 1, 1))
+  dimnames(bignsummaryOR) <-
+    c(dimnames(cp205OR10)[c(1,2)],
+      list(c("0.4|0.1|0.1","0.4|0.1|0.25","0.4|0.2|0.5","0.3|0.2|0.75"),
+           paste(c(0.05, 0.01)),
+           c("OR"),
+           "205"
+      ))
+  for (i in c(0.05, 0.01)) {
+    for (k in "OR") {
+      bignsummaryOR[,,"0.4|0.1|0.1", paste(i), paste(k), "205"] <-
+        eval(parse(text=paste0("cp205", paste(k), "10", ifelse(i == 0.05, "", "99"))))
+      bignsummaryOR[,,"0.4|0.1|0.25", paste(i), paste(k), "205"] <-
+        eval(parse(text=paste0("cp205", paste(k), "25", ifelse(i == 0.05, "", "99"))))
+      bignsummaryOR[,,"0.4|0.2|0.5", paste(i), paste(k), "205"] <-
+        eval(parse(text=paste0("cp205", paste(k), "50", ifelse(i == 0.05, "", "99"))))
+      bignsummaryOR[,,"0.3|0.2|0.75", paste(i), paste(k), "205"] <-
+        eval(parse(text=paste0("cp205", paste(k), "75", ifelse(i == 0.05, "", "99"))))
+    }
+  }
+  save(bignsummaryOR, file = paste0("data/", "bignsummaryOR.Rdata"))
 
 
   #############################################################################
@@ -162,7 +189,7 @@ if (FALSE) {
             plotlab = "ORpair", fmt="tiff", res.factor = 6)
   plotpanel(plotdata = arrays, alpha = 0.05, par3 = 0.25,
             sel = c("SCASp", "SCASpu", "mid-p", "Jeffreys", "Wilson"),
-            plotlab = "ORpair", fmt="png", res.factor = 4)
+            plotlab = "ORpair", fmt="png", res.factor = 4, smoothed=F)
 
   #############################################################################
   ### FIGURE 4: Type I error for McNemar test and 'N-1' test
@@ -244,9 +271,14 @@ if (FALSE) {
   ### Table 4: DNCP (One-sided type I error) for selected PSPs with larger sample size: N=205. Target DNCP=\ \alpha/2
   #############################################################################
   load(file=paste0('data/',"bignsummary.Rdata"))
-  mytable2 <-
+  mytable4a <-
     ftable(bignsummary[,"dncp",,,,], col.vars = c(3,2), row.vars = c(4,1))
-  write.ftable(round(mytable2, 4), sep=',', quote=TRUE, file = paste0(outpath, "bigntable205.csv"))
+  write.ftable(round(mytable4a, 4), sep=',', quote=TRUE, file = paste0(outpath, "bigntable205.csv"))
+
+  load(file=paste0('data/',"bignsummaryOR.Rdata"))
+  mytable4b <-
+    ftable(bignsummaryOR[,"dncp",,,,], col.vars = c(3,2), row.vars = c(1))
+  write.ftable(round(mytable4b, 4), sep=',', quote=TRUE, file = paste0(outpath, "bignORtable205.csv"))
 
 
   #############################################################################
@@ -412,6 +444,21 @@ if (FALSE) {
     }
   }
 
+  teamlist <- list(ORpairteam)
+  teamlabels <- c("ORpair")
+  load(file=paste0("data/cparrays.OR.", 105, ".",20,".Rdata"))
+  for (j in c(0.1, 0.25, 0.5, 0.75)) {
+    for (i in c(0.05, 0.1)) {
+      for (k in 1) {
+        plotpanel(plotdata=arrays, alpha=i, par3=j,
+                  limits=c(0,1), sel=teamlist[[k]], plotlab=teamlabels[k],
+                  fmt="png", res.factor = 4, smoothed=F)
+      }
+    }
+  }
+
+
+
 
 
   if(FALSE) {
@@ -434,6 +481,7 @@ if (FALSE) {
   }
 
   # Sample code to retrieve a previously run array:
+  # load(file=paste(outpath, "cis.OR.", 105, ".Rdata",sep=""))
   # load(file=paste(outpath, "cparrays.RR.", 40, ".",200,".Rdata",sep=""))
   # arr <- myarrays
 
