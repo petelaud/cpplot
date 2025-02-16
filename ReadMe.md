@@ -1,7 +1,6 @@
 # cpplot
 <!-- badges: start -->
-[![DOI](https://zenodo.org/badge/917390039.svg)](https://doi.org/10.5281/zenodo.14876575)
-
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.14878775.svg)](https://doi.org/10.5281/zenodo.14878775)
 <!-- badges: end -->
 
 This is an R project containing the code required to recreate an evaluation of 
