@@ -11,25 +11,20 @@ if (FALSE) {
 
   ### NOTE methods have been re-labelled in the manuscript:
   ### SCAS --> 'SCASu' (method without the 'N-1' variance bias correction)
-  ### SCAS-bc --> 'SCAS' (including the 'N-1' biascorrection)
+  ### SCAS-bc --> 'SCAS' (including the 'N-1' bias correction)
 
   # Set path for output files as required by user
-#  outpath <- '/myoutputpath'
-
-  root <- "/Users/ssu/Documents/"
-  outpath <- paste0(root, "Main/Courses_papers/skewscore/paired/")
+  outpath <- '/myoutputpath/'
+#  outpath <- 'data/'
 
   #############################################################################
+  ### OPTIONAL (summary data from these runs is provided in the repository)
   ### Run the CP calculation function for N=20, N=40 and N=65
   ### WARNING: for N=40 and 65, these take several hours to run!
   #############################################################################
   RDpairteam <- RRpairteam <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP")
-  ORpairteam <- c("SCASp", "SCASpu", "mid-p", "Jeffreys", "Wilson")
   alphas <- c(0.1, 0.05, 0.01)
-#  alphas <- c(0.05)
   phis <- c(0.1, 0.25, 0.5, 0.75)
-#  alphas <- c(0.05)
-#  phis <- c(0.25)
   system.time(mycis <- cifun(n=20, contrast="RD", alph = alphas))[[3]]/60
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
   system.time(mycis <- cifun(n=20, contrast="RR", alph = alphas))[[3]]/60
@@ -38,28 +33,33 @@ if (FALSE) {
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
   system.time(mycis <- cifun(n=40, contrast="RR", alph = alphas))[[3]]/60
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
-
   system.time(mycis <- cifun(n=65, contrast="RD", alph = alphas, methods = RDpairteam))[[3]]/60
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
   system.time(mycis <- cifun(n=65, contrast="RR", alph = alphas, methods = RRpairteam))[[3]]/60
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
 
+  # Less extensive evaluation for conditional OR
+  ORpairteam <- c("SCASp", "SCASpu", "mid-p", "Jeffreys", "Wilson")
+  alphas <- c(0.05, 0.1)
   system.time(mycis <- cifun(n=40, contrast="OR", alph = alphas, methods = ORpairteam))[[3]]/60
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
-  alphas <- c(0.05, 0.1)
-  system.time(mycis <- cifun(n=105, contrast="OR", alph = alphas, methods = ORpairteam))[[3]]/60
-  # load(file=paste(outpath, "cis.OR.", 105, ".Rdata",sep=""))
-  Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=20, jitt=F, smooth=F, phis=phis))[[3]]/60
+  # larger sample evaluation for OR with coarser grid of PSPs
+  # - for methods with closed form expressions
+#  system.time(mycis <- cifun(n=105, contrast="OR", alph = alphas, methods = ORpairteam))[[3]]/60
+#  Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=20, jitt=F, smooth=F, phis=phis))[[3]]/60
+
 
 
   #############################################################################
+  # OPTIONAL:
   # Combine output arrays for summarising across different Ns
+  # Note these are not all included in the GitHub repository due to size
+  # So the following requires all the cpfun calls above to be run
   #############################################################################
   mynums <- c(20, 40, 65)
   mymethods <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP")
   nmeth <- length(mymethods)
-# Tried to include an example data file in the GitHub repository, but it was too big
-#  load(file=paste0('data/', "cparrays.RD.", 40, ".",200,".Rdata"))
+  load(file=paste0(outpath, "cparrays.RD.", 40, ".",200,".Rdata"))
   mydims <- dim(arrays$summaries)
   mydims[5] <- length(mynums)
   mydims[6] <- 2
@@ -71,7 +71,6 @@ if (FALSE) {
 
   bigarray <- array(NA, dim = mydims)
   dimnames(bigarray) <- mydimnames
-  save(bigarray, file = paste0('data/', "allsummaries.Rdata"))
 
   submethods <- mymethods
   for (num in c(20, 40, 65)) {
@@ -80,6 +79,9 @@ if (FALSE) {
     load(file=paste0(outpath, "cparrays.RR.", num, ".",200,".Rdata"))
     bigarray[,submethods,,,paste(num), "RR"] <- arrays$summaries[,submethods,,,paste(num),]
   }
+
+  save(bigarray, file = paste0(outpath, "allsummaries.Rdata"))
+
 
   #############################################################################
   ### OPTIONAL: re-run calculations for large sample size
@@ -123,8 +125,7 @@ if (FALSE) {
         eval(parse(text=paste0("cp205", paste(k), "75", ifelse(i == 0.05, "", "99"))))
     }
   }
-  save(bignsummary, file = paste("data/bignsummary.Rdata"))
-  load(file = paste0("data/", "bignsummary.Rdata"))
+  save(bignsummary, file = paste(outpath, "bignsummary.Rdata"))
 
   # For OR
   system.time(cp205OR10 <- onecpfun(0.4, 0.1, n=205, contrast = "OR", alph=0.05, phis=0.10, methods=ORpairteam))[[3]]/60
@@ -155,7 +156,7 @@ if (FALSE) {
         eval(parse(text=paste0("cp205", paste(k), "75", ifelse(i == 0.05, "", "99"))))
     }
   }
-  save(bignsummaryOR, file = paste0("data/", "bignsummaryOR.Rdata"))
+  save(bignsummaryOR, file = paste0(outpath, "bignsummaryOR.Rdata"))
 
 
   #############################################################################
@@ -165,9 +166,6 @@ if (FALSE) {
   plotpanel(plotdata = arrays, alpha = 0.05, par3 = 0.25,
             sel = c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP"),
             plotlab = "RDpair", fmt="tiff", res.factor = 6)
-  plotpanel(plotdata = arrays, alpha = 0.05, par3 = 0.25,
-            sel = c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP"),
-            plotlab = "RDpair", fmt="png", res.factor = 4)
 
   #############################################################################
   ### FIGURE 2: CP, MACP, location index and DNCP for selected methods for RR, with N = 40, \alpha=0.05 and \phi=0.25
@@ -176,9 +174,6 @@ if (FALSE) {
   plotpanel(plotdata = arrays, alpha = 0.05, par3 = 0.25,
             sel = c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP"),
             plotlab = "RRpair", fmt="tiff", res.factor = 6)
-  plotpanel(plotdata = arrays, alpha = 0.05, par3 = 0.25,
-            sel = c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP"),
-            plotlab = "RRpair", fmt="png", res.factor = 4)
 
   #############################################################################
   ### FIGURE 3: CP, MACP, location index and DNCP for selected methods for OR, with N = 40, \alpha=0.05 and \phi=0.25
@@ -187,12 +182,10 @@ if (FALSE) {
   plotpanel(plotdata = arrays, alpha = 0.05, par3 = 0.25,
             sel = c("SCASp", "SCASpu", "mid-p", "Jeffreys", "Wilson"),
             plotlab = "ORpair", fmt="tiff", res.factor = 6)
-  plotpanel(plotdata = arrays, alpha = 0.05, par3 = 0.25,
-            sel = c("SCASp", "SCASpu", "mid-p", "Jeffreys", "Wilson"),
-            plotlab = "ORpair", fmt="png", res.factor = 4, smoothed=F)
 
   #############################################################################
   ### FIGURE 4: Type I error for McNemar test and 'N-1' test
+  ### Requires local run of cpfun for N=65 (dataset too large to upload)
   #############################################################################
   # 2-D Type I error plot
   load(file=paste0(outpath, "cparrays.RD.", 65, ".",200,".Rdata"))
@@ -307,7 +300,6 @@ if (FALSE) {
   ### Table 5.3: Example confidence intervals for OR, with (a, b, c, d) = (1, 1, 7, 12)
   #############################################################################
   x <- c(1, 1, 7, 12)
-#  x <- c(7, 25, 2, 68)
   egCI <- allpairci(x = x, contrast = "OR",
                     methods <- c("SCASp", "SCASpu", "mid-p", "Jeffreys", "Wilson", "SCASp-c125", "SCASp-c5", "C-P"),
                     alpha=0.05)
@@ -330,12 +322,23 @@ if (FALSE) {
   #############################################################################
   ### p.12 evaluation of type I error rate (TIER) for test for association
   #############################################################################
+
+  # Load the saved dataset
   load(file=paste0('data/',"tiers.Rdata"))
 
-  tier <- function(params) {
-    n <- c(params[1])
-    psi <- params[2]
-    p1 <- p2 <- params[3]
+  # TIER summaries matching Fagerland 2013
+  apply(mytiers[,4:5], 2, mean)
+  apply(mytiers[,4:5], 2, max)
+  apply(mytiers[,4:5], 2, function(x) mean(x > 0.05))
+  apply(mytiers[,4:5], 2, function(x) mean(x < 0.03))
+
+  ### OPTIONAL: run the code below to reproduce the analysis,
+  ### or run with different set of parameters
+
+  tier <- function(myparams) {
+    n <- c(myparams[1])
+    psi <- myparams[2]
+    p1 <- p2 <- myparams[3]
     g <- expand.grid(x11 = 0:n, x12 = 0:n, x21 = 0:n)
     # reduce to possible combinations of a,b,c for paired data.
     g <- g[(g$x12 <= n - g$x11) &
@@ -345,7 +348,7 @@ if (FALSE) {
                     p2 = p2,
                     psi = psi,
                     x = xs)
-    xsub <- xs[prob > 1E-8, ]
+    xsub <- xs[prob > 1E-8, , drop=F]
     if (dim(xsub)[1] > 0) {
       pvals <- sapply(1:dim(xsub)[[1]], function(i)
         pchisq(scorepair(theta = 0,
@@ -373,59 +376,40 @@ if (FALSE) {
   }
 
   # Parameter scenarios matching Fagerland 2013
-  myparams <- expand.grid(p1 = seq(0, 1, 0.01), psi = c(1, 2, 3, 5, 10), n = seq(10, 100, 5))
-  # Runtime: 3.3 hours
-  system.time(tiers <- sapply(1:dim(myparams)[1], function(i) tier(rev(unlist(myparams[i,])))))[[3]]/60
+  allparams <- expand.grid(p1 = seq(0, 1, 0.01), psi = c(1, 2, 3, 5, 10), n = seq(10, 100, 5))
+
+  # Runtime: 3.3 hours - progressBar timer can't be trusted as each iteration
+  # takes different time depending on n.
+  pbapply::pboptions(style=1)
+  system.time(
+    tiers <- pbapply::pbsapply(1:dim(allparams)[1], function(i) tier(myparams=rev(unlist(allparams[i,]))))
+    )[[3]]/60
   # Alternative scenarios with larger correlations
+  # - requires edits to the tiers function to use phi instead of psi
 #  myparams <- expand.grid(p1 = seq(0, 1, 0.02), phi = seq(0.25, 0.75, 0.05), n = seq(10, 100, 5))
-#  system.time(tiers <- sapply(1:dim(myparams)[1], function(i) tier(rev(unlist(myparams[i,])))))[[3]]/60
+#  system.time(tiers2 <- sapply(1:dim(myparams)[1], function(i) tier(rev(unlist(myparams[i,])))))[[3]]/60
 
   mytiers <- t(tiers)
-  dimnames(mytiers)[[2]] <- c("SCAStier", "AStier")
-  mytiers <- cbind(myparams, mytiers)
+  dimnames(mytiers)[[2]] <- c("nminus1_tier", "mcnemar_tier")
+  mytiers <- cbind(allparams, mytiers)
+  head(mytiers)
   save(mytiers, file = paste0(outpath, "tiers.Rdata"))
 
-  apply(mytiers[,4:5], 2, mean)
-  apply(mytiers[,4:5], 2, max)
-  apply(mytiers[,4:5], 2, function(x) mean(x > 0.05))
-  apply(mytiers[,4:5], 2, function(x) mean(x < 0.03))
-  dim(mytiers)
 
-  #############################################################################
-  ### Conditional odds ratio
-  #############################################################################
-
-  system.time(mycis <- cifun(n=40, contrast = "OR", alph = c(0.05, 0.1)))[[3]]/60
-  Sys.time()
-  system.time(
-    arrays <- cpfun(ciarrays = mycis,
-                    n.grid=200, phis=c(0.1, 0.25, 0.5, 0.75), smooth=TRUE)
-  )[[3]]/60
-  ORpairteam <- c("SCASp", "SCASpu", "mid-p", "Jeffreys", "Wilson")
-  teamlist <- list(ORpairteam)
-  teamlabels <- c("ORpair")
-  for (j in c(0.1, 0.25, 0.5, 0.75)) {
-    for (i in c(0.05, 0.1)) {
-      plotpanel(plotdata=arrays, alpha=i, par3=j,
-            sel=teamlist[[1]], plotlab=teamlabels[1],
-            fmt="png", res.factor = 4)
-    }
-    }
 
   #############################################################################
   ### SUPPLEMENTARY FIGURES:
-  ### CP, MACP, location index and DNCP for selected methods for RD, with N = 40, \alpha=0.05 and \phi=0.25
+  ### CP, MACP, location index and DNCP for selected methods for RD,
+  ### with N = 40, \alpha=0.05 and \phi=0.25
   #############################################################################
   # RD
   RDpairteam <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP")  	#Paired RD
   RDcpairteam <- c("SCAS-cc125", "SCAS-cc25", "SCAS-cc5", "MOVER-NJcc125", "MOVER-NJcc5") 	#Paired RD, cc
   teamlist <- list(RDpairteam, RDcpairteam)
   teamlabels <- c("RDpair", "RDcpair")
-  load(file = paste0(outpath, "cparrays.RD.", 20, ".", 200, ".Rdata"))
-  load(file = paste0(outpath, "cparrays.RD.", 40, ".", 200, ".Rdata"))
-  load(file = paste0(outpath, "cparrays.RD.", 65, ".", 200, ".Rdata"))
-  for (n in c(20, 40, 65)) {
-    load(file = paste0(outpath, "cparrays.RD.", n, ".", 200, ".Rdata"))
+  load(file = paste0("data/", "cparrays.RD.", 40, ".", 200, ".Rdata"))
+#  for (n in c(20, 40, 65)) {
+#    load(file = paste0(outpath, "cparrays.RD.", n, ".", 200, ".Rdata"))
     for (j in c(0.1, 0.25, 0.5, 0.75)) {
       for (i in c(0.05, 0.1, 0.01)) {
         #  for (i in c(0.05)) {
@@ -438,13 +422,12 @@ if (FALSE) {
         }
       }
     }
-  }
+#  }
+
   teamlabels <- c("RRpair", "RRcpair")
-  load(file=paste0(outpath, "cparrays.RR.", 20, ".",200,".Rdata"))
-  load(file=paste0(outpath, "cparrays.RR.", 40, ".",200,".Rdata"))
-  load(file=paste0(outpath, "cparrays.RR.", 65, ".",200,".Rdata"))
-  for (n in c(20, 40, 65)) {
-    load(file=paste0(outpath, "cparrays.RR.", n, ".",200,".Rdata"))
+  load(file=paste0("data/", "cparrays.RR.", 40, ".",200,".Rdata"))
+#  for (n in c(20, 40, 65)) {
+#    load(file=paste0(outpath, "cparrays.RR.", n, ".",200,".Rdata"))
     for (j in c(0.1, 0.25, 0.5, 0.75)) {
       for (i in c(0.05, 0.1, 0.01)) {
         for (k in 1) {
@@ -454,11 +437,11 @@ if (FALSE) {
         }
       }
     }
-  }
+#  }
+
   teamlist <- list(ORpairteam)
   teamlabels <- c("ORpair")
   load(file=paste0("data/cparrays.OR.", 40, ".",200,".Rdata"))
-  load(file=paste0(outpath, "cparrays.OR.", 40, ".",200,".Rdata"))
   for (j in c(0.1, 0.25, 0.5, 0.75)) {
     for (i in c(0.05, 0.1)) {
       for (k in 1) {
@@ -471,10 +454,15 @@ if (FALSE) {
 
 
 
+  # Sample code to retrieve a previously run array:
+  # load(file=paste(outpath, "cis.OR.", 105, ".Rdata",sep=""))
+  # load(file=paste(outpath, "cparrays.RR.", 40, ".",200,".Rdata",sep=""))
+  # arr <- myarrays
+
 
 
   if(FALSE) {
-    # Sample code in case need to combine plots for publication
+    # Sample code in case needed to combine plots for publication
     # install.packages("png")
     library(png)
     fig1a <- readPNG(paste0(outpath,"_png/summaryRD95_150,50os.png"), TRUE)
@@ -491,11 +479,6 @@ if (FALSE) {
     text(0.02,0.48,"(b)",cex=1.5*res.factor)
     dev.off()
   }
-
-  # Sample code to retrieve a previously run array:
-  # load(file=paste(outpath, "cis.OR.", 105, ".Rdata",sep=""))
-  # load(file=paste(outpath, "cparrays.RR.", 40, ".",200,".Rdata",sep=""))
-  # arr <- myarrays
 
 
 }
