@@ -134,7 +134,7 @@ allpairci <- function(xs,
                      "SCAS-c5", "SCAS-c25", "SCAS-c125",
                      "MOVER-c5", "MOVER-c25", "MOVER-c125", "BP")
       if (contrast == "RR") {
-        mymethods <- c(mymethods, "BP-J", "Tang-ccdr")
+        mymethods <- c(mymethods, "BP-J") #, "Tang-ccdr")
       }
     } else if (contrast == "OR") {
       mymethods <- c("SCASp", "SCASpu", "Jeffreys", "mid-p", "Wilson",
