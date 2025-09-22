@@ -336,19 +336,25 @@ cpfun <- function(
          paste(n),
          contrast)
 
-  arrays <- list(xs = xs, cis = cis, mastercp = mastercp, summaries = summaries)
-
   n.grid <- length(p1)
-#  set.seed(2012) # ensure we use the same jitters for each run
+  set.seed(2012) # ensure we use the same jitters for each run
   px <- pxg <- expand.grid(p1, p2, par3)
 
   refine <- 1 / n.grid
   if (jitt) {
-    jitter <- (limits[2] - limits[1]) * array(runif(2 * dim(pxg)[1], -refine / 2, refine / 2), dim = dim(pxg)) # OK if n.grid is even
-    px[, 1:2] <- pxg[, 1:2] + jitter[, 1:2]
+    # Apply the same random jitters to each value of phi/psi
+    jitter1 <- (limits[2] - limits[1]) * (runif(dim(pxg)[1]/length(par3), -refine / 2, refine / 2) ) # OK if n.grid is even
+    jitter2 <- (limits[2] - limits[1]) * (runif(dim(pxg)[1]/length(par3), -refine / 2, refine / 2) ) # OK if n.grid is even
+    jitters <- cbind(rep(jitter1, length(par3)), rep(jitter2, length(par3)))
+    px[, 1:2] <- pxg[, 1:2] + jitters[, 1:2]
+    jitter <- cbind(jitter1, jitter2)
+    ps <- expand.grid(p1, p2) + jitter # To keep in output array
   } else {
     px <- pxg
+    ps <- expand.grid(p1, p2)
   }
+
+  arrays <- list(xs = xs, cis = cis, ps = ps, mastercp = mastercp, summaries = summaries)
 
   # theta estimate for every p1,p2 pair
   if (contrast %in% c("RR")) {
