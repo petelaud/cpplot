@@ -433,6 +433,8 @@ if (FALSE) {
     }
 #  }
 
+
+  # RR
   teamlabels <- c("RRpair", "RRcpair")
   load(file=paste0(outpath, "cparrays.RR.", 40, ".",200,".Rdata"))
 #  for (n in c(20, 40, 65)) {
@@ -448,8 +450,11 @@ if (FALSE) {
     }
 #  }
 
-  teamlist <- list(ORpairteam)
-  teamlabels <- c("ORpair")
+  # OR
+  ORpairteam <- c("SCASp", "SCASpu", "mid-p", "Jeffreys", "Wilson")
+  ORcpairteam <- c("SCASp-c125", "SCASp-c25", "SCASp-c5", "midp-c25", "Jeffreys-c125", "Jeffreys-c25", "Jeffreys-c5", "C-P")
+  teamlist <- list(ORpairteam, ORcpairteam)
+  teamlabels <- c("ORpair", "ORcpair")
   load(file=paste0(outpath, "cparrays.OR.", 40, ".",200,".Rdata"))
   for (j in c(0.1, 0.25, 0.5, 0.75)) {
     for (i in c(0.05, 0.1)) {
