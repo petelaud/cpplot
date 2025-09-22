@@ -179,7 +179,7 @@ if (FALSE) {
   #############################################################################
   load(file = paste0(outpath, "cparrays.RR.", 40, ".", 200, ".Rdata"))
   plotpanel(plotdata = arrays, alpha = 0.05, par3 = 0.25,
-            sel = c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP"),
+            sel = c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP", "BP-J"),
             plotlab = "RRpair", fmt="tiff", res.factor = 6)
 
   #############################################################################
