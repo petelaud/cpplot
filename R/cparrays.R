@@ -180,7 +180,12 @@ allpairci <- function(xs,
       # DelRocco's version of continuity correction for RR - not equivariant so ruled out
 #      if ("Tang-ccdr" %in% mymethods)   ci[, 1:2, "Tang-ccdr"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, level = 1-alpha, cc=0.5, cctype="delrocco")$estimates[,c(1,3)]))
       # Proposed variation of Bonett-Price hybrid method, incorporating Jeffreys intervals
-      if ("BP-J" %in% mymethods)    ci[, 1:2, "BP-J"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method_RR = "BP", moverbase = "jeff", level = 1-alpha)$estimates[,c(1,3)]))
+      if ("BP-J" %in% mymethods)    ci[, 1:2, "BP-J"] <- t(sapply(1:lenxs,function(i) {
+        if (sum(xs[i, 2:3]) == 0 ) outdata <- c(0, Inf)
+        else outdata <- pairbinci(x = xs[i,], contrast = contrast, method = "BP", moverbase = "jeff", level = 1-alpha)$estimates[,c(1,3)]
+        outdata
+      }
+            ))
     }
   } else if (contrast == "OR") {
     # Explore various options for transformed binomial intervals for conditional OR
