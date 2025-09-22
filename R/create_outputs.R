@@ -413,7 +413,7 @@ if (FALSE) {
   #############################################################################
   # RD
   RDpairteam <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP")  	#Paired RD
-  RDcpairteam <- c("SCAS-cc125", "SCAS-cc25", "SCAS-cc5", "MOVER-NJcc125", "MOVER-NJcc5") 	#Paired RD, cc
+  RDcpairteam <- c("SCAS-c125", "SCAS-c25", "SCAS-c5", "MOVER-c125", "MOVER-c25", "MOVER-c5") 	#Paired RD, cc
   teamlist <- list(RDpairteam, RDcpairteam)
   teamlabels <- c("RDpair", "RDcpair")
   load(file = paste0(outpath, "cparrays.RD.", 40, ".", 200, ".Rdata"))
