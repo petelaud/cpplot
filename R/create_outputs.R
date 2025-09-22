@@ -23,7 +23,7 @@ if (FALSE) {
   ### Run the CP calculation function for N=20, N=40 and N=65
   ### WARNING: for N=40 and 65, these take several hours to run!
   #############################################################################
-  RDpairteam <- RRpairteam <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP")
+  RDpairteam <- RRpairteam <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP") # Subset of methods used for larger N
   alphas <- c(0.1, 0.05, 0.01)
   phis <- c(0.1, 0.25, 0.5, 0.75)
   system.time(mycis <- cifun(n=20, contrast="RD", alph = alphas))[[3]]/60
@@ -39,13 +39,19 @@ if (FALSE) {
   system.time(mycis <- cifun(n=65, contrast="RR", alph = alphas, methods = RRpairteam))[[3]]/60
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
 
-  # Less extensive evaluation for conditional OR
-  ORpairteam <- c("SCASp", "SCASpu", "mid-p", "Jeffreys", "Wilson")
-  alphas <- c(0.05, 0.1)
-  system.time(mycis <- cifun(n=40, contrast="OR", alph = alphas, methods = ORpairteam))[[3]]/60
+  # Evaluation for conditional OR
+  ORpairteam <- c("SCASp", "SCASpu", "mid-p", "Jeffreys", "Wilson") # Subset of OR methods used for larger N
+  system.time(mycis <- cifun(n=20, contrast="OR", alph = alphas))[[3]]/60
+  Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
+  system.time(mycis <- cifun(n=40, contrast="OR", alph = alphas))[[3]]/60
+  Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
+#  system.time(mycis <- cifun(n=65, contrast="OR", alph = alphas, methods = ORpairteam))[[3]]/60
+  system.time(mycis <- cifun(n=65, contrast="OR", alph = alphas))[[3]]/60
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
   # larger sample evaluation for OR with coarser grid of PSPs
-  # - for methods with closed form expressions
+  # - methods with closed form expressions are quicker to calculate,
+  #   but the coverage probability calculations take longer because there is an extra step
+  #   to get p12, p21 from p1, p2 and phi
 #  system.time(mycis <- cifun(n=105, contrast="OR", alph = alphas, methods = ORpairteam))[[3]]/60
 #  Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=20, jitt=F, smooth=F, phis=phis))[[3]]/60
 
