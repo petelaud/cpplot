@@ -287,7 +287,7 @@ if (FALSE) {
   x <- c(1, 1, 7, 12)
   egCI <- allpairci(x = x, contrast = "RD",
                     methods <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-NW", "MOVER-W", "BP",
-                                 "SCAS-cc125", "SCAS-cc5", "MOVER-NJcc125", "MOVER-NJcc5"),
+                                 "SCAS-c125", "SCAS-c5", "MOVER-c125", "MOVER-c5"),
                     alpha=0.05)
   dimnames(egCI)[[1]] <- ""
   ftable(round(egCI, 3), row.vars = 3)
@@ -298,7 +298,7 @@ if (FALSE) {
   x <- c(1, 1, 7, 12)
   egCI <- allpairci(x = x, contrast = "RR",
                     methods <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-NW", "MOVER-W", "BP",
-                                 "SCAS-cc125", "SCAS-cc5", "MOVER-NJcc125", "MOVER-NJcc5"),
+                                 "SCAS-c125", "SCAS-c5", "MOVER-c125", "MOVER-c5"),
                     alpha=0.05)
   dimnames(egCI)[[1]] <- ""
   ftable(round(egCI, 3), row.vars = 3)
@@ -308,10 +308,12 @@ if (FALSE) {
   #############################################################################
   x <- c(1, 1, 7, 12)
   egCI <- allpairci(x = x, contrast = "OR",
-                    methods <- c("SCASp", "SCASpu", "mid-p", "Jeffreys", "Wilson", "SCASp-c125", "SCASp-c5", "C-P"),
+                    methods <- c("SCASp", "SCASpu", "mid-p", "Jeffreys", "Wilson",
+                                 "SCASp-c125", "SCASp-c5", "Jeffreys-c125", "Jeffreys-c5", "C-P"),
                     alpha=0.05)
   dimnames(egCI)[[1]] <- ""
   ftable(round(egCI, 3), row.vars = 3)
+  (round(log(egCI[,2,]) - log(egCI[,1,]),2))
 
 
   #############################################################################
