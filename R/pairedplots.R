@@ -545,6 +545,10 @@ plotpanel <- function(plotdata,
             "\n","DNCP above ",
             format(1.2*alpha/2,scientific=F),
             "=",(summaries[i,"pctBad.DNCP"]),
+#            "%",
+#            "\n","DNCP within ±",
+#            format(0.2*alpha/2,scientific=F),
+#            "=",(summaries[i,"pctnear.1side"]),
             "%"
           )))
   }
