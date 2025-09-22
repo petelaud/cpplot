@@ -328,17 +328,25 @@ plotpanel <- function(plotdata,
   # and it would take too long to go back and re-run everything
   longlab[longlab=="SCAS"] <- "SCASu"
   longlab[longlab=="SCAS-bc"] <- "SCAS"
-  longlab[longlab=="MOVER-NJcc5"] <- "MOVER-c (\U0263=0.5)"
-  longlab[longlab=="MOVER-NJcc125"] <- "MOVER-c (\U0263=0.125)"
-  longlab[longlab=="SCAS-cc5"] <- "SCAS-c (\U0263=0.5)"
-  longlab[longlab=="SCAS-cc25"] <- "SCAS-c (\U0263=0.25)"
-  longlab[longlab=="SCAS-cc125"] <- "SCAS-c (\U0263=0.125)"
+  longlab[longlab=="MOVER-c5"] <- "MOVER-c (\U0263=0.5)"
+  longlab[longlab=="MOVER-c25"] <- "MOVER-c (\U0263=0.25)"
+  longlab[longlab=="MOVER-c125"] <- "MOVER-c (\U0263=0.125)"
+  longlab[longlab=="SCAS-c5"] <- "SCAS-c (\U0263=0.5)"
+  longlab[longlab=="SCAS-c25"] <- "SCAS-c (\U0263=0.25)"
+  longlab[longlab=="SCAS-c125"] <- "SCAS-c (\U0263=0.125)"
 
-  longlab[longlab=="SCASp"] <- "T-SCASp"
-  longlab[longlab=="SCASpu"] <- "T-SCASpu"
-  longlab[longlab=="mid-p"] <- "T-mid-p"
+  longlab[longlab=="SCASp"] <- "T-SCASp(N-1)"
+  longlab[longlab=="SCASpu"] <- "T-SCASp"
+  longlab[longlab=="mid-p"] <- "T-midp"
   longlab[longlab=="Jeffreys"] <- "T-Jeffreys"
   longlab[longlab=="Wilson"] <- "T-Wilson"
+  longlab[longlab=="SCASp-c125"] <- "T-SCASp-c125"
+  longlab[longlab=="SCASp-c25"] <- "T-SCASp-c25"
+  longlab[longlab=="SCASp-c5"] <- "T-SCASp-c5"
+  longlab[longlab=="midp-c25"] <- "T-midp-c25"
+  longlab[longlab=="Jeffreys-c25"] <- "T-Jeffreys-c25"
+  longlab[longlab=="Wilson-c"] <- "T-Wilson-c"
+  longlab[longlab=="C-P"] <- "T-CP"
 
   names(longlab) <- names(methods) <- methods
   n.grid <- dim(plotdata[["mastercp"]])[1]
