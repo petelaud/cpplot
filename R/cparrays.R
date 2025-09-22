@@ -324,7 +324,8 @@ cpfun <- function(
                    "pctAveCons", "pctAvenear", "pctAvenearlo", "pctAvenearhi", "pctAveBad",
                    "meanMNCP", "meanDNCP", "maxLNCP", "pctCons.1side", "pctBad.1side", "pctBad.DNCP",
                    "pctnear.1side", "pctAvenear.1side", "typeI", "maxtypeI", "avetypeI",
-                   "meanlen", "meanlocindex", "pctgoodloc")
+                   "meanlen", "meanlocindex", "pctgoodloc",
+                   "pctnear.DNCP", "pctCons.DNCP", "pctBad.either", "pctCons.both")
   summaries <- array(NA, dim = c(length(par3), length(mymethods), length(alph), length(summarylist), 1, 1))
   dimnames(summaries) <-
     list(paste(par3),
@@ -468,6 +469,7 @@ tryCatch(
     arrays[["mastercp"]][, , , , paste(100 * (1 - alpha)), "dncp", , ] <- dncp
     arrays[["mastercp"]][, , , , paste(100 * (1 - alpha)), "locindex", , ] <- locindex
     arrays[["mastercp"]][, , , , paste(100 * (1 - alpha)), "len", , ] <- len
+    maxncp <- pmax(lncp, rncp)
 
     meanlen <- format(round(apply(len, 3:4, mymean), 3), nsmall = 3)
     meanCP <- format(round(apply(cp, 3:4, mymean), 3), nsmall = 3)
@@ -482,10 +484,14 @@ tryCatch(
     meanMNCP <- format(round(apply(mncp, 3:4, mymean), 3), nsmall = 3)
     meanDNCP <- format(round(apply((1 - cp - mncp), 3:4, mymean), 3), nsmall = 3)
     maxLNCP <- format(round(apply(lncp, 3:4, function(x) max(x, na.rm = TRUE)), 3), nsmall = 3)
-    pctBad.1side <- format(100 * round(apply(lncp, 3:4, FUN = function(x) mymean(x > (1.1 * alpha / 2))), 3), nsmall = 1)
+    pctBad.1side <- format(100 * round(apply(lncp, 3:4, FUN = function(x) mymean(x > (1.2 * alpha / 2))), 3), nsmall = 1)
     pctBad.DNCP <- format(100 * round(apply(1 - cp - mncp, 3:4, FUN = function(x) mymean(x > (1.2 * alpha / 2))), 3), nsmall = 1)
     pctCons.1side <- format(100 * round(apply(lncp, 3:4, FUN = function(x) mymean(x < (alpha / 2))), 3), nsmall = 1)
-    pctnear.1side <- format(100 * round(apply(lncp, 3:4, FUN = function(x) mymean(x > 0.9 * (alpha / 2) & x < 1.1 * (alpha / 2))), 3), nsmall = 1)
+    pctnear.1side <- format(100 * round(apply(lncp, 3:4, FUN = function(x) mymean(x > 0.8 * (alpha / 2) & x < 1.2 * (alpha / 2))), 3), nsmall = 1)
+    pctnear.DNCP <- format(100 * round(apply((1 - cp - mncp), 3:4, FUN = function(x) mymean(x > 0.8 * (alpha / 2) & x < 1.2 * (alpha / 2))), 3), nsmall = 1)
+    pctCons.DNCP <- format(100 * round(apply((1 - cp - mncp), 3:4, FUN = function(x) mymean(x < (alpha / 2))), 3), nsmall = 1)
+    pctBad.either <- format(100 * round(apply(maxncp, 3:4, FUN = function(x) mymean(x > (1.2 * alpha / 2))), 3), nsmall = 1)
+    pctCons.both <- format(100 * round(apply(maxncp, 3:4, FUN = function(x) mymean(x < (alpha / 2))), 3), nsmall = 1)
 
     pctAveCons <-  pctAvenear <-  pctAvenearlo <- pctAvenearhi <- pctAveBad <-
       pctAvenear.1side <- typeI <- maxtypeI <- avetypeI <-
@@ -553,11 +559,12 @@ if (smooth == TRUE) {
               pctAveCons, pctAvenear, pctAvenearlo, pctAvenearhi, pctAveBad,
               meanMNCP, meanDNCP, maxLNCP, pctCons.1side, pctBad.1side, pctBad.DNCP,
               pctnear.1side, pctAvenear.1side, typeI, maxtypeI, avetypeI,
-              meanlen, meanlocindex, pctgoodloc),
+              meanlen, meanlocindex, pctgoodloc,
+              pctnear.DNCP, pctCons.DNCP, pctBad.either, pctCons.both),
             dim=c(max(length(psis), length(phis)), nmeth, length(summarylist)))
 
         # Free up some memory
-    rm(cp, lncp, rncp, mncp, locindex, len,
+    rm(cp, lncp, rncp, mncp, maxncp, locindex, len,
            cpl, lncpl, rncpl, mncpl, lenl, locindexl)
 
     save(arrays,
