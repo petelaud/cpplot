@@ -422,7 +422,7 @@ if (FALSE) {
     for (j in c(0.1, 0.25, 0.5, 0.75)) {
       for (i in c(0.05, 0.1, 0.01)) {
         #  for (i in c(0.05)) {
-        for (k in 1) {
+        for (k in 1:2) {
           plotpanel(
             plotdata = arrays, alpha = i, par3 = j,
             limits = c(0, 1), sel = teamlist[[k]], plotlab = teamlabels[k],
@@ -439,7 +439,7 @@ if (FALSE) {
 #    load(file=paste0(outpath, "cparrays.RR.", n, ".",200,".Rdata"))
     for (j in c(0.1, 0.25, 0.5, 0.75)) {
       for (i in c(0.05, 0.1, 0.01)) {
-        for (k in 1) {
+        for (k in 1:2) {
           plotpanel(plotdata=arrays, alpha=i, par3=j,
                     limits=c(0,1), sel=teamlist[[k]], plotlab=teamlabels[k],
                     fmt="png", res.factor = 4)
@@ -453,7 +453,7 @@ if (FALSE) {
   load(file=paste0(outpath, "cparrays.OR.", 40, ".",200,".Rdata"))
   for (j in c(0.1, 0.25, 0.5, 0.75)) {
     for (i in c(0.05, 0.1)) {
-      for (k in 1) {
+      for (k in 1:2) {
         plotpanel(plotdata=arrays, alpha=i, par3=j,
                   limits=c(0,1), sel=teamlist[[k]], plotlab=teamlabels[k],
                   fmt="png", res.factor = 4, smoothed=T)
