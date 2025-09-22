@@ -15,7 +15,8 @@ if (FALSE) {
 
   # Set path for output files as required by user
   outpath <- '/myoutputpath/'
-#  outpath <- 'data/'
+  outpath <- paste0(root, "Main/Courses_papers/skewscore/paired/") # Remove for final upload
+  #  outpath <- 'data/'
 
   #############################################################################
   ### OPTIONAL (summary data from these runs is provided in the repository)
@@ -162,7 +163,7 @@ if (FALSE) {
   #############################################################################
   ### FIGURE 1: CP, MACP, location index and DNCP for selected methods for RD, with N = 40, \alpha=0.05 and \phi=0.25
   #############################################################################
-  load(file = paste0('data/', "cparrays.RD.", 40, ".",200,".Rdata"))
+  load(file = paste0(outpath, "cparrays.RD.", 40, ".",200,".Rdata"))
   plotpanel(plotdata = arrays, alpha = 0.05, par3 = 0.25,
             sel = c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP"),
             plotlab = "RDpair", fmt="tiff", res.factor = 6)
@@ -170,7 +171,7 @@ if (FALSE) {
   #############################################################################
   ### FIGURE 2: CP, MACP, location index and DNCP for selected methods for RR, with N = 40, \alpha=0.05 and \phi=0.25
   #############################################################################
-  load(file = paste0('data/', "cparrays.RR.", 40, ".",200,".Rdata"))
+  load(file = paste0(outpath, "cparrays.RR.", 40, ".", 200, ".Rdata"))
   plotpanel(plotdata = arrays, alpha = 0.05, par3 = 0.25,
             sel = c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP"),
             plotlab = "RRpair", fmt="tiff", res.factor = 6)
@@ -178,7 +179,7 @@ if (FALSE) {
   #############################################################################
   ### FIGURE 3: CP, MACP, location index and DNCP for selected methods for OR, with N = 40, \alpha=0.05 and \phi=0.25
   #############################################################################
-  load(file = paste0('data/', "cparrays.OR.", 40, ".",200,".Rdata"))
+  load(file = paste0(outpath, "cparrays.OR.", 40, ".",200,".Rdata"))
   plotpanel(plotdata = arrays, alpha = 0.05, par3 = 0.25,
             sel = c("SCASp", "SCASpu", "mid-p", "Jeffreys", "Wilson"),
             plotlab = "ORpair", fmt="tiff", res.factor = 6)

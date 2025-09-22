@@ -357,7 +357,7 @@ plotpanel <- function(plotdata,
 
   # Select plot output format depending on journal requirements
   if (fmt=="tiff")  {
-    tiff(file = paste(outpath,"_",fmt,"/","summary",
+    tiff(file = paste(outpath,"_",fmt,"/",
                       ifelse(sided=="L","L",""),
                       plotlab, nums, "_", 100*(1-alpha), "_", format(par3, nsmall=2),
                       ifelse(oneside, "os", ""), collab, ".tiff",
@@ -368,7 +368,7 @@ plotpanel <- function(plotdata,
     type="quartz"
     )
   } else if (fmt=="png") {
-    png(file = paste(outpath,
+    png(file = paste(outpath, "_", fmt, "/",
                      ifelse(sided=="L","L",""),
                      plotlab, nums, "_", 100*(1-alpha), "_", format(par3, nsmall=2),
                      ifelse(oneside, "os", ""), collab, ".png",

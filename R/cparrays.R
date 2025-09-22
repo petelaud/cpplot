@@ -362,6 +362,7 @@ cpfun <- function(
   } else if (contrast == "OR") {
     # Note this is the conditional OR, p12/p21, not the marginal OR
     # So need to get p12 and p21 from the PSP values of p1, p2 and phi/psi
+    # This adds to the runtimes for this contrast
     if (!is.null(phis)) pij <- params(p1 = px[, 1], p2 = px[, 2], phi = px[, 3])[, 5:8]
     if (!is.null(psis)) pij <- params(p1 = px[, 1], p2 = px[, 2], psi = px[, 3])[, 5:8]
     theta <- pij[, 2] / pij[, 3] # Conditional OR
@@ -578,10 +579,10 @@ if (smooth == TRUE) {
            cpl, lncpl, rncpl, mncpl, lenl, locindexl)
 
     save(arrays,
-#         file = paste(outpath, "cparrays.", contrast, ".",
-#                      n, ".", n.grid, ".Rdata", sep = "")
-         file = paste("data/", "cparrays.", contrast, ".",
+         file = paste(outpath, "cparrays.", contrast, ".",
                       n, ".", n.grid, ".Rdata", sep = "")
+#         file = paste("data/", "cparrays.", contrast, ".",
+#                      n, ".", n.grid, ".Rdata", sep = "")
     )
   }
 
