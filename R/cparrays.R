@@ -291,7 +291,8 @@ cpfun <- function(
                   smooth = TRUE,
                   prerun = F,
                   jitt = TRUE,
-                  sided = "R"
+                  sided = "R",
+                  pcut = 1E-10
                   ) {
 
   xs <- ciarrays[["xs"]]
@@ -417,26 +418,28 @@ tryCatch(
 
   },
       if (any(!is.na(prob))) {
-        cpl[i, ] <- t(ci[, 1, ] <= theta[i] & ci[, 2, ] >= theta[i] & ci[, 2, ] > ci[, 1, ]) %*% prob # 2-sided coverage probability. NB degenerate intervals excluded
-        lncpl[i, ] <- t(ci[, 1, ] > theta[i] | ci[, 2, ] == ci[, 1, ]) %*% prob # L-sided non-coverage (R-side is a mirror image)
-        rncpl[i, ] <- t(ci[, 2, ] < theta[i] | ci[, 2, ] == ci[, 1, ]) %*% prob # R-sided non-coverage
+        cisub <- ci[prob > pcut, , ]
+        probsub <- prob[prob > pcut]
+        cpl[i, ] <- t(cisub[, 1, ] <= theta[i] & cisub[, 2, ] >= theta[i] & cisub[, 2, ] > cisub[, 1, ]) %*% probsub # 2-sided coverage probability. NB degenerate intervals excluded
+        lncpl[i, ] <- t(cisub[, 1, ] > theta[i] | cisub[, 2, ] == cisub[, 1, ]) %*% probsub # L-sided non-coverage (R-side is a mirror image)
+        rncpl[i, ] <- t(cisub[, 2, ] < theta[i] | cisub[, 2, ] == cisub[, 1, ]) %*% probsub # R-sided non-coverage
 
         # not really interested in length, I think location is more important
         # - and its complicated to explain on log scale
         # but included as reviewers might request it
-        lens <- ci[, 2, ] - ci[, 1, ]
+        lens <- cisub[, 2, ] - cisub[, 1, ]
         ## you get whacky results with length on linear scale
         # 		if(contrast %in% c("RR")) lens<-(ci[,2,])-(ci[,1,])
         # 		lens[lens>100]<-100 #workaround for infinite lengths with RR
         if (contrast %in% c("RR")) {
           # for RR, use length on the log scale. Still an issue with infinite lengths though
-          lens <- log(ci[, 2, ]) - log(pmax(0.0000000001, ci[, 1, ]))
+          lens <- log(cisub[, 2, ]) - log(pmax(0.0000000001, cisub[, 1, ]))
           # Try Newcombe's book suggestion to use U/(1+U) - L/(1+L) - also doesn't resolve the issue
           #lens <- ci[, 2, ]/(1 + ci[, 2, ]) - ci[, 1, ]/(1 + ci[, 1, ])
         }
         lens[lens > 10] <- 10 # workaround for infinite lengths with RR
-        lens[ci[, 2, ] == ci[, 1, ]] <- 0
-        lenl[i, ] <- t(lens) %*% prob
+        lens[cisub[, 2, ] == cisub[, 1, ]] <- 0
+        lenl[i, ] <- t(lens) %*% probsub
       }
   ) # End trycatch bracket
     }
@@ -448,6 +451,7 @@ tryCatch(
 
     # Free up some memory
     rm(ci)
+    rm(cisub)
 
     # convert CPs etc to a square grid of p1,p2 points
     mydim <- c(length(p1), length(p2), length(par3), nmeth)
