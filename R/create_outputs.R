@@ -242,7 +242,7 @@ if (FALSE) {
   #############################################################################
   ### TABLE 2.1 & TABLE 3.1: Summary of % proximate for selected methods for RD & RR
   #############################################################################
-  load(file = paste0('data/', "allsummaries.Rdata"))
+  load(file = paste0(outpath, "allsummaries.Rdata"))
   mysummaries <-
     bigarray[, , c('95', '90'), c("meanCP", "pctCons", "pctnear", "pctgoodloc", "meanlocindex"),,]
   # Round to 0dps
@@ -270,12 +270,12 @@ if (FALSE) {
   #############################################################################
   ### Table 4: DNCP (One-sided type I error) for selected PSPs with larger sample size: N=205. Target DNCP=\ \alpha/2
   #############################################################################
-  load(file=paste0('data/',"bignsummary.Rdata"))
+  load(file=paste0(outpath,"bignsummary.Rdata"))
   mytable4a <-
     ftable(bignsummary[,"dncp",,,,], col.vars = c(3,2), row.vars = c(4,1))
   write.ftable(round(mytable4a, 4), sep=',', quote=TRUE, file = paste0(outpath, "bigntable205.csv"))
 
-  load(file=paste0('data/',"bignsummaryOR.Rdata"))
+  load(file=paste0(outpath,"bignsummaryOR.Rdata"))
   mytable4b <-
     ftable(bignsummaryOR[,"dncp",,,,], col.vars = c(3,2), row.vars = c(1))
   write.ftable(round(mytable4b, 4), sep=',', quote=TRUE, file = paste0(outpath, "bignORtable205.csv"))
@@ -331,7 +331,7 @@ if (FALSE) {
   #############################################################################
 
   # Load the saved dataset
-  load(file=paste0('data/',"tiers.Rdata"))
+  load(file=paste0(outpath,"tiers.Rdata"))
 
   # TIER summaries matching Fagerland 2013
   apply(mytiers[,4:5], 2, mean)
@@ -414,7 +414,7 @@ if (FALSE) {
   RDcpairteam <- c("SCAS-cc125", "SCAS-cc25", "SCAS-cc5", "MOVER-NJcc125", "MOVER-NJcc5") 	#Paired RD, cc
   teamlist <- list(RDpairteam, RDcpairteam)
   teamlabels <- c("RDpair", "RDcpair")
-  load(file = paste0("data/", "cparrays.RD.", 40, ".", 200, ".Rdata"))
+  load(file = paste0(outpath, "cparrays.RD.", 40, ".", 200, ".Rdata"))
 #  for (n in c(20, 40, 65)) {
 #    load(file = paste0(outpath, "cparrays.RD.", n, ".", 200, ".Rdata"))
     for (j in c(0.1, 0.25, 0.5, 0.75)) {
@@ -432,7 +432,7 @@ if (FALSE) {
 #  }
 
   teamlabels <- c("RRpair", "RRcpair")
-  load(file=paste0("data/", "cparrays.RR.", 40, ".",200,".Rdata"))
+  load(file=paste0(outpath, "cparrays.RR.", 40, ".",200,".Rdata"))
 #  for (n in c(20, 40, 65)) {
 #    load(file=paste0(outpath, "cparrays.RR.", n, ".",200,".Rdata"))
     for (j in c(0.1, 0.25, 0.5, 0.75)) {
@@ -448,7 +448,7 @@ if (FALSE) {
 
   teamlist <- list(ORpairteam)
   teamlabels <- c("ORpair")
-  load(file=paste0("data/cparrays.OR.", 40, ".",200,".Rdata"))
+  load(file=paste0(outpath, "cparrays.OR.", 40, ".",200,".Rdata"))
   for (j in c(0.1, 0.25, 0.5, 0.75)) {
     for (i in c(0.05, 0.1)) {
       for (k in 1) {
