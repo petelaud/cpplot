@@ -23,7 +23,9 @@ if (FALSE) {
   ### Run the CP calculation function for N=20, N=40 and N=65
   ### WARNING: for N=40 and 65, these take several hours to run!
   #############################################################################
-  RDpairteam <- RRpairteam <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP") # Subset of methods used for larger N
+  RDpairteam <- RRpairteam <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP")
+  # ^^ Example of how you might specify a subset of methods used for larger N
+  # for reduced runtimes using methods= argument in cpfun() below
   alphas <- c(0.1, 0.05, 0.01)
   phis <- c(0.1, 0.25, 0.5, 0.75)
   system.time(mycis <- cifun(n=20, contrast="RD", alph = alphas))[[3]]/60
@@ -34,9 +36,9 @@ if (FALSE) {
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
   system.time(mycis <- cifun(n=40, contrast="RR", alph = alphas))[[3]]/60
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
-  system.time(mycis <- cifun(n=65, contrast="RD", alph = alphas, methods = RDpairteam))[[3]]/60
+  system.time(mycis <- cifun(n=65, contrast="RD", alph = alphas))[[3]]/60
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
-  system.time(mycis <- cifun(n=65, contrast="RR", alph = alphas, methods = RRpairteam))[[3]]/60
+  system.time(mycis <- cifun(n=65, contrast="RR", alph = alphas))[[3]]/60
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
 
   # Evaluation for conditional OR
@@ -45,11 +47,10 @@ if (FALSE) {
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
   system.time(mycis <- cifun(n=40, contrast="OR", alph = alphas))[[3]]/60
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
-#  system.time(mycis <- cifun(n=65, contrast="OR", alph = alphas, methods = ORpairteam))[[3]]/60
   system.time(mycis <- cifun(n=65, contrast="OR", alph = alphas))[[3]]/60
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
   # larger sample evaluation for OR with coarser grid of PSPs
-  # - methods with closed form expressions are quicker to calculate,
+  # - Note: OR methods with closed form expressions are quicker to calculate,
   #   but the coverage probability calculations take longer because there is an extra step
   #   to get p12, p21 from p1, p2 and phi
 #  system.time(mycis <- cifun(n=105, contrast="OR", alph = alphas, methods = ORpairteam))[[3]]/60
@@ -64,27 +65,42 @@ if (FALSE) {
   # So the following requires all the cpfun calls above to be run
   #############################################################################
   mynums <- c(20, 40, 65)
-  mymethods <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP")
+#  mynums <- c(40, 65)
+  mymethods <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP", "BP-J",
+                 "SCAS-c5", "SCAS-c25", "SCAS-c125", "MOVER-c5", "MOVER-c25", "MOVER-c125",
+                 "SCASp", "SCASpu", "Jeffreys", "mid-p", "Wilson",
+                 "SCASp-c5", "SCASp-c25", "SCASp-c125", "C-P", "Jeffreys-c25", "Jeffreys-c125")
+  RDmeth <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP",
+              "SCAS-c5", "SCAS-c25", "SCAS-c125", "MOVER-c5", "MOVER-c25", "MOVER-c125")
+  RRmeth <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP", "BP-J",
+              "SCAS-c5", "SCAS-c25", "SCAS-c125", "MOVER-c5", "MOVER-c25", "MOVER-c125")
+  ORmeth <- c("SCASp", "SCASpu", "mid-p", "Jeffreys", "Wilson",
+              "SCASp-c5", "SCASp-c25", "SCASp-c125", "C-P", "Jeffreys-c25", "Jeffreys-c125")
   nmeth <- length(mymethods)
   load(file=paste0(outpath, "cparrays.RD.", 40, ".",200,".Rdata"))
   mydims <- dim(arrays$summaries)
   mydims[5] <- length(mynums)
-  mydims[6] <- 2
+  mydims[6] <- 3
   mydims[2] <- nmeth
   mydimnames <- dimnames(arrays$summaries)
   mydimnames[[5]] <- paste(mynums)
-  mydimnames[[6]] <- c("RD", "RR")
+  mydimnames[[6]] <- c("RD", "RR", "OR")
   mydimnames[[2]] <- mymethods
 
   bigarray <- array(NA, dim = mydims)
   dimnames(bigarray) <- mydimnames
 
-  submethods <- mymethods
-  for (num in c(20, 40, 65)) {
+  for (num in mynums) {
     load(file=paste0(outpath, "cparrays.RD.", num, ".",200,".Rdata"))
-    bigarray[,submethods,,,paste(num), "RD"] <- arrays$summaries[,submethods,,,paste(num),]
+    bigarray[,RDmeth,,,paste(num), "RD"] <- arrays$summaries[,RDmeth,,,paste(num),]
+  }
+  for (num in mynums) {
     load(file=paste0(outpath, "cparrays.RR.", num, ".",200,".Rdata"))
-    bigarray[,submethods,,,paste(num), "RR"] <- arrays$summaries[,submethods,,,paste(num),]
+    bigarray[,RRmeth,,,paste(num), "RR"] <- arrays$summaries[,RRmeth,,,paste(num),]
+  }
+  for (num in mynums) {
+    load(file=paste0(outpath, "cparrays.OR.", num, ".",200,".Rdata"))
+    bigarray[,ORmeth,,,paste(num), "OR"] <- arrays$summaries[,ORmeth,,,paste(num),]
   }
 
   save(bigarray, file = paste0(outpath, "allsummaries.Rdata"))
