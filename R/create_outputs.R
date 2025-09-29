@@ -298,6 +298,28 @@ if (FALSE) {
 
   #############################################################################
   ### Table 5.1: Example confidence intervals for RD, with (a, b, c, d) = (1, 1, 7, 12)
+  ### Table 6: Conservative coverage summary
+  #############################################################################
+
+  RDcpairteam <- RRcpairteam <- c("SCAS-c5", "SCAS-c25", "SCAS-c125", "SCAS", "MOVER-c5", "MOVER-c25", "MOVER-c125", "MOVER-NJ") 	#Paired RD, cc
+  ORcpairteam <- c("SCASp-c5", "SCASp-c25", "SCASp-c125", "SCASp", "C-P", "Jeffreys-c25", "Jeffreys-c125", "Jeffreys")
+
+  # Overall minimum coverage for each continuity-adjusted method per contrast
+  # (Including corresponding unadjusted method for reference)
+  apply(bigarray[,RDcpairteam,c("95","90"),"minCP",,"RD"], 2:3, min)
+  apply(bigarray[,RRcpairteam,c("95","90"),"minCP",,"RR"], 2:3, min)
+  apply(bigarray[,ORcpairteam,c("95","90"),"minCP",,"OR"], 2:3, min)
+
+  # Overall average of %PSP that are doubly conservative (showing 2dps for results close to 100)
+  apply(bigarray[,RDcpairteam,c("95","90"),"pctCons.both",,"RD"], 2:3,  function(x) round(mean(as.numeric(x)), 2))
+  apply(bigarray[,RDcpairteam,c("95","90"),"pctCons.both",,"RD"], 2:3,  function(x) round(mean(as.numeric(x)), 0))
+  apply(bigarray[,RRcpairteam,c("95","90"),"pctCons.both",,"RR"], 2:3,  function(x) round(mean(as.numeric(x)), 2))
+  apply(bigarray[,RRcpairteam,c("95","90"),"pctCons.both",,"RR"], 2:3,  function(x) round(mean(as.numeric(x)), 0))
+  apply(bigarray[,ORcpairteam,c("95","90"),"pctCons.both",,"OR"], 2:3,  function(x) round(mean(as.numeric(x)), 2))
+  apply(bigarray[,ORcpairteam,c("95","90"),"pctCons.both",,"OR"], 2:3,  function(x) round(mean(as.numeric(x)), 0))
+
+
+
   #############################################################################
   x <- c(1, 1, 7, 12)
   egCI <- allpairci(x = x, contrast = "RD",
