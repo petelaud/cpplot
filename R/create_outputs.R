@@ -352,7 +352,8 @@ if (FALSE) {
 
 
   #############################################################################
-  ### p.5 footnote: MOVER-NJ intervals discrepancy vs M-L Tang et al
+  ### p.6 footnote: MOVER-NJ RD intervals discrepancy vs M-L Tang et al 2020a Table VI
+  ### (cf methods AS=TANGO, MOVER-NW=NW and MOVER=NJ≠NJ)
   #############################################################################
   xs <- rbind(c(43, 0, 1, 0),
              c(8, 3, 1, 2),
@@ -360,6 +361,16 @@ if (FALSE) {
   egCI <- allpairci(x = xs, contrast = "RD",
             methods <- c("AS", "MOVER-NW", "MOVER-NJ"),
             alpha=0.05)
+  ftable(round(egCI, 4), row.vars = 1, col.vars=c(3, 2))
+
+  # And RR intervals from the other M-L Tang et al paper, Tables 4, 6 & 8
+  # (cf methods AS = Score:14 or NB:15, MOVER-W = WCI:3, MOVER-NJ ≠ JCI:4)
+  xs <- rbind(c(8, 3, 1, 2),
+              c(22, 2, 0, 1),
+              c(43, 0, 1, 0))
+  egCI <- allpairci(x = xs, contrast = "RR",
+                    methods <- c("AS", "MOVER-W", "MOVER-J"),
+                    alpha=0.05)
   ftable(round(egCI, 4), row.vars = 1, col.vars=c(3, 2))
 
 
