@@ -255,36 +255,35 @@ if (FALSE) {
   lines(p2, 1 - cp1[,"AS","cp"], lty=2, lwd = 2*res.factor)
   dev.off()
 
+
   #############################################################################
-  ### TABLE 2.1 & TABLE 3.1: Summary of % proximate for selected methods for RD & RR
+  ### TABLE 2, 3 & 4: Summary of each metric for selected methods for RD & RR, & OR
   #############################################################################
   load(file = paste0(outpath, "allsummaries.Rdata"))
   mysummaries <-
-    bigarray[, , c('95', '90'), c("meanCP", "pctCons", "pctnear", "pctgoodloc", "meanlocindex"),,]
+    bigarray[, , c('95', '90'), c("meanCP", "pctCons", "pctnear", "pctgoodloc", "meanlocindex", "pctBad.DNCP", "minCP", "pctCons.both"), c("20", "40", "65"), ,drop=F]
   # Round to 0dps
-  mysummaries[, , , c("pctCons", "pctnear", "pctgoodloc"),,] <-
-    round(as.numeric(mysummaries[, , ,c("pctCons", "pctnear", "pctgoodloc"),,]), 0)
+  mysummaries[, , , c("pctCons", "pctnear", "pctgoodloc", "pctBad.DNCP"),,] <-
+    round(as.numeric(mysummaries[, , ,c("pctCons", "pctnear", "pctgoodloc", "pctBad.DNCP"),,]), 0)
   # Add brackets to anticonservative methods
   anticons <- (as.numeric(mysummaries[,,,"pctCons",,]) < 50)
   mysummaries[,,,"pctnear",,] <- paste0(ifelse(anticons,"["," "),
                                         mysummaries[,,,"pctnear",,],
                                         ifelse(anticons,"]"," "))
 
-  mytable1 <-
-    ftable((mysummaries[, , , c("pctnear"),,]), col.vars = c(3,1), row.vars = c(5,4,2))
-  write.ftable(mytable1, sep=',', quote=TRUE, file = paste0(outpath, "tablecp2065.csv"))
+  dimnames(mysummaries)
+  RDmeth <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP")
+  RRmeth <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP", "BP-J")
+  ORmeth <- c("SCASp", "SCASpu", "mid-p", "Jeffreys", "Wilson")
+
+  # Summarise by metric for N=40 for new tables in resubmission
+  ftable((mysummaries[, RDmeth, , c("pctnear", "pctgoodloc", "pctBad.DNCP"),"40",c("RD")]), col.vars = c(3,1), row.vars = c(4,2))
+  ftable((mysummaries[, RRmeth, , c("pctnear", "pctgoodloc", "pctBad.DNCP"), "40", c("RR")]), col.vars = c(3,1), row.vars = c(4,2))
+  ftable((mysummaries[, ORmeth, , c("pctnear", "pctgoodloc", "pctBad.DNCP"),"40",c("OR")]), col.vars = c(3,1), row.vars = c(4,2))
 
 
   #############################################################################
-  ### TABLE 2.2 & TABLE 3.2: Summary of % central for selected methods for RD & RR
-  #############################################################################
-  mytable2 <-
-    ftable((mysummaries[, , , c("pctgoodloc"),,]), col.vars = c(3,1), row.vars = c(5,4,2))
-  write.ftable(mytable2, sep=',', quote=TRUE, file = paste0(outpath, "tableloc2065.csv"))
-
-
-  #############################################################################
-  ### Table 4: DNCP (One-sided type I error) for selected PSPs with larger sample size: N=205. Target DNCP=\ \alpha/2
+  ### Table 5: DNCP (One-sided type I error) for selected PSPs with larger sample size: N=205. Target DNCP=\ \alpha/2
   #############################################################################
   load(file=paste0(outpath,"bignsummary.Rdata"))
   mytable4a <-
