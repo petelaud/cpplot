@@ -297,7 +297,6 @@ if (FALSE) {
 
 
   #############################################################################
-  ### Table 5.1: Example confidence intervals for RD, with (a, b, c, d) = (1, 1, 7, 12)
   ### Table 6: Conservative coverage summary
   #############################################################################
 
@@ -321,6 +320,8 @@ if (FALSE) {
 
 
   #############################################################################
+  ### Table 5: Example confidence intervals with (a, b, c, d) = (1, 1, 7, 12)
+  #############################################################################
   x <- c(1, 1, 7, 12)
   egCI <- allpairci(x = x, contrast = "RD",
                     methods <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-NW", "MOVER-W", "BP",
@@ -328,28 +329,25 @@ if (FALSE) {
                     alpha=0.05)
   dimnames(egCI)[[1]] <- ""
   ftable(round(egCI, 3), row.vars = 3)
+  # Calculate width from unrounded data, for consistency with Fagerland et al
+  t(t((round(egCI[,2,], 3) - round(egCI[,1,],3))))
 
-  #############################################################################
-  ### Table 5.2: Example confidence intervals for RR, with (a, b, c, d) = (1, 1, 7, 12)
-  #############################################################################
-  x <- c(1, 1, 7, 12)
   egCI <- allpairci(x = x, contrast = "RR",
                     methods <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-NW", "MOVER-W", "BP",
                                  "SCAS-c125", "SCAS-c5", "MOVER-c125", "MOVER-c5"),
                     alpha=0.05)
   dimnames(egCI)[[1]] <- ""
   ftable(round(egCI, 3), row.vars = 3)
+  # Calculate log width from unrounded data, for consistency with Fagerland et al
+  t(t((round(log(egCI[,2,]) - log(egCI[,1,]),2))))
 
-  #############################################################################
-  ### Table 5.3: Example confidence intervals for OR, with (a, b, c, d) = (1, 1, 7, 12)
-  #############################################################################
-  x <- c(1, 1, 7, 12)
   egCI <- allpairci(x = x, contrast = "OR",
                     methods <- c("SCASp", "SCASpu", "mid-p", "Jeffreys", "Wilson",
                                  "SCASp-c125", "SCASp-c5", "Jeffreys-c125", "Jeffreys-c5", "C-P"),
                     alpha=0.05)
   dimnames(egCI)[[1]] <- ""
   ftable(round(egCI, 3), row.vars = 3)
+  t(t((round(log(egCI[,2,]) - log(egCI[,1,]),2))))
   (round(log(egCI[,2,]) - log(egCI[,1,]),2))
 
 
