@@ -56,6 +56,43 @@ if (FALSE) {
 #  system.time(mycis <- cifun(n=105, contrast="OR", alph = alphas, methods = ORpairteam))[[3]]/60
 #  Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=20, jitt=F, smooth=F, phis=phis))[[3]]/60
 
+  RDmeth <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP",
+              "SCAS-c5", "SCAS-c25", "SCAS-c125", "MOVER-c5", "MOVER-c25", "MOVER-c125")
+  RRmeth <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP", "BP-J",
+              "SCAS-c5", "SCAS-c25", "SCAS-c125", "MOVER-c5", "MOVER-c25", "MOVER-c125")
+  ORmeth <- c("SCASp", "SCASpu", "mid-p", "Jeffreys", "Wilson",
+              "SCASp-c5", "SCASp-c25", "SCASp-c125", "C-P", "Jeffreys-c25", "Jeffreys-c125")
+
+
+  # Limited versions for GitHub due to file size limit
+  load(file=paste(outpath, "cparrays.RD.", 40, ".",200,".Rdata",sep=""))
+  mycis <- arrays
+  Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, alph=0.05, phis=phis,
+                                          methods = RDmeth[1:6], outdir="data/"))[[3]]/60
+  load(file=paste(outpath, "cparrays.RR.", 40, ".",200,".Rdata",sep=""))
+  mycis <- arrays
+  Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, alph=0.05, phis=phis,
+                                          methods = RRmeth[1:7], outdir="data/"))[[3]]/60
+  load(file=paste(outpath, "cparrays.OR.", 40, ".",200,".Rdata",sep=""))
+  mycis <- arrays
+  Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, alph=0.05, phis=phis,
+                                          methods = ORmeth[1:5], outdir="data/"))[[3]]/60
+
+  # Subset arrays to selected N and methods for smaller file size to upload to GitHub
+  load(file=paste(outpath, "cparrays.RD.", 40, ".",200,".Rdata",sep=""))
+  arrays$cis <- arrays$cis[,, RDmeth[1:6], "95",,, drop=FALSE]
+  arrays$mastercp <- arrays$mastercp[,,, RDmeth[1:6], "95",,,, drop=FALSE]
+  save(arrays, file = paste("data/cparrays.RD.40.200.Rdata", sep = ""))
+
+  load(file=paste(outpath, "cparrays.RR.", 40, ".",200,".Rdata",sep=""))
+  arrays$cis <- arrays$cis[,, RRmeth[1:7], "95",,, drop=FALSE]
+  arrays$mastercp <- arrays$mastercp[,,, RDmeth[1:7], "95",,,, drop=FALSE]
+  save(arrays, file = paste("data/cparrays.RR.40.200.Rdata", sep = ""))
+
+  load(file=paste(outpath, "cparrays.OR.", 40, ".",200,".Rdata",sep=""))
+  arrays$cis <- arrays$cis[,, ORmeth[1:5], "95",,, drop=FALSE]
+  arrays$mastercp <- arrays$mastercp[,,, ORmeth[1:5], "95",,,, drop=FALSE]
+  save(arrays, file = paste("data/cparrays.OR.40.200.Rdata", sep = ""))
 
 
   #############################################################################
@@ -70,12 +107,6 @@ if (FALSE) {
                  "SCAS-c5", "SCAS-c25", "SCAS-c125", "MOVER-c5", "MOVER-c25", "MOVER-c125",
                  "SCASp", "SCASpu", "Jeffreys", "mid-p", "Wilson",
                  "SCASp-c5", "SCASp-c25", "SCASp-c125", "C-P", "Jeffreys-c25", "Jeffreys-c125")
-  RDmeth <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP",
-              "SCAS-c5", "SCAS-c25", "SCAS-c125", "MOVER-c5", "MOVER-c25", "MOVER-c125")
-  RRmeth <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP", "BP-J",
-              "SCAS-c5", "SCAS-c25", "SCAS-c125", "MOVER-c5", "MOVER-c25", "MOVER-c125")
-  ORmeth <- c("SCASp", "SCASpu", "mid-p", "Jeffreys", "Wilson",
-              "SCASp-c5", "SCASp-c25", "SCASp-c125", "C-P", "Jeffreys-c25", "Jeffreys-c125")
   nmeth <- length(mymethods)
   load(file=paste0(outpath, "cparrays.RD.", 40, ".",200,".Rdata"))
   mydims <- dim(arrays$summaries)
@@ -272,14 +303,14 @@ if (FALSE) {
                                         ifelse(anticons,"]"," "))
 
   dimnames(mysummaries)
-  RDmeth <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP")
-  RRmeth <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP", "BP-J")
-  ORmeth <- c("SCASp", "SCASpu", "mid-p", "Jeffreys", "Wilson")
+#  RDmeth <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP")
+#  RRmeth <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP", "BP-J")
+#  ORmeth <- c("SCASp", "SCASpu", "mid-p", "Jeffreys", "Wilson")
 
   # Summarise by metric for N=40 for new tables in resubmission
-  ftable((mysummaries[, RDmeth, , c("pctnear", "pctgoodloc", "pctBad.DNCP"),"40",c("RD")]), col.vars = c(3,1), row.vars = c(4,2))
-  ftable((mysummaries[, RRmeth, , c("pctnear", "pctgoodloc", "pctBad.DNCP"), "40", c("RR")]), col.vars = c(3,1), row.vars = c(4,2))
-  ftable((mysummaries[, ORmeth, , c("pctnear", "pctgoodloc", "pctBad.DNCP"),"40",c("OR")]), col.vars = c(3,1), row.vars = c(4,2))
+  ftable((mysummaries[, RDmeth[1:6], , c("pctnear", "pctgoodloc", "pctBad.DNCP"),"40",c("RD")]), col.vars = c(3,1), row.vars = c(4,2))
+  ftable((mysummaries[, RRmeth[1:7], , c("pctnear", "pctgoodloc", "pctBad.DNCP"), "40", c("RR")]), col.vars = c(3,1), row.vars = c(4,2))
+  ftable((mysummaries[, ORmeth[1:5], , c("pctnear", "pctgoodloc", "pctBad.DNCP"),"40",c("OR")]), col.vars = c(3,1), row.vars = c(4,2))
 
 
   #############################################################################
