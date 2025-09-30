@@ -293,13 +293,17 @@ cpfun <- function(
                   prerun = F,
                   jitt = TRUE,
                   sided = "R",
-                  pcut = 1E-10
+                  pcut = 1E-10,
+                  outdir = outpath
                   ) {
 
   xs <- ciarrays[["xs"]]
   cis <- ciarrays[["cis"]]
   contrast <- dimnames(cis)[[6]]
-  mymethods <- longlab <- dimnames(cis)[[3]]
+  if (is.null(methods)) {
+    mymethods <- longlab <- dimnames(cis)[[3]]
+  } else mymethods <- longlab <- methods
+
   if (is.null(alph)) alph <- 1 - (as.numeric(dimnames(cis)[[4]])/100)
   nmeth <- length(mymethods)
   n <- as.numeric(dimnames(cis)[[5]])
@@ -379,7 +383,7 @@ cpfun <- function(
   for (alpha in alph) {
     cat(paste0("alpha=", alpha,"\n"))
     cat(paste0("Coverage probabilities\n"))
-    ci <- cis[,,, paste(100 * (1 - alpha)),,]
+    ci <- cis[,, mymethods, paste(100 * (1 - alpha)),,]
 
     # To obtain coverage probability for n,p1,p2, we determine the probability
     # of each possible pair of observed frequencies a,b given p1,p2 using
@@ -580,7 +584,7 @@ if (smooth == TRUE) {
            cpl, lncpl, rncpl, mncpl, lenl, locindexl)
 
     save(arrays,
-         file = paste(outpath, "cparrays.", contrast, ".",
+         file = paste(outdir, "cparrays.", contrast, ".",
                       n, ".", n.grid, ".Rdata", sep = "")
 #         file = paste("data/", "cparrays.", contrast, ".",
 #                      n, ".", n.grid, ".Rdata", sep = "")
