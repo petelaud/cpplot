@@ -130,7 +130,7 @@ allpairci <- function(xs,
   } else {
     if (contrast %in% c("RD", "RR")) {
       mymethods <- c("AS", "AS-bc", "SCAS", "SCAS-bc",
-                     "MOVER-W", "MOVER-NW", "MOVER-NJ", "MOVER-NS",
+                     "MOVER-W", "MOVER-J", "MOVER-NW", "MOVER-NJ", "MOVER-NS",
                      "SCAS-c5", "SCAS-c25", "SCAS-c125",
                      "MOVER-c5", "MOVER-c25", "MOVER-c125", "BP")
       if (contrast == "RR") {
@@ -158,6 +158,7 @@ allpairci <- function(xs,
     if ("SCAS-c125" %in% mymethods)  ci[, 1:2, "SCAS-c125"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method = "Score", skew=TRUE, bcf=TRUE, cc=0.125, level = 1-alpha)$estimates[,c(1,3)]))
     # MOVER methods, first without modification
     if ("MOVER-W" %in% mymethods) ci[, 1:2, "MOVER-W"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method = "MOVER", moverbase = "wilson", level = 1-alpha)$estimates[,c(1,3)]))
+    if ("MOVER-J" %in% mymethods) ci[, 1:2, "MOVER-J"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method = "MOVER", moverbase = "jeff", level = 1-alpha)$estimates[,c(1,3)]))
     # "-N" adds Newcombe's correlation correction
     if ("MOVER-NW" %in% mymethods)  ci[, 1:2, "MOVER-NW"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method = "MOVER_newc", moverbase = "wilson", level = 1-alpha)$estimates[,c(1,3)]))
     # then try different input methods: Jeffreys & SCASp
