@@ -395,14 +395,32 @@ if (FALSE) {
   ftable(round(egCI, 4), row.vars = 1, col.vars=c(3, 2))
 
   # And RR intervals from the other M-L Tang et al paper, Tables 4, 6 & 8
-  # (cf methods AS = Score:14 or NB:15, MOVER-W = WCI:3, MOVER-NJ ≠ JCI:4)
+  # (cf methods AS = Score:14 or NB:15, MOVER-W = WCI:3, MOVER-J ≠ JCI:4)
   xs <- rbind(c(8, 3, 1, 2),
               c(22, 2, 0, 1),
               c(43, 0, 1, 0))
   egCI <- allpairci(x = xs, contrast = "RR",
-                    methods <- c("AS", "MOVER-W", "MOVER-J"),
+                    methods <- c("AS", "MOVER-W", "MOVER-J", "MOVER-NJ"),
                     alpha=0.05)
   ftable(round(egCI, 4), row.vars = 1, col.vars=c(3, 2))
+
+  # Check qbeta vs qf version of Jeffreys interval, for p = 11/14
+  x <- 11
+  n <- 14
+  alpha <- 0.05
+  cc <- 0
+  ai <- bi <- 0.5
+  CI_qf <- c((2*x + 1) / (2*x + 1 + (2*(n-x) + 1)*qf(1-alpha/2, 2*(n-x)+1, 2*x+1)),
+             (2*x + 1) / (2*x + 1 + (2*(n-x) + 1)*qf(alpha/2, 2*(n-x)+1, 2*x+1)))
+  CI_beta <- c(qbeta(alpha / 2, x + (ai - cc), n - x + (bi + cc)),
+               qbeta(1 - alpha / 2, x + (ai + cc), n - x + (bi - cc)))
+  rbind(CI_qf, CI_beta)
+
+
+  est <- qbeta(0.5, x + (ai), n - x + (bi)) # Obtain phat as the median
+  #    CI_upper <- qbeta(1 - alpha / 2, x + (ai + cc), n - x + (bi - cc))
+  CI_upper <- (2*x + 1) / (2*x + 1 + (2*(n-x) + 1)*qf(alpha/2, 2*(n-x)+1, 2*x+1))
+
 
 
   #############################################################################
