@@ -218,7 +218,7 @@ CPcontour <- function(plotdata,
 #	par(mar=res.factor*(c(2,1,2,0)+0.1))
 	plot(x, y, type = 'n', col.axis="white", xlim=xlim,
 	     ylim=ylim, 	      xaxs="i",
-	     yaxs="i",)
+	     yaxs="i", xlab='', ylab='')
 	abline(h = seq(0, 1, 0.02), v = seq(0, 1, 0.025), col="black")
 	image(x,
 	      y,
