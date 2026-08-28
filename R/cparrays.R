@@ -454,7 +454,8 @@ tryCatch(
         # 		lens[lens>100]<-100 #workaround for infinite lengths with RR
         if (contrast %in% c("RR")) {
           # for RR, use length on the log scale. Still an issue with infinite lengths though
-          lens <- log(cisub[, 2, ]) - log(pmax(0.0000000001, cisub[, 1, ]))
+#          lens <- log(cisub[, 2, ]) - log(pmax(0.0000000001, cisub[, 1, ]))
+          lens <- log(cisub[, 2, ]) - log(cisub[, 1, ])
           # Try Newcombe's book suggestion to use U/(1+U) - L/(1+L) - also doesn't resolve the issue
           #lens <- ci[, 2, ]/(1 + ci[, 2, ]) - ci[, 1, ]/(1 + ci[, 1, ])
         }
@@ -696,17 +697,20 @@ onecpfun <- function(
         # not really interested in length, I think location is more important
         # - and its complicated to explain on log scale
         # but included as reviewers might request it
-        lens <- ci[, 2, ] - ci[, 1, ]
+        if (contrast %in% c("RD")) {
+          lens <- ci[, 2, ] - ci[, 1, ]
+        }
         ## you get  whacky results with length on linear scale
         # 		if(contrast %in% c("RR")) lens<-(ci[,2,])-(ci[,1,])
         # 		lens[lens>100]<-100 #workaround for infinite lengths with RR
-        if (contrast %in% c("RR")) {
+        if (contrast %in% c("RR", "OR")) {
           # for RR, use length on the log scale
-      #    lens <- log(ci[, 2, ]) - log(pmax(0.0000000001, ci[, 1, ]))
-      #    lens <- ci[, 2, ]/(1 + ci[, 2, ]) - ci[, 1, ]/(1 + ci[, 1, ])
-          lens <- log(1/(1 + 1/ci[, 2, ])) - log(ci[, 1, ]/(1 + ci[, 1, ]))
+#          lens <- log(pmin(1E10, ci[, 2, ])) - log(pmax(0.0000000001, ci[, 1, ]))
+          lens <- log(ci[, 2, ]) - log(ci[, 1, ])
+          #    lens <- ci[, 2, ]/(1 + ci[, 2, ]) - ci[, 1, ]/(1 + ci[, 1, ]) # Newcome book suggested this
+      #    lens <- log(1/(1 + 1/ci[, 2, ])) - log(ci[, 1, ]/(1 + ci[, 1, ])) # ???
         }
-#        lens[lens > 10] <- 10 # workaround for infinite lengths with RR
+        lens[lens > 10] <- 10 # arbitrary workaround for infinite lengths with RR
         lens[ci[, 2, ] == ci[, 1, ]] <- 0
         lenl[i, ] <- t(lens) %*% prob
       }
