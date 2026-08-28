@@ -755,14 +755,15 @@ onecpfun <- function(
     xs <- data.matrix(cbind(g, x22 = n - rowSums(g)))
     lenxs <- dim(xs)[1]
     row.names(xs) <- NULL
-    px <- array(c(p1, p2, phis), dim = c(1, 3))
     i <- 1 # For now, only allow this for a single PSP
     if (!is.null(psis)) {
+      px <- array(c(p1, p2, psis), dim = c(1, 3))
       prob <- pdfpair(p1 = px[i, 1],
                       p2 = px[i, 2],
                       psi = px[i, 3],
                       x = xs)
     } else if (!is.null(phis)) {
+      px <- array(c(p1, p2, phis), dim = c(1, 3))
       prob <- pdfpair(p1 = px[i, 1],
                       p2 = px[i, 2],
                       phi = px[i, 3],
