@@ -23,11 +23,13 @@ if (FALSE) {
   ### Run the CP calculation function for N=20, N=40 and N=65
   ### WARNING: for N=40 and 65, these take several hours to run!
   #############################################################################
-  RDpairteam <- RRpairteam <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP")
+  RDpairteam <- RRpairteam <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP", "Wald", "Wald-cc")
   # ^^ Example of how you might specify a subset of methods used for larger N
   # for reduced runtimes using methods= argument in cpfun() below
   alphas <- c(0.1, 0.05, 0.01)
+  alphas <- c(0.05)
   phis <- c(0.1, 0.25, 0.5, 0.75)
+  phis <- c(0.25, 0.5)
   system.time(mycis <- cifun(n=20, contrast="RD", alph = alphas))[[3]]/60
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
   system.time(mycis <- cifun(n=20, contrast="RR", alph = alphas))[[3]]/60
@@ -56,7 +58,7 @@ if (FALSE) {
 #  system.time(mycis <- cifun(n=105, contrast="OR", alph = alphas, methods = ORpairteam))[[3]]/60
 #  Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=20, jitt=F, smooth=F, phis=phis))[[3]]/60
 
-  RDmeth <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP",
+  RDmeth <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP", "Wald",
               "SCAS-c5", "SCAS-c25", "SCAS-c125", "MOVER-c5", "MOVER-c25", "MOVER-c125")
   RRmeth <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP", "BP-J",
               "SCAS-c5", "SCAS-c25", "SCAS-c125", "MOVER-c5", "MOVER-c25", "MOVER-c125")
@@ -218,16 +220,16 @@ if (FALSE) {
   #############################################################################
   load(file = paste0(outpath, "cparrays.RD.", 40, ".",200,".Rdata"))
   plotpanel(plotdata = arrays, alpha = 0.05, par3 = 0.25,
-            sel = c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP"),
-            plotlab = "RDpair", fmt="tiff", res.factor = 6)
+            sel = c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP", "Wald"),
+            plotlab = "RDpairW", fmt="tiff", res.factor = 6)
 
   #############################################################################
   ### FIGURE 2: CP, MACP, location index and DNCP for selected methods for RR, with N = 40, \alpha=0.05 and \phi=0.25
   #############################################################################
   load(file = paste0(outpath, "cparrays.RR.", 40, ".", 200, ".Rdata"))
   plotpanel(plotdata = arrays, alpha = 0.05, par3 = 0.25,
-            sel = c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP", "BP-J"),
-            plotlab = "RRpair", fmt="tiff", res.factor = 6)
+            sel = c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP", "BP-J", "Wald"),
+            plotlab = "RRpairW", fmt="tiff", res.factor = 6)
 
   #############################################################################
   ### FIGURE 3: CP, MACP, location index and DNCP for selected methods for OR, with N = 40, \alpha=0.05 and \phi=0.25

@@ -4,7 +4,7 @@
 
 rm(list = ls())
 #install.packages("zoo")
-pak::pak('petelaud/ratesci')
+#pak::pak('petelaud/ratesci')
 
 set.seed(2012) #ensure we use the same jitters for each run
 
@@ -116,6 +116,9 @@ mtext(expression(paste("at selected values of ", theta["RR"])),
 }
 
 
+
+
+
 # Calculate all (or selected) CI methods for a given set of x's
 allpairci <- function(xs,
                       contrast = "RD",
@@ -132,7 +135,10 @@ allpairci <- function(xs,
       mymethods <- c("AS", "AS-bc", "SCAS", "SCAS-bc",
                      "MOVER-W", "MOVER-J", "MOVER-NW", "MOVER-NJ", "MOVER-NS",
                      "SCAS-c5", "SCAS-c25", "SCAS-c125",
-                     "MOVER-c5", "MOVER-c25", "MOVER-c125", "BP")
+                     "MOVER-c5", "MOVER-c25", "MOVER-c125", "BP", "Wald")
+      if (contrast == "RD") {
+        mymethods <- c(mymethods, "Wald-cc")
+      }
       if (contrast == "RR") {
         mymethods <- c(mymethods, "BP-J") #, "Tang-ccdr")
       }
@@ -170,6 +176,9 @@ allpairci <- function(xs,
     if ("MOVER-c125" %in% mymethods)  ci[, 1:2, "MOVER-c125"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method = "MOVER_newc", moverbase = "jeff", level = 1-alpha, cc=0.125)$estimates[,c(1,3)]))
     # Bonett-Price hybrid method for RR, or their adjusted Wald method for RD
     if ("BP" %in% mymethods) ci[, 1:2, "BP"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method = "BP", moverbase = "wilson", level = 1-alpha)$estimates[,c(1,3)]))
+    # Wald approximate normal methods
+    if ("Wald" %in% mymethods) ci[, 1:2, "Wald"] <- t(sapply(1:lenxs,function(i) waldpairci(x = xs[i,], contrast = contrast, level = 1-alpha)$estimates[,c(1,3)]))
+    if ("Wald-cc" %in% mymethods) ci[, 1:2, "Wald-cc"] <- t(sapply(1:lenxs,function(i) waldpairci(x = xs[i,], contrast = contrast, level = 1-alpha, cc = TRUE)$estimates[,c(1,3)]))
     if (alpha == 0.05) {
       # Further evaluation of TDAS method proposed for paired analysis in Laud2017
       # doesn't compare favourably with new paired SCAS method
@@ -300,7 +309,7 @@ cpfun <- function(
   xs <- ciarrays[["xs"]]
   cis <- ciarrays[["cis"]]
   contrast <- dimnames(cis)[[6]]
-  if (is.null(methods)) {
+  if (is.null(methods) || methods == "All") {
     mymethods <- longlab <- dimnames(cis)[[3]]
   } else mymethods <- longlab <- methods
 
