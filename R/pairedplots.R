@@ -819,11 +819,16 @@ plotpanel <- function(plotdata,
         line=0.5*res.factor)
   mtext(side = 3,
         outer = TRUE,
-        text = latex2exp::TeX(paste0("\\textbf{",contrast,
+#        text = latex2exp::TeX(paste0("\\textbf{",contrast,
+#                                     "N = ", nums,
+#                                     "\u03b1 = ", format(alpha, nsmall=2),
+#                                     "\u03D5 = ", format(par3, nsmall=2),
+#                                     "}")),
+        text = latex2exp::TeX(paste0(contrast,
                                      "\nN = ", nums,
                                      "\n\u03b1 = ", format(alpha, nsmall=2),
-                                     "\n\u03D5 = ", format(par3, nsmall=2),
-                                     "}")),
+                                     "\n\u03D5 = ", format(par3, nsmall=2)
+                                     )),
         cex = textsize*0.8*res.factor,
         at = -0.01,
         line = 2*res.factor
@@ -832,5 +837,9 @@ plotpanel <- function(plotdata,
   dev.off()
 }
 
-
+#latex2exp::TeX(paste0("\\textbf{", 0.2, "}\n",
+#                      "\\textbf{N = ", 20, "}",
+#                      "\n\u03b1 = ", format(0.05, nsmall=2),
+#                      "\n\u03D5 = ", format(0.25, nsmall=2),
+#))
 
