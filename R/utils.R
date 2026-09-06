@@ -175,6 +175,7 @@ scorepair <- function(theta,
 waldpairci <- function(x,
                        level = 0.95,
                        contrast = "RD",
+                       laplace = FALSE,
                        cc = FALSE) {
   x11 <- x[1]
   x10 <- x[2]
@@ -204,6 +205,17 @@ waldpairci <- function(x,
       upper = ifelse(x1 == 0, Inf, exp(logestimate + z0 * sqrt(v)))
     )
     row.names(estimates) <- NULL
+  } else if (contrast == "OR") {
+    lapadd <- 1 * laplace
+    xx10 <- x10 + lapadd
+    xx01 <- x01 + lapadd
+    logestimate <- log(xx10 / xx01)
+    v <- 1 / xx10 + 1 / xx01
+    estimates <- cbind(
+      lower = ifelse((xx10 == 0 | xx01 == 0), 0, exp(logestimate - z0 * sqrt(v))),
+      est = exp(logestimate),
+      upper = ifelse((xx01 == 0 | xx10 == 0), Inf, exp(logestimate + z0 * sqrt(v)))
+    )
   }
   list(estimates = estimates)
 }
