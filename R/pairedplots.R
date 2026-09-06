@@ -1,4 +1,3 @@
-
 # Create contour plot for a single cell of the panel plot
 CPcontour <- function(plotdata,
                       alpha,
@@ -6,7 +5,7 @@ CPcontour <- function(plotdata,
                       nums,
                       xlim = c(0,1),
                       ylim = xlim,
-                      methlab = "MN",
+                      methlab = "AS",
                       avg = F,
                       lside = F,
                       lines = F,
@@ -17,6 +16,8 @@ CPcontour <- function(plotdata,
                       res.factor = 6,
                       colour = T,
                       textsize = 1) {
+
+  contrast <- dimnames(plotdata[["summaries"]])[[6]]
 
   if (colour == T) {
   	col1 = colorRampPalette(c("BLACK","RED"))(5)[4]
@@ -75,9 +76,9 @@ CPcontour <- function(plotdata,
 	)
 	lencols1 <- c(colorRampPalette(c("WHITE",col4))(100),
 	              colorRampPalette(c(col4,col1))(201))
-	lencols <- c(colorRampPalette(c("WHITE","WHITE"))(100),
-	             colorRampPalette(c("WHITE",col4))(100),
-	             colorRampPalette(c(col1,"BLACK"))(101))
+	lencols <- c(colorRampPalette(c(col4,col3))(180),
+	             c(rep(col3, 20),rep(col2, 20)),
+	             colorRampPalette(c(col2,col1))(181))
 	loccols = (c(colorRampPalette(c("BLACK",col1))(5)[-1],
 	              col2,col3,
 	              colorRampPalette(c(col4,"WHITE"),space="Lab")(4)))
@@ -97,7 +98,7 @@ CPcontour <- function(plotdata,
 		"0.2" = seq(0,1,0.005),
 		"0.01" = seq(0.0005,0.9995,0.0005)
 	)
-	lenconts <- seq(-10,20,0.02)
+	lenconts <- c(seq(-20, 20, 2), -1, 1)
 
 	p1 <- as.numeric(dimnames(plotdata[["mastercp"]])[[1]])
 	p2 <- as.numeric(dimnames(plotdata[["mastercp"]])[[2]])
@@ -146,24 +147,47 @@ CPcontour <- function(plotdata,
 	  if(lside == TRUE) cpdata <- lirev * ncpval
 	  else cpdata <- rawcpdata
 	}
-	if(CIlen) {
-		if(avg) cpdata <- plotdata[["mastercp"]][paste(x),
+	if(CIlen == TRUE) {
+	  ASlen <- plotdata[["mastercp"]][paste(x),
+	                                  paste(y),
+	                                  paste(par3),
+	                                  "AS",
+	                                  paste(100*(1-alpha)),
+	                                  "len",
+	                                  nums,]
+	  # Expected interval width difference vs AS, as a percentage
+		if(avg) {
+		  if (contrast == "RD") {
+		    lendata <- 100 * (plotdata[["mastercp"]][paste(x),
 		                                paste(y),
+		                                paste(par3),
 		                                methlab,
 		                                paste(100*(1-alpha)),
 		                                "len",
-		                                nums,] - plotdata[["mastercp"]][,,"MN",
-		                                                    paste(100*(1-alpha)),
-		                                                    "len",
-		                                                    nums,]
-		else cpdata <- plotdata[["mastercp"]][paste(x),
+		                                nums,] - ASlen) / ASlen
+		  } else if (contrast == "RR") {
+		    lendata <- 100 * (exp(plotdata[["mastercp"]][paste(x),
+		                                             paste(y),
+		                                             paste(par3),
+		                                             methlab,
+		                                             paste(100*(1-alpha)),
+		                                             "len",
+		                                             nums,]) - exp(ASlen)) / exp(ASlen)
+
+		  }
+
+		}
+
+		# Raw expected interval width
+		else rawlendata <- plotdata[["mastercp"]][paste(x),
 		                             paste(y),
+		                             paste(par3),
 		                             methlab,
 		                             paste(100*(1-alpha)),
 		                             "len",
 		                             nums,]
-		cpdata[cpdata<(-10)] <- (-10)
-		cpdata[cpdata>20] <- 20
+		lendata[lendata < (-20)] <- (-20)
+		lendata[lendata > 20] <- 20
 	}
 	if(locind) {
 	  # Rename this
@@ -198,13 +222,14 @@ CPcontour <- function(plotdata,
 	} else if (alpha == 0.025 | alpha == 0.05) {
 	  ccol <- ceiling(200*cpdata*ifelse(lside,2,1))
 	}
-	if(CIlen) ccol <- ceiling(20*cpdata)
+	if(CIlen) ccol <- ceiling(10*lendata)
 	if(locind) ccol <- ceiling(10*cpdata)
 
 	if(!CIlen) ccol[ccol<1] <- 1
 
 	z <- cpdata #[p1>=min(xlim) & p1<=max(xlim),p2>=min(ylim) & p2<=max(ylim)]
 	zc <- avecpdata
+	if(CIlen) zc <- lendata
 
 	shift <- 0
 	palette <- switch(as.character(lside), "TRUE" = oscols, "FALSE" = cols)
@@ -354,6 +379,11 @@ plotpanel <- function(plotdata,
 
   # Set up to adjust number 4 rows of plots
   rows <- ifelse(smoothed == TRUE, 4, 3)
+  labadj <- 0
+  if (CIlen == TRUE) {
+    rows <- rows + 1
+    labadj <- 1
+  }
 
   # Select plot output format depending on journal requirements
   if (fmt=="tiff")  {
@@ -365,7 +395,8 @@ plotpanel <- function(plotdata,
     ),
     width = (120 * nmeth + 60) * res.factor,
     height = 4*rows * 38 * res.factor,
-    type="quartz"
+#    type="quartz"
+    type="windows"
     )
   } else if (fmt=="png") {
     png(file = paste(outpath, "_", fmt, "/",
@@ -419,20 +450,20 @@ plotpanel <- function(plotdata,
     par(mar = res.factor*(c(2,1,1,0.5)+0.1))
     methlab <- longlab[i]
     # Run the unsmoothed plot and capture the output palette
-    palette <- CPcontour(plotdata=plotdata,
-                         alpha=alpha,
-                         par3=par3,
-                         nums=nums,
-                         methlab=i,
-                         lside=oneside,
+    palette <- CPcontour(plotdata = plotdata,
+                         alpha = alpha,
+                         par3 = par3,
+                         nums = nums,
+                         methlab = i,
+                         lside = oneside,
                          avg = FALSE,
-                         lines=linesx,
+                         lines = linesx,
                          locind = FALSE,
-                         CIlen=CIlen,
-                         res.factor=res.factor,
-                         colour=colour,
-                         textsize=textsize,
-                         xlim=limits)
+                         CIlen = FALSE,
+                         res.factor = res.factor,
+                         colour = colour,
+                         textsize = textsize,
+                         xlim = limits)
     mtext(side = 3,
           cex = res.factor*0.8*textsize,
           line = 7*res.factor,
@@ -468,20 +499,20 @@ plotpanel <- function(plotdata,
 
   if (smoothed == TRUE) {
     # Run the smoothed plot
-    CPcontour(plotdata=plotdata,
-                         alpha=alpha,
-                         par3=par3,
-                         nums=nums,
-                         methlab=i,
-                         lside=oneside,
+    CPcontour(plotdata = plotdata,
+                         alpha = alpha,
+                         par3 = par3,
+                         nums = nums,
+                         methlab = i,
+                         lside = oneside,
                          avg = TRUE,
-                         lines=linesx,
+                         lines = linesx,
                          locind = FALSE,
-                         CIlen=CIlen,
-                         res.factor=res.factor,
-                         colour=colour,
-                         textsize=textsize,
-                         xlim=limits)
+                         CIlen = FALSE,
+                         res.factor = res.factor,
+                         colour = colour,
+                         textsize = textsize,
+                         xlim = limits)
     mtext(side = 3,
           cex = res.factor*0.8*textsize,
           line = 0.5*res.factor,
@@ -500,6 +531,33 @@ plotpanel <- function(plotdata,
                         )))
     )
   }
+    # Run the DNCP plot
+    palettex <- CPcontour(plotdata = plotdata,
+                          alpha = alpha,
+                          par3 = par3,
+                          nums = nums,
+                          methlab = i,
+                          lside = TRUE,
+                          lines = linesx,
+                          res.factor = res.factor,
+                          colour = colour,
+                          textsize = textsize,
+                          xlim = limits)
+    mtext(side=3,
+          cex=res.factor*0.8*textsize,
+          line=0.5*res.factor,
+          text = (paste0(
+            "\n","meanDNCP",
+            "=",(summaries[i,"meanDNCP"]),
+            "\n","DNCP above ",
+            format(1.2*alpha/2,scientific=F),
+            "=",(summaries[i,"pctBad.DNCP"]),
+            #            "%",
+            #            "\n","DNCP within ±",
+            #            format(0.2*alpha/2,scientific=F),
+            #            "=",(summaries[i,"pctnear.1side"]),
+            "%"
+          )))
     # Run the location index plot
     palette2 <- CPcontour(plotdata = plotdata,
               alpha = alpha,
@@ -524,33 +582,44 @@ plotpanel <- function(plotdata,
             "%" #,
           ))
     )
-    # Run the DNCP plot
-    palettex <- CPcontour(plotdata = plotdata,
-                          alpha = alpha,
-                          par3 = par3,
-                          nums = nums,
-                          methlab = i,
-                          lside = TRUE,
-                          lines = linesx,
-                          res.factor = res.factor,
-                          colour = colour,
-                          textsize = textsize,
-                          xlim = limits)
-    mtext(side=3,
-          cex=res.factor*0.8*textsize,
-          line=0.5*res.factor,
-          text = (paste0(
-            "\n","meanDNCP",
-            "=",(summaries[i,"meanDNCP"]),
-            "\n","DNCP above ",
-            format(1.2*alpha/2,scientific=F),
-            "=",(summaries[i,"pctBad.DNCP"]),
-#            "%",
-#            "\n","DNCP within ±",
-#            format(0.2*alpha/2,scientific=F),
-#            "=",(summaries[i,"pctnear.1side"]),
-            "%"
-          )))
+
+    if (CIlen == TRUE) {
+      # Run the smoothed plot
+      CPcontour(plotdata = plotdata,
+                alpha = alpha,
+                par3 = par3,
+                nums = nums,
+                methlab = i,
+                lside = oneside,
+                avg = TRUE,
+                lines = linesx,
+                locind = FALSE,
+                CIlen = CIlen,
+                res.factor = res.factor,
+                colour = colour,
+                textsize = textsize,
+                xlim = limits)
+      if (FALSE) {
+      mtext(side = 3,
+            cex = res.factor*0.8*textsize,
+            line = 0.5*res.factor,
+            text = (paste0(#longlab[i],
+              "MACP cons=",summaries[i,"pctAveCons"],"%",
+              ifelse(any(sel=="SCcc"),
+                     paste0(("\n"),"pctCons=",(summaries[i,paste("pctCons",ifelse(oneside,".1side",""),sep="")]),"%"),
+                     paste0("\n","within ±",
+                            (ifelse(oneside,
+                                    format(0.1*alpha/2,scientific=F),
+                                    format(0.1*alpha,scientific=F))
+                            ),"=",
+                            (summaries[i,paste("pctAvenear",ifelse(oneside,".1side",""),sep="")]),
+                            "%"
+                     )
+              )))
+      )
+      }
+    }
+
   }
 
   par(pty="m", mar=res.factor*c(2.35, 1.5, ifelse(fmt=="xxx", 2, 1.35), 3)+0.1)
@@ -785,16 +854,16 @@ plotpanel <- function(plotdata,
   }
   mtext(side=2,
         outer=TRUE,
-        text = "DNCP\n for individual PSPs",
+        text = "Location index\n for individual PSPs",
         cex=textsize*0.8*res.factor,
-        at = 1/(2*rows),
+        at = 1/(2*rows) + (labadj)/rows,
+#        at = (1 - 1/(2*rows) - 2/rows),
         line=0.5*res.factor)
   mtext(side=2,
         outer=TRUE,
-        text = "Location index\n for individual PSPs",
+        text = "DNCP\n for individual PSPs",
         cex=textsize*0.8*res.factor,
-        at = 1/(2*rows) + 1/rows,
-#        at = (1 - 1/(2*rows) - 2/rows),
+        at = 1/(2*rows) + (1 + labadj)/rows,
         line=0.5*res.factor)
   if (smoothed == TRUE) {
     mtext(side=2,
