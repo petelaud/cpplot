@@ -130,9 +130,6 @@ allpairci <- function(xs,
   # Force vector input to an array
   if (is.vector(xs)) dim(xs) <- c(1, length(xs))
   lenxs <- dim(xs)[1]
-  if (!is.null(methods)) {
-    mymethods <- methods
-  } else {
     if (contrast %in% c("RD", "RR")) {
       mymethods <- c("AS", "AS-bc", "SCAS", "SCAS-bc",
                      "MOVER-W", "MOVER-J", "MOVER-NW", "MOVER-NJ", "MOVER-NS",
@@ -149,7 +146,9 @@ allpairci <- function(xs,
                      "SCASp-c5", "SCASp-c25", "SCASp-c125", "C-P",
                      "Jeffreys-c25", "Jeffreys-c125", "Wilson-c", "midp-c25")
     }
-  }
+    if (is.null(methods)) {
+      methods <- mymethods
+    }
   ci <- array(NA, dim = c(lenxs, 2, length(mymethods)))
   dimnames(ci)[[3]] <- mymethods
   if (contrast %in% c("RD", "RR")) {
@@ -178,35 +177,41 @@ allpairci <- function(xs,
     }
 
     # MOVER methods, alternative versions
-    if ("MOVER-J" %in% mymethods) ci[, 1:2, "MOVER-J"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method = "MOVER", moverbase = "jeff", level = 1-alpha)$estimates[,c(1,3)]))
-    if ("MOVER-NS" %in% mymethods)  ci[, 1:2, "MOVER-NS"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method = "MOVER_newc", moverbase = "SCASp", level = 1-alpha)$estimates[,c(1,3)]))
+    if ("MOVER-J" %in% methods) ci[, 1:2, "MOVER-J"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method = "MOVER", moverbase = "jeff", level = 1-alpha)$estimates[,c(1,3)]))
+    if ("MOVER-NS" %in% methods)  ci[, 1:2, "MOVER-NS"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method = "MOVER_newc", moverbase = "SCASp", level = 1-alpha)$estimates[,c(1,3)]))
 
   } else if (contrast == "OR") {
     # Explore various options for transformed binomial intervals for conditional OR
     # Transformed SCASp with experimental bcf using N/(N-1) to match 'N-1' test for association
 #    if ("SCASp" %in% mymethods) ci[, 1:2, "SCASp"] <- t(sapply(1:lenxs,function(i) ratesci::scorepairci(x = xs[i,], contrast = contrast, closedform = TRUE, bcf = TRUE, level = 1-alpha)$estimates[,c(1,3)]))
     # Transformed Uncorrected SCAS (i.e. skewness-corrected Wilson)
-    if ("SCASpu" %in% mymethods) ci[, 1:2, "SCASpu"] <- t(sapply(1:lenxs,function(i) ratesci::scorepairci(x = xs[i,], contrast = contrast, closedform = TRUE, bcf = FALSE, level = 1-alpha)$estimates[,c(1,3)]))
+    if ("SCASpu" %in% methods) ci[, 1:2, "SCASpu"] <- t(sapply(1:lenxs,function(i) ratesci::scorepairci(x = xs[i,], contrast = contrast, closedform = TRUE, bcf = FALSE, level = 1-alpha)$estimates[,c(1,3)]))
 
     tempout <- aperm(array((sapply(1:lenxs, function(i) ratesci::orpairci(x = xs[i,], level = 1-alpha)$estimates[,c(1,3)])), dim = c(5,2,lenxs)), c(3, 2, 1))
-    ci[, 1:2, c("SCASp", "mid-p", "Wilson", "Jeffreys")] <- tempout[, , 1:4]
+    ci[, 1:2, c("SCASp", "mid-p", "Wilson", "Jeffreys", "Wald")] <- tempout[, , 1:5]
 
     # Wald approximate normal methods
-    if ("Wald" %in% mymethods) ci[, 1:2, "Wald"] <- t(sapply(1:lenxs,function(i) waldpairci(x = xs[i,], contrast = contrast, level = 1-alpha)$estimates[,c(1,3)]))
-    if ("Laplace" %in% mymethods) ci[, 1:2, "Laplace"] <- t(sapply(1:lenxs,function(i) waldpairci(x = xs[i,], contrast = contrast, laplace = TRUE, level = 1-alpha)$estimates[,c(1,3)]))
+#    if ("Wald" %in% methods) ci[, 1:2, "Wald"] <- t(sapply(1:lenxs,function(i) waldpairci(x = xs[i,], contrast = contrast, level = 1-alpha)$estimates[,c(1,3)]))
+    if ("Laplace" %in% methods) ci[, 1:2, "Laplace"] <- t(sapply(1:lenxs,function(i) waldpairci(x = xs[i,], contrast = contrast, laplace = TRUE, level = 1-alpha)$estimates[,c(1,3)]))
 
     # Explore continuity adjustments - could also try reduced gamma variations, e.g. cc=0.125
-    tempout5 <- aperm(array((sapply(1:lenxs, function(i) ratesci::orpairci(x = xs[i,], level = 1-alpha, cc = TRUE)$estimates[,c(1,3)])), dim = c(4,2,lenxs)), c(3, 2, 1))
-    ci[, 1:2, c("SCASp-c5", "C-P", "Wilson-c")] <- tempout5[, , 1:3]
-    tempout25 <- aperm(array((sapply(1:lenxs, function(i) ratesci::orpairci(x = xs[i,], level = 1-alpha, cc = 0.25)$estimates[,c(1,3)])), dim = c(4,2,lenxs)), c(3, 2, 1))
-    ci[, 1:2, c("SCASp-c25", "midp-c25", "Jeffreys-c25")] <- tempout25[, , c(1, 2, 4)]
-    tempout125 <- aperm(array((sapply(1:lenxs, function(i) ratesci::orpairci(x = xs[i,], level = 1-alpha, cc = 0.125)$estimates[,c(1,3)])), dim = c(4,2,lenxs)), c(3, 2, 1))
-    ci[, 1:2, c("SCASp-c125", "Jeffreys-c125")] <- tempout125[, , c(1, 4)]
+    if ("SCASp-c5" %in% methods) {
+      tempout5 <- aperm(array((sapply(1:lenxs, function(i) ratesci::orpairci(x = xs[i,], level = 1-alpha, cc = TRUE)$estimates[,c(1,3)])), dim = c(4,2,lenxs)), c(3, 2, 1))
+      ci[, 1:2, c("SCASp-c5", "C-P", "Wilson-c")] <- tempout5[, , 1:3]
+    }
+    if ("SCASp-c25" %in% methods) {
+      tempout25 <- aperm(array((sapply(1:lenxs, function(i) ratesci::orpairci(x = xs[i,], level = 1-alpha, cc = 0.25)$estimates[,c(1,3)])), dim = c(4,2,lenxs)), c(3, 2, 1))
+      ci[, 1:2, c("SCASp-c25", "midp-c25", "Jeffreys-c25")] <- tempout25[, , c(1, 2, 4)]
+    }
+    if ("SCASp-c125" %in% methods) {
+      tempout125 <- aperm(array((sapply(1:lenxs, function(i) ratesci::orpairci(x = xs[i,], level = 1-alpha, cc = 0.125)$estimates[,c(1,3)])), dim = c(4,2,lenxs)), c(3, 2, 1))
+      ci[, 1:2, c("SCASp-c125", "Jeffreys-c125")] <- tempout125[, , c(1, 4)]
+    }
 
     # (Add conditional logistic regression CI?)
   }
   dimnames(ci)[[2]] <- c("LCL", "UCL")
-  ci
+  ci[, , methods, drop=FALSE]
 }
 
 # Calculates all possible confidence intervals for a given n,
