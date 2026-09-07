@@ -78,7 +78,9 @@ CPcontour <- function(plotdata,
 	              colorRampPalette(c(col4,col1))(201))
 	lencols <- c(colorRampPalette(c(col4,col3))(180),
 	             c(rep(col3, 20),rep(col2, 20)),
-	             colorRampPalette(c(col2,col1))(181))
+	             colorRampPalette(c(col2,col1))(180),
+	             colorRampPalette(c(col1,"BLACK"))(101)
+	)
 	loccols = (c(colorRampPalette(c("BLACK",col1))(5)[-1],
 	              col2,col3,
 	              colorRampPalette(c(col4,"WHITE"),space="Lab")(4)))
@@ -98,7 +100,8 @@ CPcontour <- function(plotdata,
 		"0.2" = seq(0,1,0.005),
 		"0.01" = seq(0.0005,0.9995,0.0005)
 	)
-	lenconts <- c(seq(-20, 20, 2), -1, 1)
+	lenconts <- c(seq(-100, 100, 2))
+	lenconts2 <- c(-1.5, -1, -0.5, 0.5, 1, 1.5)
 
 	p1 <- as.numeric(dimnames(plotdata[["mastercp"]])[[1]])
 	p2 <- as.numeric(dimnames(plotdata[["mastercp"]])[[2]])
@@ -148,13 +151,23 @@ CPcontour <- function(plotdata,
 	  else cpdata <- rawcpdata
 	}
 	if(CIlen == TRUE) {
-	  ASlen <- plotdata[["mastercp"]][paste(x),
-	                                  paste(y),
-	                                  paste(par3),
-	                                  "AS",
-	                                  paste(100*(1-alpha)),
-	                                  "len",
-	                                  nums,]
+	  if (contrast == "OR") {
+	    ASlen <- plotdata[["mastercp"]][paste(x),
+	                                    paste(y),
+	                                    paste(par3),
+	                                    "Wilson",
+	                                    paste(100*(1-alpha)),
+	                                    "len",
+	                                    nums,]
+	  } else {
+  	  ASlen <- plotdata[["mastercp"]][paste(x),
+  	                                  paste(y),
+  	                                  paste(par3),
+  	                                  "AS",
+  	                                  paste(100*(1-alpha)),
+  	                                  "len",
+  	                                  nums,]
+	  }
 	  # Expected interval width difference vs AS, as a percentage
 		if(avg) {
 		  if (contrast == "RD") {
@@ -165,14 +178,14 @@ CPcontour <- function(plotdata,
 		                                paste(100*(1-alpha)),
 		                                "len",
 		                                nums,] - ASlen) / ASlen
-		  } else if (contrast == "RR") {
+		  } else if (contrast %in% c("RR", "OR")) {
 		    lendata <- 100 * (exp(plotdata[["mastercp"]][paste(x),
 		                                             paste(y),
 		                                             paste(par3),
 		                                             methlab,
 		                                             paste(100*(1-alpha)),
 		                                             "len",
-		                                             nums,]) - exp(ASlen)) / exp(ASlen)
+		                                             nums,] - ASlen) - 1)
 
 		  }
 
@@ -187,7 +200,7 @@ CPcontour <- function(plotdata,
 		                             "len",
 		                             nums,]
 		lendata[lendata < (-20)] <- (-20)
-		lendata[lendata > 20] <- 20
+		lendata[lendata > 30] <- 30
 	}
 	if(locind) {
 	  # Rename this
@@ -276,6 +289,23 @@ CPcontour <- function(plotdata,
 	          col=contcol,
 	          vfont=c("sans serif","bold")
 	          )
+	  if (CIlen) {
+      contour(x,
+	            y,
+	            zc,
+	            levels=switch(as.character(CIlen),
+	                          "TRUE"=lenconts2,
+	                          "FALSE"=switch(as.character(lside),
+	                                         "TRUE"=osconts,
+	                                         "FALSE"=conts)),
+	            add=T,
+	            labcex=0.5*textsize*res.factor,
+	            lwd=contwd*textsize*res.factor,
+	            col = "GRAY25",
+	            vfont=c("sans serif","bold")
+	    )
+
+	  }
 	}
 }
 	axis(side = 1,
@@ -599,25 +629,26 @@ plotpanel <- function(plotdata,
                 colour = colour,
                 textsize = textsize,
                 xlim = limits)
-      if (FALSE) {
+      if (contrast == "OR") {
+        ASmeanlen <- as.numeric(summaries["Wilson", "meanlen"])
+      } else {
+        ASmeanlen <- as.numeric(summaries["AS", "meanlen"])
+      }
       mtext(side = 3,
             cex = res.factor*0.8*textsize,
             line = 0.5*res.factor,
-            text = (paste0(#longlab[i],
-              "MACP cons=",summaries[i,"pctAveCons"],"%",
-              ifelse(any(sel=="SCcc"),
-                     paste0(("\n"),"pctCons=",(summaries[i,paste("pctCons",ifelse(oneside,".1side",""),sep="")]),"%"),
-                     paste0("\n","within ±",
-                            (ifelse(oneside,
-                                    format(0.1*alpha/2,scientific=F),
-                                    format(0.1*alpha,scientific=F))
-                            ),"=",
-                            (summaries[i,paste("pctAvenear",ifelse(oneside,".1side",""),sep="")]),
-                            "%"
-                     )
-              )))
+            text = (paste0(
+              paste0("\n","mean width vs AS=",
+                     ifelse(contrast == "RD",
+                            round(100 * (as.numeric(summaries[i, "meanlen"]) / ASmeanlen - 1), 1),
+                            round(100 * (exp(as.numeric(summaries[i, "meanlen"]) - ASmeanlen) - 1), 1)
+                            ),
+                            "%",
+              "\n","mean width (log)=",
+              (summaries[i,"meanlen"])#,
+#              "%" #,
+            )))
       )
-      }
     }
 
   }
@@ -851,6 +882,14 @@ plotpanel <- function(plotdata,
     line = 5*res.factor,
     outer = TRUE,
     cex=res.factor*textsize)
+  }
+  if (CIlen) {
+    mtext(side=2,
+          outer=TRUE,
+          text = "Expected interval width\n vs AS (%)",
+          cex=textsize*0.8*res.factor,
+          at = 1/(2*rows),
+          line=0.5*res.factor)
   }
   mtext(side=2,
         outer=TRUE,
