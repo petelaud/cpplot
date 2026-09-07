@@ -4,29 +4,56 @@ if (FALSE) {
 
   root <- "/Users/ssu/Documents/"
   outpath <- paste(root, "Main/Courses_papers/skewscore/paired/", sep = "")
+  outpath <- "D:/Pete/Documents/GitHub/cpplot/data/"
 
 
 
-load(file=paste0(outpath, "cparrays.RD.", 40, ".",200,".Rdata"))
-p0 <- as.numeric(dimnames(arrays$mastercp)[[1]])
-del <- 0.2
-del <- 0
-length(p0)
-p0 <- seq(0,1-del,length.out=51)
-p2 <- p0
+res.factor <- 3
+tiff(file = paste0(outpath,"_tiff/unluckyN.tiff"),
+width = (600) * res.factor,
+height = 300 * res.factor,
+#    type="quartz"
+type="windows"
+)
+par(cex.main = res.factor*0.8*1, cex.axis=res.factor*0.8*1)
+#par(mar = res.factor*(c(2,3,1,0.5)+0.1))
+
+
+par(mfrow = c(1, 2)) #, cex = res.factor)
+
+for (myN in c(40, 39)) {
+
+#myN <- 20
+psi <- 3
+load(file=paste0(outpath, "cis.RR.", myN, ".Rdata"))
+#system.time(ciarrays <- cifun(n=myN, contrast="RD", alph = 0.05))[[3]]/60
+
+#p0 <- as.numeric(dimnames(arrays$mastercp)[[1]])
+del <- 0.2 # * myN/40
+#del <- 0.1
+#del <- 0
+#length(p0)
+#p0 <- seq(0, 1-del, length.out=51)
+#p2 <- p0
 
 #p2 <- p0[p0 + del >= 0 & p0 + del <= 1]
 
-# 2-D coverage plot
+# 2-D coverage plot, e.g. illustrating how unrepresentative Fig 8.11 is
+p2 <- seq(0, 1-del, length.out=101)
 p1 <- p2 + del
   cp1 <- onecpfun(
+    n = myN,
     p1 = p1,
     p2 = p2,
-#    ciarrays = arrays,
+#    ciarrays = mycis,
+    ciarrays = ciarrays,
     alph = 0.05,
     psis = 3
 #    phis = 0.25
   )
+
+  if (FALSE) {
+  # One point at a time is inefficient
   cp1 <- onecpfun(
     n = 40,
     contrast = "RD",
@@ -34,18 +61,19 @@ p1 <- p2 + del
     p2 = p2[10],
     #    ciarrays = arrays,
     alph = 0.05,
-#    psis = 3
-        phis = 0.25
+    psis = 3
+#        phis = 0.25
   )
+  }
   plot(p2,
      cp1[,"AS","cp"],
      type = "l",
      lwd = 2,
-     ylim = c(0.90,1),
-     ylab = "CP",
+     ylim = c(0.90, 1),
+     ylab = "Coverage Probability",
      xlab = "p2",
-     main = "CP"
-)
+     main = paste0("N = ", myN, ", θ = ", del, "±0.005, ψ = ", psi)
+  )
 abline(h=0.95)
 rect(
   xleft = par("usr")[1], xright = par("usr")[2], ybottom = 0.945, ytop = 0.955,
@@ -53,15 +81,16 @@ rect(
 )
 #abline(h=0.945,lty=2)
 
-dels <- del + seq(-0.01,0.01,0.001)[-5]
+dels <- del + seq(-0.005,0.005,0.001)[-6]
 for(i in 1:length(dels)){
   p1 <- p2 + dels[i]
   cp1 <- onecpfun(
     p1 = p1,
     p2 = p2,
-    ciarrays = arrays,
+    ciarrays = ciarrays,
     alph = 0.05,
-    phis = 0.25
+#    phis = 0.25
+    psis = psi
   )
   lines(p2,
        cp1[,"AS","cp"],
@@ -69,6 +98,8 @@ for(i in 1:length(dels)){
   )
 }
 
+}
+dev.off()
 
 # 2-D Type I error plot
 load(file=paste0(outpath, "cparrays.RD.", 65, ".",200,".Rdata"))
