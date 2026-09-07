@@ -24,13 +24,15 @@ if (FALSE) {
   ### Run the CP calculation function for N=20, N=40 and N=65
   ### WARNING: for N=40 and 65, these take several hours to run!
   #############################################################################
-  RDpairteam <- RRpairteam <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP", "Wald", "Wald-cc")
+  RDpairteam <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP", "Wald", "Wald-cc")
+  RRpairteam <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP", "Wald")
   # ^^ Example of how you might specify a subset of methods used for larger N
   # for reduced runtimes using methods= argument in cpfun() below
   alphas <- c(0.1, 0.05, 0.01)
-  alphas <- c(0.05)
+  alphas <- c(0.1)
   phis <- c(0.1, 0.25, 0.5, 0.75)
   phis <- c(0.25, 0.5)
+
   system.time(mycis <- cifun(n=20, contrast="RD", alph = alphas))[[3]]/60
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
   system.time(mycis <- cifun(n=20, contrast="RR", alph = alphas))[[3]]/60
@@ -45,7 +47,8 @@ if (FALSE) {
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
 
   # Evaluation for conditional OR
-  ORpairteam <- c("SCASp", "SCASpu", "mid-p", "Jeffreys", "Wilson") # Subset of OR methods used for larger N
+  ORpairteam <- c("SCASp", "SCASpu", "mid-p", "Jeffreys", "Wilson", "Wald", "Laplace")
+  #                "SCASp-c125", "SCASp-c25", "SCASp-c5", "midp-c25", "Jeffreys-c125", "Jeffreys-c25", "C-P") # Subset of OR methods used for larger N
   system.time(mycis <- cifun(n=20, contrast="OR", alph = alphas))[[3]]/60
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
   system.time(mycis <- cifun(n=40, contrast="OR", alph = alphas))[[3]]/60
@@ -56,14 +59,15 @@ if (FALSE) {
   # - Note: OR methods with closed form expressions are quicker to calculate,
   #   but the coverage probability calculations take longer because there is an extra step
   #   to get p12, p21 from p1, p2 and phi
+  alphas <- 0.05
 #  system.time(mycis <- cifun(n=105, contrast="OR", alph = alphas, methods = ORpairteam))[[3]]/60
-#  Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=20, jitt=F, smooth=F, phis=phis))[[3]]/60
+#  Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=40, jitt=T, smooth=T, phis=phis))[[3]]/60
 
-  RDmeth <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP", "Wald",
+  RDmeth <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP", "Wald", "Wald-cc",
               "SCAS-c5", "SCAS-c25", "SCAS-c125", "MOVER-c5", "MOVER-c25", "MOVER-c125")
-  RRmeth <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP", "BP-J",
+  RRmeth <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP", "BP-J", "Wald",
               "SCAS-c5", "SCAS-c25", "SCAS-c125", "MOVER-c5", "MOVER-c25", "MOVER-c125")
-  ORmeth <- c("SCASp", "SCASpu", "mid-p", "Jeffreys", "Wilson",
+  ORmeth <- c("SCASp", "SCASpu", "mid-p", "Jeffreys", "Wilson", "Wald", "Laplace",
               "SCASp-c5", "SCASp-c25", "SCASp-c125", "C-P", "Jeffreys-c25", "Jeffreys-c125")
 
 
@@ -79,7 +83,7 @@ if (FALSE) {
   load(file=paste(outpath, "cparrays.OR.", 40, ".",200,".Rdata",sep=""))
   mycis <- arrays
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, alph=0.05, phis=phis,
-                                          methods = ORmeth[1:5], outdir="data/"))[[3]]/60
+                                          methods = ORmeth[1:7], outdir="data/"))[[3]]/60
 
   # Subset arrays to selected N and methods for smaller file size to upload to GitHub
   load(file=paste(outpath, "cparrays.RD.", 40, ".",200,".Rdata",sep=""))
@@ -220,25 +224,26 @@ if (FALSE) {
   ### FIGURE 1: CP, MACP, location index and DNCP for selected methods for RD, with N = 40, \alpha=0.05 and \phi=0.25
   #############################################################################
   load(file = paste0(outpath, "cparrays.RD.", 40, ".",200,".Rdata"))
-  plotpanel(plotdata = arrays, alpha = 0.05, par3 = 0.25,
-            sel = c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP", "Wald"),
-            plotlab = "RDpairW", fmt="tiff", res.factor = 6)
+  plotpanel(plotdata = arrays, alpha = 0.1, par3 = 0.25,
+            sel = c("SCAS-bc", "SCAS", "AS-bc", "AS", "MOVER-NJ", "MOVER-NW", "MOVER-W", "BP", "Wald"),
+            plotlab = "RDpairW", fmt="tiff", res.factor = 6, CIlen = TRUE)
 
   #############################################################################
   ### FIGURE 2: CP, MACP, location index and DNCP for selected methods for RR, with N = 40, \alpha=0.05 and \phi=0.25
   #############################################################################
   load(file = paste0(outpath, "cparrays.RR.", 40, ".", 200, ".Rdata"))
   plotpanel(plotdata = arrays, alpha = 0.05, par3 = 0.25,
-            sel = c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP", "BP-J", "Wald"),
-            plotlab = "RRpairW", fmt="tiff", res.factor = 6)
+            sel = c("SCAS-bc", "SCAS", "AS-bc", "AS", "MOVER-NJ", "MOVER-NW", "MOVER-W", "BP", "BP-J", "Wald"),
+            plotlab = "RRpairW", fmt="tiff", res.factor = 6, CIlen = TRUE)
 
   #############################################################################
   ### FIGURE 3: CP, MACP, location index and DNCP for selected methods for OR, with N = 40, \alpha=0.05 and \phi=0.25
   #############################################################################
-  load(file = paste0(outpath, "cparrays.OR.", 40, ".",200,".Rdata"))
+  load(file = paste0(outpath, "cparrays.OR.", 105, ".",40,".Rdata"))
+  dimnames(arrays$summaries)
   plotpanel(plotdata = arrays, alpha = 0.05, par3 = 0.25,
-            sel = c("SCASp", "SCASpu", "mid-p", "Jeffreys", "Wilson"),
-            plotlab = "ORpair", fmt="tiff", res.factor = 6)
+            sel = c("SCASp", "SCASpu", "mid-p", "Jeffreys", "Wilson", "Wald", "Laplace"),
+            plotlab = "ORpairW", fmt="tiff", res.factor = 6, CIlen = TRUE)
 
   #############################################################################
   ### FIGURE 4: Type I error for McNemar test and 'N-1' test
