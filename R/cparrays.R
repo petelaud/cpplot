@@ -611,13 +611,13 @@ if (smooth == TRUE) {
 # or for a single PSP with calculation of CIs for all x's with non-negligible density
 onecpfun <- function(
     p1 = c(0.3),
-    p2 = c(0.1),
+    p2 = c(0.05),
     ciarrays = NULL,
     n = NULL,
     contrast = NULL,
     alph = NULL,
     psis = NULL,
-    phis = 0.25,
+    phis = NULL,
     methods = "All",
     jitt = FALSE
 ) {
@@ -630,11 +630,11 @@ onecpfun <- function(
     nmeth <- length(mymethods)
     n <- as.numeric(dimnames(cis)[[5]])
 
-  if (!is.null(psis)) par3 <- psis
+  if (!is.null(psis)) par3 <- rep_len(psis, length.out = length(p1))
   if (!is.null(phis)) par3 <- rep_len(phis, length.out = length(p1))
 
   mastercp <- array(NA, dim = c(length(p1), length(mymethods), length(alph), 6, 1, 1))
-  dimnames(mastercp) <- list(paste(p2),
+  dimnames(mastercp) <- list(paste(p1),
                              mymethods,
                              paste(100*(1-alph)),
                              c("cp", "lncp", "rncp", "dncp", "len", "locindex"),
@@ -663,6 +663,11 @@ onecpfun <- function(
     #  CI, for each CI method.
     cpl <- lncpl <- rncpl <- lenl <- locindexl <-
       array(NA, dim = c(dim(px)[1], nmeth))
+
+    dimnames(cpl) <- dimnames(locindexl) <- dimnames(lncpl) <-
+      dimnames(rncpl) <- dimnames(lenl) <-
+      list(p1, mymethods)
+
 
     # NB method using sapply was no quicker than this loop:
     # NB this is the most time-consuming part of the process when n is small
@@ -711,9 +716,21 @@ onecpfun <- function(
           #    lens <- ci[, 2, ]/(1 + ci[, 2, ]) - ci[, 1, ]/(1 + ci[, 1, ]) # Newcome book suggested this
       #    lens <- log(1/(1 + 1/ci[, 2, ])) - log(ci[, 1, ]/(1 + ci[, 1, ])) # ???
         }
-        lens[lens > 10] <- 10 # arbitrary workaround for infinite lengths with RR
+#        lens[lens > 10] <- 10 # arbitrary workaround for infinite lengths with RR
         lens[ci[, 2, ] == ci[, 1, ]] <- 0
-        lenl[i, ] <- t(lens) %*% prob
+
+#        lenl[i, ] <- t(lens) %*% prob
+        # Exclude infinite length outcomes from calculation of expected lengths
+        # in order to reproduce Fagerland plots
+        for (methi in mymethods) {
+          lenpermeth <- lens[, methi]
+          lennoninf <- lenpermeth[lenpermeth < Inf & lenpermeth > 0]
+          probnoninf <- prob[lenpermeth < Inf & lenpermeth > 0]
+          probmod <- probnoninf / sum(probnoninf) # Rescale probabilities excluding infinite lengths (and zero widths?)
+          lenl[i, methi] <- lennoninf %*% probmod
+        }
+
+
       }
     }
 
@@ -723,15 +740,13 @@ onecpfun <- function(
     locindexl <- ifelse(cpl == 1, 0, mncpl / (1 - cpl))
     dncpl <- 1 - cpl - mncpl
 
+#    dimnames(dncpl) <- list(p1, mymethods)
+
     # Free up some memory
     rm(ci)
 
-    dimnames(cpl) <- dimnames(locindexl) <- dimnames(lncpl) <-
-      dimnames(rncpl) <- dimnames(lenl) <- dimnames(dncpl) <-
-      list(p2, mymethods)
-
-    mastercp <- array(rbind(cpl, lncpl, rncpl, dncpl, locindexl, lenl), dim = c(length(p2), 6, nmeth))
-    dimnames(mastercp) <- list(p2, c("cp", "lncp", "rncp", "dncp", "locindex", "len") , mymethods)
+    mastercp <- array(rbind(cpl, lncpl, rncpl, dncpl, locindexl, lenl), dim = c(length(p1), 6, nmeth))
+    dimnames(mastercp) <- list(p1, c("cp", "lncp", "rncp", "dncp", "locindex", "len") , mymethods)
 
     # Free up some memory
     rm(
@@ -746,12 +761,12 @@ onecpfun <- function(
                     n, ".Rdata", sep = "")
   )
 
-}
+
 
   ### Following section runs calculations for a single PSP ###
   ### without having pre-run the CIs ###
-  if (!is.null(n) && length(p1) == 1 && length(p2) == 1 && length(phis) == 1) {
-    nmeth <- length(methods)
+  } else if (!is.null(n) && length(p1) == 1 && length(p2) == 1 && (length(phis) == 1 | length(psis) == 1)) {
+#    nmeth <- length(methods)
     # For a given N, find the set of outcomes with non-negligible probabilities
     g <- (expand.grid(x11 = 0:n, x12 = 0:n, x21 = 0:n))
     # reduce to possible combinations of a,b,c for paired data.
@@ -776,14 +791,15 @@ onecpfun <- function(
     }
 
     xsub <- xs[prob > 1E-10, ]
-    cpl <- lncpl <- rncpl <- lenl <- locindexl <-
-      array(NA, dim = c(dim(px)[1], nmeth))
 
     tester <- allpairci(x = rep(10,4), contrast = contrast)
-    if (is.null(methods)) {
-      mymethods <- dimnames(tester)[[3]]
+    if (is.null(methods) || methods == "All") {
+        mymethods <- dimnames(tester)[[3]]
     } else mymethods <- methods
     nmeth <- length(mymethods)
+
+    cpl <- lncpl <- rncpl <- lenl <- locindexl <-
+      array(NA, dim = c(dim(px)[1], nmeth))
 
 #    ci <- allpairci(x = xsub, contrast = contrast, alpha = alph, methods = mymethods)
     ci <- array(NA, dim=c(dim(xsub)[1], 2, nmeth))
@@ -814,8 +830,10 @@ onecpfun <- function(
     locindexl <- ifelse(cpl == 1, 0, mncpl / (1 - cpl))
     dncpl <- 1 - cpl - mncpl
 
-    mastercp <- array(rbind(cpl, lncpl, rncpl, dncpl, locindexl, lenl), dim = c(length(p2), 6, nmeth))
-    dimnames(mastercp) <- list(p2, c("cp", "lncp", "rncp", "dncp", "locindex", "len") , mymethods)
+    # Placeholder to add expected width (lenl)
+
+    mastercp <- array(rbind(cpl, lncpl, rncpl, dncpl, locindexl, lenl), dim = c(length(p1), 6, nmeth))
+    dimnames(mastercp) <- list(p1, c("cp", "lncp", "rncp", "dncp", "locindex", "len") , mymethods)
 
     myoutput <- aperm(mastercp, c(3,2,1))
 
