@@ -16,6 +16,7 @@ if (FALSE) {
   # Set path for output files as required by user
   outpath <- '/myoutputpath/'
   outpath <- paste0(root, "Main/Courses_papers/skewscore/paired/") # Remove for final upload
+  outpath <- "D:/Pete/Documents/Research/paired/" # Remove for final upload
   #  outpath <- 'data/'
 
   #############################################################################
