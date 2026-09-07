@@ -295,6 +295,32 @@ if (FALSE) {
   dev.off()
 
 
+
+  #############################################################################
+  ### FIGURE 5: CP, MACP, location index and DNCP for selected conservative methods for RD, with N = 40, \alpha=0.05 and \phi=0.25
+  #############################################################################
+  load(file = paste0(outpath, "cparrays.RD.", 40, ".",200,".Rdata"))
+  plotpanel(plotdata = arrays, alpha = 0.05, par3 = 0.25,
+            sel = c("SCAS-c125", "SCAS-c25", "SCAS-c5", "MOVER-c125", "MOVER-c25", "MOVER-c5", "Wald-cc"),
+            plotlab = "RDcpair", fmt="tiff", res.factor = 6, CIlen = TRUE)
+
+
+  #############################################################################
+  ### FIGURE 6: CP, MACP, location index and DNCP for selected conservative methods for RR, with N = 40, \alpha=0.05 and \phi=0.25
+  #############################################################################
+  load(file = paste0(outpath, "cparrays.RR.", 40, ".", 200, ".Rdata"))
+  plotpanel(plotdata = arrays, alpha = 0.05, par3 = 0.25,
+            sel = c("SCAS-c125", "SCAS-c25", "SCAS-c5", "MOVER-c125", "MOVER-c25", "MOVER-c5", "BP-cc"),
+            plotlab = "RRcpair", fmt="tiff", res.factor = 6, CIlen = TRUE)
+
+  #############################################################################
+  ### FIGURE 7: CP, MACP, location index and DNCP for selected methods for OR, with N = 40, \alpha=0.05 and \phi=0.25
+  #############################################################################
+  load(file = paste0(outpath, "cparrays.OR.", 105, ".",40,".Rdata"))
+  plotpanel(plotdata = arrays, alpha = 0.05, par3 = 0.25,
+            sel = c("SCASp-c125", "SCASp-c25", "SCASp-c5", "midp-c25", "Jeffreys-c125", "Jeffreys-c25", "C-P"),
+            plotlab = "ORcpair", fmt="tiff", res.factor = 6)
+
   #############################################################################
   ### TABLE 2, 3 & 4: Summary of each metric for selected methods for RD & RR, & OR
   #############################################################################
