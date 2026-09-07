@@ -137,13 +137,16 @@ lines(p2, 1 - cp1[,"SCASstrat","cp"], lty=4, lwd = 2)
 # 2-D interval width plot, RD
 myN <- 40
 load(file=paste0(outpath, "cparrays.RD.", myN, ".",200,".Rdata"))
-myN <- 25
-#system.time(mycis <- cifun(n=25, contrast="RD", alph = c(0.05)))[[3]]/60
 mycis <- arrays
+
+# Fagerland figure 5 (left panel)
+myN <- 25
+#system.time(mycis <- cifun(n=myN, contrast="RD", alph = c(0.05)))[[3]]/60
 
 #p0 <- as.numeric(dimnames(arrays$mastercp)[[1]])
 del <- 0.3
-phi <- 0.1
+phi <- 0
+psi <- 2
 #length(p0)
 p0 <- seq(0, 1 - del, length.out = 51)
 p2 <- p0
@@ -157,40 +160,55 @@ cp1 <- onecpfun(
   p2 = p2,
   ciarrays = mycis,
   alph = 0.05,
-  phis = phi
+#  phis = phi
+  psis = psi
 )
-par(pty = "s")
 widthteam <- c("AS", "SCAS", "SCAS-bc")
 widthteam <- c("MOVER-NW", "MOVER-NJ", "BP")
 widthteam <- c("AS", "SCAS-bc", "MOVER-NJ", "BP")
+widthteam <- c("AS", "BP", "MOVER-NW", "SCAS-bc") # Selected methods from Fagerland plot, plus SCAS-bc
+par(pty = "s")
 plot(p2,
      cp1[,"AS","len"],
      type = "n",
      ylim = c(0.35, 0.55),
      ylab = "Expected width",
      xlab = "p2",
-     main = paste0("N = ", myN, ", θ = ", del, ", ϕ = ", phi)
+#     main = paste0("N = ", myN, ", θ = ", del, ", ϕ = ", phi)
+     main = paste0("N = ", myN, ", θ = ", del, ", ψ = ", psi)
 )
 #widthteam <- c("SCAS-bc", "AS", "MOVER-NW", "MOVER-NJ", "BP")
-lwds <- c(2, 1, 2, 1, 1, 1)
+lwds <- c(2, 2, 1, 2, 1, 1)
+ltys <- c(1, 2, 0, 3)
+mysymbols <- c(NA,NA,5,NA)
 for (i in 1:length(widthteam)) {
   lines(x = p2,
         y = cp1[, widthteam[i], "len"],
-        lty = i,
+        lty = ltys[i],
+        lwd = lwds[i])
+  points(x = p2,
+        y = cp1[, widthteam[i], "len"],
+        pch = mysymbols[i],
         lwd = lwds[i])
 }
-legend(x = "bottom", legend = widthteam, lty = 1:length(widthteam), lwd = lwds)
+legend(x = "bottom", legend = widthteam, lty = ltys, pch = mysymbols, lwd = lwds)
 
 dev.off()
 
 # 2-D interval width plot, RR
-load(file=paste0(outpath, "cparrays.RR.", myN, ".",200,".Rdata"))
-mycis <- arrays
+myN <- 40
+load(file = paste0(outpath, "cis.RR.", myN,".Rdata"))
+mycis <- ciarrays
+
+# ?Fagerland figure 6
 myN <- 15
 #system.time(mycis <- cifun(n = myN, contrast="RR", alph = c(0.05)))[[3]]/60
+dimnames(mycis$cis)
+mycis$cis[,,"SCAS-bc",,,]
 #p0 <- as.numeric(dimnames(arrays$mastercp)[[1]])
 theta <- 6
-phi <- 0.1
+#phi <- 0.1
+psi <- 3
 #length(p0)
 p0 <- seq(0, 1, length.out = 51)
 p1 <- p0[c(-1, -51)]
@@ -204,29 +222,43 @@ cp1 <- onecpfun(
   p2 = p2,
   ciarrays = mycis,
   alph = 0.05,
-  phis = phi
+#  phis = phi
+  psis = psi
 )
+aslen <- cp1[, "AS" , "len"]
+scaslen <- cp1[, "SCAS" , "len"]
+(exp(scaslen) - exp(aslen)) / exp(aslen)
+
+
 #widthteam <- c("AS", "SCAS", "SCAS-bc") #, "MOVER-NW", "MOVER-NJ", "BP")
 widthteam <- c("SCAS-bc", "SCAS", "AS", "MOVER-NW", "MOVER-NJ", "BP-W")
 widthteam <- c("SCAS-bc", "AS", "MOVER-NW", "MOVER-NJ") #, "BP-W")
 #widthteam <- c("AS", "MOVER-NW", "MOVER-NJ", "BP-W")
+widthteam <- c("AS", "BP", "MOVER-W", "Wald", "SCAS", "SCAS-bc")
 par(pty = "s")
 plot(p1,
      cp1[,"AS","len"],
      type = "n",
-     ylim = c(-2, 10),
-     ylab = "Expected width",
+     ylim = c(2, 6),
+     ylab = "Expected width (log)",
      xlab = "p1",
-     main = paste0("N = ", myN, ", θ = ", theta, ", ϕ = ", phi)
+#     main = paste0("N = ", myN, ", θ = ", theta, ", ϕ = ", phi)
+     main = paste0("N = ", myN, ", θ = ", theta, ", ψ = ", psi)
 )
-lwds <- c(2, 2, 2, 1, 1, 1)
+lwds <- c(2, 2, 1, 2, 1, 1)
+ltys <- c(1, 2, 0, 3, 0, 5, 3)
+mysymbols <- c(NA,NA,3,NA, 1)
 for (i in 1:length(widthteam)) {
   lines(x = p1,
         y = cp1[, widthteam[i], "len"],
-        lty = i,
+        lty = ltys[i],
         lwd = lwds[i])
+  points(x = p1,
+         y = cp1[, widthteam[i], "len"],
+         pch = mysymbols[i],
+         lwd = lwds[i])
 }
-legend(x = "topright", legend = widthteam, lty = 1:length(widthteam), lwd = lwds)
+legend(x = "topright", legend = widthteam, lty = ltys, pch = mysymbols, lwd = lwds)
 #cp1[, "AS" , "len"]
 
 
