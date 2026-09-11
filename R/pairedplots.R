@@ -80,7 +80,11 @@ CPcontour <- function(plotdata,
 	             c(rep(col3, 20),rep(col2, 20)),
 	             colorRampPalette(c(col2,col1))(180),
 	             colorRampPalette(c(col1,"BLACK"))(101)
-	)
+	            )
+	lencols <- c(colorRampPalette(c(col4,col3))(80),
+	             c(rep(col3, 20),rep(col2, 20)),
+	             colorRampPalette(c(col2,col1))(81)
+	              )
 	loccols = (c(colorRampPalette(c("BLACK",col1))(5)[-1],
 	              col2,col3,
 	              colorRampPalette(c(col4,"WHITE"),space="Lab")(4)))
@@ -100,8 +104,13 @@ CPcontour <- function(plotdata,
 		"0.2" = seq(0,1,0.005),
 		"0.01" = seq(0.0005,0.9995,0.0005)
 	)
-	lenconts <- c(seq(-100, 100, 2))
-	lenconts2 <- c(-1.5, -1, -0.5, 0.5, 1, 1.5)
+	if (contrast == "RD") {
+	  lenconts <- c(seq(-100, 100, 2))
+	  lenconts2 <- c(-1.5, -1, -0.5, 0.5, 1, 1.5)
+	} else {
+	  lenconts <- c(seq(-100, 100, 20))
+	  lenconts2 <- c(-15, -10, -5, 5, 10, 15)
+	}
 
 	p1 <- as.numeric(dimnames(plotdata[["mastercp"]])[[1]])
 	p2 <- as.numeric(dimnames(plotdata[["mastercp"]])[[2]])
@@ -147,8 +156,16 @@ CPcontour <- function(plotdata,
 	                               "cp",
 	                               nums,]
 
-	  if(lside == TRUE) cpdata <- lirev * ncpval
-	  else cpdata <- rawcpdata
+	  if(lside == TRUE) {
+#	    cpdata <- lirev * ncpval
+	    cpdata <- plotdata[["mastercp"]][paste(x),
+	                                        paste(y),
+	                                        paste(par3),
+	                                        methlab,
+	                                        paste(100*(1-alpha)),
+	                                        "rncp",
+	                                        nums,]
+	  } else cpdata <- rawcpdata
 	}
 	if(CIlen == TRUE) {
 	  if (contrast == "OR") {
@@ -178,6 +195,7 @@ CPcontour <- function(plotdata,
 		                                paste(100*(1-alpha)),
 		                                "len",
 		                                nums,] - ASlen) / ASlen
+		    lendata[ASlen == 0] <- 0
 		  } else if (contrast %in% c("RR", "OR")) {
 		    lendata <- 100 * (exp(plotdata[["mastercp"]][paste(x),
 		                                             paste(y),
@@ -199,8 +217,8 @@ CPcontour <- function(plotdata,
 		                             paste(100*(1-alpha)),
 		                             "len",
 		                             nums,]
-		lendata[lendata < (-20)] <- (-20)
-		lendata[lendata > 30] <- 30
+#		lendata[lendata < (-10)] <- (-10)
+#		lendata[lendata > 10] <- 10
 	}
 	if(locind) {
 	  # Rename this
@@ -235,7 +253,12 @@ CPcontour <- function(plotdata,
 	} else if (alpha == 0.025 | alpha == 0.05) {
 	  ccol <- ceiling(200*cpdata*ifelse(lside,2,1))
 	}
-	if(CIlen) ccol <- ceiling(10*lendata)
+	if(CIlen) {
+	  if (contrast == "RD") { ccol <- ceiling(10*lendata)
+	  } else ccol <- ceiling(lendata)
+	  ccol[ccol < (-100)] <- (-100)
+	  ccol[ccol > 100] <- 100
+	}
 	if(locind) ccol <- ceiling(10*cpdata)
 
 	if(!CIlen) ccol[ccol<1] <- 1
@@ -249,7 +272,7 @@ CPcontour <- function(plotdata,
 	if (CIlen) {
 		if(avg) {
 		  palette <- lencols
-		  shift=200
+		  shift <- 101
 		} else palette <- lencols1
 	}
 	if (locind) palette <- loccols
@@ -383,6 +406,7 @@ plotpanel <- function(plotdata,
   # and it would take too long to go back and re-run everything
   longlab[longlab=="SCAS"] <- "SCASu"
   longlab[longlab=="SCAS-bc"] <- "SCAS"
+  longlab[longlab=="AS-bc"] <- "AS(N-1)"
   longlab[longlab=="MOVER-c5"] <- "MOVER-c (\U0263=0.5)"
   longlab[longlab=="MOVER-c25"] <- "MOVER-c (\U0263=0.25)"
   longlab[longlab=="MOVER-c125"] <- "MOVER-c (\U0263=0.125)"
@@ -395,6 +419,7 @@ plotpanel <- function(plotdata,
   longlab[longlab=="mid-p"] <- "T-midp"
   longlab[longlab=="Jeffreys"] <- "T-Jeffreys"
   longlab[longlab=="Wilson"] <- "T-Wilson"
+  longlab[longlab=="Blaker"] <- "T-Blaker"
   longlab[longlab=="SCASp-c125"] <- "T-SCASp-c125"
   longlab[longlab=="SCASp-c25"] <- "T-SCASp-c25"
   longlab[longlab=="SCASp-c5"] <- "T-SCASp-c5"
@@ -425,8 +450,8 @@ plotpanel <- function(plotdata,
     ),
     width = (120 * nmeth + 60) * res.factor,
     height = 4*rows * 38 * res.factor,
-#    type="quartz"
-    type="windows"
+#    type="quartz" # Mac environment
+    type="windows" # Windows environment
     )
   } else if (fmt=="png") {
     png(file = paste(outpath, "_", fmt, "/",
@@ -438,7 +463,8 @@ plotpanel <- function(plotdata,
     width = (115 * nmeth + 60) * res.factor,
 #    height = (4*rows) * 38 * res.factor,
     height = (4*rows+0) * 38 * res.factor,
-    type = "quartz"
+#    type = "quartz"
+    type="windows"
     )
   }
   if (FALSE) { # Left-over code not checked for this application
@@ -577,16 +603,25 @@ plotpanel <- function(plotdata,
           cex=res.factor*0.8*textsize,
           line=0.5*res.factor,
           text = (paste0(
-            "\n","meanDNCP",
-            "=",(summaries[i,"meanDNCP"]),
-            "\n","DNCP above ",
-            format(1.2*alpha/2,scientific=F),
-            "=",(summaries[i,"pctBad.DNCP"]),
-            #            "%",
+                    "within ±",
+                    format(0.2*alpha/2, scientific=F),
+                    "=",
+                    summaries[i, "pctnear.1side"],
+                    "%",
+                                "\n","above ",
+                                format(1.2*alpha/2, scientific=F),
+                                "=",(summaries[i,"pctBad.1side"]),
+                                "%"
+#             "\n","meanDNCP",
+#            "=",(summaries[i,"meanDNCP"]),
+#            "\n","DNCP above ",
+#            format(1.2*alpha/2,scientific=F),
+#            "=",(summaries[i,"pctBad.DNCP"]),
+#            "%",
             #            "\n","DNCP within ±",
             #            format(0.2*alpha/2,scientific=F),
             #            "=",(summaries[i,"pctnear.1side"]),
-            "%"
+            #            "%"
           )))
     # Run the location index plot
     palette2 <- CPcontour(plotdata = plotdata,
@@ -615,7 +650,7 @@ plotpanel <- function(plotdata,
 
     if (CIlen == TRUE) {
       # Run the smoothed plot
-      CPcontour(plotdata = plotdata,
+      palette3 <- CPcontour(plotdata = plotdata,
                 alpha = alpha,
                 par3 = par3,
                 nums = nums,
@@ -644,7 +679,8 @@ plotpanel <- function(plotdata,
                             round(100 * (exp(as.numeric(summaries[i, "meanlen"]) - ASmeanlen) - 1), 1)
                             ),
                             "%",
-              "\n","mean width (log)=",
+              "\n",
+              ifelse(contrast == "RD", "mean width=", "mean width (log)="),
               (summaries[i,"meanlen"])#,
 #              "%" #,
             )))
@@ -771,42 +807,6 @@ plotpanel <- function(plotdata,
         cex=res.factor*0.6,
         line=2*res.factor/3)
 
-
-  # Add legend for location index
-  image(y = (1:20-0.5)/20,
-        z = matrix(1:20,nrow=1),
-        col = (palette2),
-        axes = F,
-        ylab = "")
-  text(x=1.2,
-       y=(0:10)/10,
-       labels=(0:10)/10,
-       xpd=T,
-       cex=res.factor*textsize,
-       pos=4)
-  text(x=c(-2),
-       y=c(0),
-       labels=c("Too mesial"),
-       adj=c(0),
-       xpd=T,
-       srt=90,
-       cex=res.factor*textsize)
-  text(x=c(-2),
-       y=c(1),
-       labels=c("Too distal"),
-       adj=c(1),
-       xpd=T,
-       srt=90,
-       cex=res.factor*textsize)
-
-  box(lwd=0.6*textsize*res.factor)
-  mtext(text="MNCP/NCP",
-        side=3,
-        at = 0,
-        adj = 0.5,
-        cex=res.factor*0.6,
-        line=2*res.factor/3)
-
   # Add legend for DNCP
   if (alpha == 0.05) {
       image(y = (1:20-0.5)/20,
@@ -859,12 +859,88 @@ plotpanel <- function(plotdata,
            pos=4)
   }
   box(lwd=0.6*textsize*res.factor)
-  mtext(text="DNCP",
+  mtext(text="RNCP",
         side=3,
         at = 0,
         adj = 0.5,
         cex=res.factor*0.6,
         line=2*res.factor/3)
+
+  # Add legend for location index
+  image(y = (1:20-0.5)/20,
+        z = matrix(1:20,nrow=1),
+        col = (palette2),
+        axes = F,
+        ylab = "")
+  text(x=1.2,
+       y=(0:10)/10,
+       labels=(0:10)/10,
+       xpd=T,
+       cex=res.factor*textsize,
+       pos=4)
+  text(x=c(-2),
+       y=c(0),
+       labels=c("Too mesial"),
+       adj=c(0),
+       xpd=T,
+       srt=90,
+       cex=res.factor*textsize)
+  text(x=c(-2),
+       y=c(1),
+       labels=c("Too distal"),
+       adj=c(1),
+       xpd=T,
+       srt=90,
+       cex=res.factor*textsize)
+
+  box(lwd=0.6*textsize*res.factor)
+  mtext(text="MNCP/NCP",
+        side=3,
+        at = 0,
+        adj = 0.5,
+        cex=res.factor*0.6,
+        line=2*res.factor/3)
+
+
+  # Add legend for expected width
+  if (CIlen == TRUE) {
+    image(y = (1:200-100)/10,
+        z = matrix(1:200,nrow=1),
+        col = (palette3),
+        axes = F,
+        ylab = "")
+  text(x=1.2,
+       y=(-5:5)*2,
+       labels=(-5:5) * ifelse(contrast == "RD", 2, 20),
+       xpd=T,
+       cex=res.factor*textsize,
+       pos=4)
+  }
+if (FALSE) {
+  text(x=c(-2),
+       y=c(0),
+       labels=c("Too mesial"),
+       adj=c(0),
+       xpd=T,
+       srt=90,
+       cex=res.factor*textsize)
+  text(x=c(-2),
+       y=c(1),
+       labels=c("Too distal"),
+       adj=c(1),
+       xpd=T,
+       srt=90,
+       cex=res.factor*textsize)
+}
+  box(lwd=0.6*textsize*res.factor)
+  mtext(text="Width \n vs AS (%)",
+        side=3,
+        at = 0,
+        adj = 0.5,
+        cex=res.factor*0.6,
+        line=2*res.factor/3)
+
+
 
   if(fmt=="xxx") {
     mtext(paste(ifelse(oneside,
@@ -900,7 +976,7 @@ plotpanel <- function(plotdata,
         line=0.5*res.factor)
   mtext(side=2,
         outer=TRUE,
-        text = "DNCP\n for individual PSPs",
+        text = "RNCP\n for individual PSPs",
         cex=textsize*0.8*res.factor,
         at = 1/(2*rows) + (1 + labadj)/rows,
         line=0.5*res.factor)
