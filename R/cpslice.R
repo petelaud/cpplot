@@ -411,4 +411,29 @@ for(i in 1:length(dels)){
 }
 
 
+# For troubleshooting plots
+
+load(file = paste0(outpath, "cparrays.RD.", 20, ".",200,".Rdata"))
+CPcontour(
+  plotdata = arrays,
+                      alpha = 0.05,
+                      par3 = 0.75,
+                      nums = "20",
+                      xlim = c(0,1),
+                      ylim = c(0,1),
+                      methlab = "MOVER-NJ",
+                      avg = T,
+                      lside = F,
+                      lines = F,
+                      lines1 = F,
+                      CIlen = T,
+                      locind = F,
+                      crude = F,
+                      res.factor = 6,
+                      colour = T,
+                      textsize = 1
+
+                      )
+
+
 }
