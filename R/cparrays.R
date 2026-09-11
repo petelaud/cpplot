@@ -142,7 +142,7 @@ allpairci <- function(xs,
         mymethods <- c(mymethods, "BP-J", "BP-cc") #, "Tang-ccdr")
       }
     } else if (contrast == "OR") {
-      mymethods <- c("SCASp", "SCASpu", "Jeffreys", "mid-p", "Wilson", "Wald", "Laplace",
+      mymethods <- c("SCASp", "SCASpu", "Jeffreys", "mid-p", "Wilson", "Wald", "Laplace", "Blaker",
                      "SCASp-c5", "SCASp-c25", "SCASp-c125", "C-P",
                      "Jeffreys-c25", "Jeffreys-c125", "Wilson-c", "midp-c25")
     }
@@ -187,8 +187,8 @@ allpairci <- function(xs,
     # Transformed Uncorrected SCAS (i.e. skewness-corrected Wilson)
     if ("SCASpu" %in% methods) ci[, 1:2, "SCASpu"] <- t(sapply(1:lenxs,function(i) ratesci::scorepairci(x = xs[i,], contrast = contrast, closedform = TRUE, bcf = FALSE, level = 1-alpha)$estimates[,c(1,3)]))
 
-    tempout <- aperm(array((sapply(1:lenxs, function(i) ratesci::orpairci(x = xs[i,], level = 1-alpha)$estimates[,c(1,3)])), dim = c(5,2,lenxs)), c(3, 2, 1))
-    ci[, 1:2, c("SCASp", "mid-p", "Wilson", "Jeffreys", "Wald")] <- tempout[, , 1:5]
+    tempout <- aperm(array((sapply(1:lenxs, function(i) ratesci::orpairci(x = xs[i,], level = 1-alpha)$estimates[,c(1,3)])), dim = c(6,2,lenxs)), c(3, 2, 1))
+    ci[, 1:2, c("SCASp", "mid-p", "Wilson", "Jeffreys", "Blaker", "Wald")] <- tempout[, , 1:6]
 
     # Wald approximate normal methods
 #    if ("Wald" %in% methods) ci[, 1:2, "Wald"] <- t(sapply(1:lenxs,function(i) waldpairci(x = xs[i,], contrast = contrast, level = 1-alpha)$estimates[,c(1,3)]))
