@@ -29,9 +29,7 @@ if (FALSE) {
   # ^^ Example of how you might specify a subset of methods used for larger N
   # for reduced runtimes using methods= argument in cpfun() below
   alphas <- c(0.1, 0.05, 0.01)
-  alphas <- c(0.1)
   phis <- c(0.1, 0.25, 0.5, 0.75)
-  phis <- c(0.25, 0.5)
 
   system.time(mycis <- cifun(n=20, contrast="RD", alph = alphas))[[3]]/60
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
@@ -47,7 +45,7 @@ if (FALSE) {
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
 
   # Evaluation for conditional OR
-  ORpairteam <- c("SCASp", "SCASpu", "mid-p", "Jeffreys", "Wilson", "Wald", "Laplace")
+  ORpairteam <- c("SCASp", "SCASpu", "mid-p", "Jeffreys", "Wilson", "Blaker", "Wald", "Laplace")
   #                "SCASp-c125", "SCASp-c25", "SCASp-c5", "midp-c25", "Jeffreys-c125", "Jeffreys-c25", "C-P") # Subset of OR methods used for larger N
   system.time(mycis <- cifun(n=20, contrast="OR", alph = alphas))[[3]]/60
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
@@ -61,7 +59,7 @@ if (FALSE) {
   #   to get p12, p21 from p1, p2 and phi
   alphas <- 0.05
 #  system.time(mycis <- cifun(n=105, contrast="OR", alph = alphas, methods = ORpairteam))[[3]]/60
-#  Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=40, jitt=T, smooth=T, phis=phis))[[3]]/60
+#  Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=100, jitt=T, smooth=T, phis=phis))[[3]]/60
 
   RDmeth <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP", "Wald", "Wald-cc",
               "SCAS-c5", "SCAS-c25", "SCAS-c125", "MOVER-c5", "MOVER-c25", "MOVER-c125")
@@ -223,9 +221,9 @@ if (FALSE) {
   #############################################################################
   ### FIGURE 1: CP, MACP, location index and DNCP for selected methods for RD, with N = 40, \alpha=0.05 and \phi=0.25
   #############################################################################
-  load(file = paste0(outpath, "cparrays.RD.", 40, ".",200,".Rdata"))
-  plotpanel(plotdata = arrays, alpha = 0.1, par3 = 0.25,
-            sel = c("SCAS-bc", "SCAS", "AS-bc", "AS", "MOVER-NJ", "MOVER-NW", "MOVER-W", "BP", "Wald"),
+  load(file = paste0(outpath, "cparrays.RD.", 20, ".",200,".Rdata"))
+  plotpanel(plotdata = arrays, alpha = 0.05, par3 = 0.75,
+            sel = c("SCAS-bc", "AS-bc", "AS", "MOVER-NJ", "MOVER-NW", "MOVER-W", "BP", "Wald"),
             plotlab = "RDpairW", fmt="tiff", res.factor = 6, CIlen = TRUE)
 
   #############################################################################
@@ -233,16 +231,16 @@ if (FALSE) {
   #############################################################################
   load(file = paste0(outpath, "cparrays.RR.", 40, ".", 200, ".Rdata"))
   plotpanel(plotdata = arrays, alpha = 0.05, par3 = 0.25,
-            sel = c("SCAS-bc", "SCAS", "AS-bc", "AS", "MOVER-NJ", "MOVER-NW", "MOVER-W", "BP", "BP-J", "Wald"),
+            sel = c("SCAS-bc", "AS-bc", "AS", "MOVER-NJ", "MOVER-NW", "MOVER-W", "BP-J", "BP", "Wald"),
             plotlab = "RRpairW", fmt="tiff", res.factor = 6, CIlen = TRUE)
 
   #############################################################################
   ### FIGURE 3: CP, MACP, location index and DNCP for selected methods for OR, with N = 40, \alpha=0.05 and \phi=0.25
   #############################################################################
-  load(file = paste0(outpath, "cparrays.OR.", 105, ".",40,".Rdata"))
-  dimnames(arrays$summaries)
+  load(file = paste0(outpath, "cparrays.OR.", 105, ".",100,".Rdata"))
+#  dimnames(arrays$summaries)
   plotpanel(plotdata = arrays, alpha = 0.05, par3 = 0.25,
-            sel = c("SCASp", "SCASpu", "mid-p", "Jeffreys", "Wilson", "Wald", "Laplace"),
+            sel = c("SCASp", "SCASpu", "mid-p", "Jeffreys", "Wilson", "Blaker", "Wald", "Laplace"),
             plotlab = "ORpairW", fmt="tiff", res.factor = 6, CIlen = TRUE)
 
   #############################################################################
@@ -537,12 +535,13 @@ if (FALSE) {
 
   #############################################################################
   ### SUPPLEMENTARY FIGURES:
-  ### CP, MACP, location index and DNCP for selected methods for RD,
+  ### CP, MACP, location index RNCP and width for selected methods for RD,
   ### with N = 40, \alpha=0.05 and \phi=0.25
   #############################################################################
   # RD
   RDpairteam <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP")  	#Paired RD
-  RDcpairteam <- c("SCAS-c125", "SCAS-c25", "SCAS-c5", "MOVER-c125", "MOVER-c25", "MOVER-c5") 	#Paired RD, cc
+  RDpairteam <- c("SCAS-bc", "AS-bc", "AS", "MOVER-NJ", "MOVER-NW", "MOVER-W", "BP", "Wald")
+  RDcpairteam <- c("SCAS-c125", "SCAS-c25", "SCAS-c5", "MOVER-c125", "MOVER-c25", "MOVER-c5", "Wald-cc") 	#Paired RD, cc
   teamlist <- list(RDpairteam, RDcpairteam)
   teamlabels <- c("RDpair", "RDcpair")
 #  load(file = paste0(outpath, "cparrays.RD.", 40, ".", 200, ".Rdata"))
@@ -556,7 +555,7 @@ if (FALSE) {
           plotpanel(
             plotdata = arrays, alpha = i, par3 = j,
             limits = c(0, 1), sel = teamlist[[k]], plotlab = teamlabels[k],
-            fmt = "png", res.factor = 4
+            fmt = "png", res.factor = 4, CIlen = TRUE
           )
           }
         }
