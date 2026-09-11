@@ -5,13 +5,13 @@ if (FALSE) {
   root <- "/Users/ssu/Documents/"
   outpath <- paste(root, "Main/Courses_papers/skewscore/paired/", sep = "")
   outpath <- "D:/Pete/Documents/GitHub/cpplot/data/"
-
+  outpath <- "D:/Pete/Documents/Research/paired/" # Remove for final upload
 
 
 res.factor <- 3
 tiff(file = paste0(outpath,"_tiff/unluckyN.tiff"),
 width = (600) * res.factor,
-height = 300 * res.factor,
+height = 200 * res.factor,
 #    type="quartz"
 type="windows"
 )
@@ -19,11 +19,11 @@ par(cex.main = res.factor*0.8*1, cex.axis=res.factor*0.8*1)
 #par(mar = res.factor*(c(2,3,1,0.5)+0.1))
 
 
-par(mfrow = c(1, 2)) #, cex = res.factor)
+par(mfrow = c(1, 3)) #, cex = res.factor)
 
-for (myN in c(40, 39)) {
+for (myN in c(39, 40, 41)) {
 
-#myN <- 20
+#myN <- 41
 psi <- 3
 load(file=paste0(outpath, "cis.RR.", myN, ".Rdata"))
 #system.time(ciarrays <- cifun(n=myN, contrast="RD", alph = 0.05))[[3]]/60
