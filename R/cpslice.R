@@ -141,6 +141,8 @@ mycis <- arrays
 
 # Fagerland figure 5 (left panel)
 myN <- 25
+# Fagerland book, figure 8.12
+myN <- 30
 #system.time(mycis <- cifun(n=myN, contrast="RD", alph = c(0.05)))[[3]]/60
 
 #p0 <- as.numeric(dimnames(arrays$mastercp)[[1]])
@@ -152,7 +154,15 @@ p0 <- seq(0, 1 - del, length.out = 51)
 p2 <- p0
 #p2[1] <- 0.0001
 
-#p2 <- p0[p0 + del >= 0 & p0 + del <= 1]
+# Check Newcombe Table 8.5
+# - confirm surprisingly shorter widths for MOVER-NW with large phi
+myN <- 10
+del <- 0
+phi <- 0.96
+dimnames(arrays$mastercp)
+arrays$mastercp["0.4975", "0.4975", "0.96", , "95", "len", ,]
+arrays$mastercp["0.4975", "0.4975", "0.96", , "95", "avecp", ,]
+
 
 p1 <- p2 + del
 cp1 <- onecpfun(
