@@ -10,8 +10,11 @@ if (FALSE) {
 
 myNs <- c(39, 40, 41)
 
+
+plot811 <- function(method = "AS", label = "Tango", measure = "cp", lab2 = "CP") {
+
 res.factor <- 3
-tiff(file = paste0(outpath,"_tiff/unluckyN_v2.tiff"),
+tiff(file = paste0(outpath,"_tiff/unluckyN_", method, measure, ".tiff"),
 #     width = (200 * length(myNs)) * res.factor,
      width = (300 * 1) * res.factor,
      height = 300 * res.factor,
@@ -21,7 +24,7 @@ type="windows"
 par(cex.main = res.factor*0.8*1, cex.axis=res.factor*0.8*1)
 #par(mar = res.factor*(c(2,3,1,0.5)+0.1))
 par(pty='s')
-par(mar = res.factor*(c(2,3,2,0.5)+0.1))
+par(mar = res.factor*(c(2,3,3,0.5)+0.1))
 
 
 # par(mfrow = c(1, length(myNs))) #, cex = res.factor)
@@ -41,25 +44,40 @@ cp1 <- onecpfun(
   psis = 3
   #    phis = 0.25
 )
+if (measure == "cp") {
+  lims <- c(0.9, 1)
+} else lims <- c(0, 0.05)
+
 plot(p2,
-     cp1[,"AS","cp"],
+     cp1[, method, measure],
      type = "l",
      lwd = 2,
-     ylim = c(0.90, 1),
+     ylim = lims,
 #     ylab = "Coverage Probability",
 #     xlab = "p2",
       xlab = '',
       ylab = '',
       xaxt='n',
      yaxt='n',
-     main = paste0("N = 39,40,41, θ = ", del, "±0.005, ψ = ", psi, "\n",
+     main = paste0("Method: ", method, "\n",
+                   "N = 39,40,41, θ = ", del, "±0.005, ψ = ", psi, "\n",
                    "Solid line: N = 40, θ = 0.2")
 )
-abline(h=0.95)
-rect(
-  xleft = par("usr")[1], xright = par("usr")[2], ybottom = 0.945, ytop = 0.955,
-  border = NA, col = adjustcolor("gray", alpha = 0.3)
-)
+
+if (measure == "cp") {
+  abline(h=0.95)
+  rect(
+    xleft = par("usr")[1], xright = par("usr")[2], ybottom = 0.945, ytop = 0.955,
+    border = NA, col = adjustcolor("gray", alpha = 0.3)
+  )
+} else {
+  abline(h=0.025)
+  rect(
+    xleft = par("usr")[1], xright = par("usr")[2], ybottom = 0.02, ytop = 0.03,
+    border = NA, col = adjustcolor("gray", alpha = 0.3)
+  )
+
+}
 axis(side = 2, las = 2)
 axis(side = 1, las = 1, )
 mtext(side = 1,
@@ -67,7 +85,7 @@ mtext(side = 1,
       cex = res.factor*1,
       line = 1.5*res.factor)
 mtext(side = 2,
-      text = "Coverage probability",
+      text = lab2,
       cex = res.factor*1,
       line = 2*res.factor)
 
@@ -148,7 +166,7 @@ for(i in 1:length(dels)){
     psis = psi
   )
   lines(p2,
-       cp1[,"AS","cp"],
+       cp1[, method, measure],
        lty = 2
   )
 }
@@ -156,7 +174,16 @@ for(i in 1:length(dels)){
 }
 dev.off()
 
+}
 
+plot811(method = "AS", label = "Tango")
+plot811(method = "MOVER-NW", label = "MOVER-NW")
+plot811(method = "BP", label = "BP")
+
+
+plot811(method = "AS", label = "Tango", measure = "rncp", lab2 = "RNCP")
+plot811(method = "MOVER-NW", label = "MOVER-NW", measure = "rncp", lab2 = "RNCP")
+plot811(method = "BP", label = "BP", measure = "rncp", lab2 = "RNCP")
 
 
 # 2-D Type I error plot
