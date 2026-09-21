@@ -414,19 +414,20 @@ plotpanel <- function(plotdata,
   longlab[longlab=="SCAS-c25"] <- "SCAS-c (\U0263=0.25)"
   longlab[longlab=="SCAS-c125"] <- "SCAS-c (\U0263=0.125)"
 
-  longlab[longlab=="SCASp"] <- "T-SCASp(N-1)"
-  longlab[longlab=="SCASpu"] <- "T-SCASp"
+  longlab[longlab=="SCASp"] <- "T-SCAS(N-1)"
+  longlab[longlab=="SCASpu"] <- "T-SCAS"
   longlab[longlab=="mid-p"] <- "T-midp"
   longlab[longlab=="Jeffreys"] <- "T-Jeffreys"
   longlab[longlab=="Wilson"] <- "T-Wilson"
   longlab[longlab=="Blaker"] <- "T-Blaker"
-  longlab[longlab=="SCASp-c125"] <- "T-SCASp-c125"
-  longlab[longlab=="SCASp-c25"] <- "T-SCASp-c25"
-  longlab[longlab=="SCASp-c5"] <- "T-SCASp-c5"
+  longlab[longlab=="SCASp-c125"] <- "T-SCAS-c125"
+  longlab[longlab=="SCASp-c25"] <- "T-SCAS-c25"
+  longlab[longlab=="SCASp-c5"] <- "T-SCAS-c5"
   longlab[longlab=="midp-c25"] <- "T-midp-c25"
   longlab[longlab=="Jeffreys-c25"] <- "T-Jeffreys-c25"
+  longlab[longlab=="Jeffreys-c125"] <- "T-Jeffreys-c125"
   longlab[longlab=="Wilson-c"] <- "T-Wilson-c"
-  longlab[longlab=="C-P"] <- "T-CP"
+  longlab[longlab=="C-P"] <- "T-C-P"
 
   names(longlab) <- names(methods) <- methods
   n.grid <- dim(plotdata[["mastercp"]])[1]
