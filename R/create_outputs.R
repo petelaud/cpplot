@@ -17,6 +17,9 @@ if (FALSE) {
   outpath <- '/myoutputpath/'
   outpath <- paste0(root, "Main/Courses_papers/skewscore/paired/") # Remove for final upload
   outpath <- "D:/Pete/Documents/Research/paired/" # Remove for final upload
+  outpath1 <- "D:/Pete/Documents/Research/paired/" # Remove for final upload
+  outpath <- "D:/Pete/Documents/Research/paired/negcorr/" # Remove for final upload
+
   #  outpath <- 'data/'
 
   #############################################################################
@@ -24,20 +27,22 @@ if (FALSE) {
   ### Run the CP calculation function for N=20, N=40 and N=65
   ### WARNING: for N=40 and 65, these take several hours to run!
   #############################################################################
-  RDpairteam <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP", "Wald", "Wald-cc")
-  RRpairteam <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP", "Wald")
+  RDpairteam <- c("SCAS-bc", "AS-bc", "AS", "MOVER-NJ", "MOVER-NW", "MOVER-W", "BP", "Wald", "Wald-cc")
+  RRpairteam <- c("SCAS-bc", "AS-bc", "AS", "MOVER-NJ", "MOVER-NW", "MOVER-W", "BP", "BP-J", "Wald")
   # ^^ Example of how you might specify a subset of methods used for larger N
   # for reduced runtimes using methods= argument in cpfun() below
   alphas <- c(0.1, 0.05, 0.01)
-  phis <- c(0.1, 0.25, 0.5, 0.75)
+  phis <- c(-0.25, 0.1, 0.25, 0.5, 0.75)
 
   system.time(mycis <- cifun(n=20, contrast="RD", alph = alphas))[[3]]/60
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
   system.time(mycis <- cifun(n=20, contrast="RR", alph = alphas))[[3]]/60
+# load(file=paste0(outpath1, "cis.RR.20.Rdata")); mycis <- ciarrays
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
   system.time(mycis <- cifun(n=40, contrast="RD", alph = alphas))[[3]]/60
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
   system.time(mycis <- cifun(n=40, contrast="RR", alph = alphas))[[3]]/60
+  # load(file=paste0(outpath1, "cis.RR.40.Rdata")); mycis <- ciarrays
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
   system.time(mycis <- cifun(n=65, contrast="RD", alph = alphas))[[3]]/60
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
@@ -50,6 +55,7 @@ if (FALSE) {
   system.time(mycis <- cifun(n=20, contrast="OR", alph = alphas))[[3]]/60
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
   system.time(mycis <- cifun(n=40, contrast="OR", alph = alphas))[[3]]/60
+  # load(file=paste0(outpath1, "cis.OR.40.Rdata")); mycis <- ciarrays
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
   system.time(mycis <- cifun(n=65, contrast="OR", alph = alphas))[[3]]/60
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
