@@ -61,11 +61,11 @@ if (FALSE) {
 #  system.time(mycis <- cifun(n=105, contrast="OR", alph = alphas, methods = ORpairteam))[[3]]/60
 #  Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=100, jitt=T, smooth=T, phis=phis))[[3]]/60
 
-  RDmeth <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP", "Wald", "Wald-cc",
+  RDmeth <- c("SCAS-bc", "SCAS", "AS-bc", "AS", "MOVER-NJ", "MOVER-NW", "MOVER-W", "BP", "Wald", "Wald-cc",
               "SCAS-c5", "SCAS-c25", "SCAS-c125", "MOVER-c5", "MOVER-c25", "MOVER-c125")
-  RRmeth <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP", "BP-J", "Wald",
-              "SCAS-c5", "SCAS-c25", "SCAS-c125", "MOVER-c5", "MOVER-c25", "MOVER-c125")
-  ORmeth <- c("SCASp", "SCASpu", "mid-p", "Jeffreys", "Wilson", "Wald", "Laplace",
+  RRmeth <- c("SCAS-bc", "SCAS", "AS-bc", "AS", "MOVER-NJ", "MOVER-NW", "MOVER-W", "BP", "BP-J", "Wald",
+              "SCAS-c5", "SCAS-c25", "SCAS-c125", "MOVER-c5", "MOVER-c25", "MOVER-c125", "BP-cc")
+  ORmeth <- c("SCASp", "SCASpu", "mid-p", "Jeffreys", "Wilson", "Blaker", "Wald", "Laplace",
               "SCASp-c5", "SCASp-c25", "SCASp-c125", "C-P", "Jeffreys-c25", "Jeffreys-c125")
 
 
@@ -107,10 +107,11 @@ if (FALSE) {
   # So the following requires all the cpfun calls above to be run
   #############################################################################
   mynums <- c(20, 40, 65)
-#  mynums <- c(40, 65)
-  mymethods <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP", "BP-J",
+  phis <- c(0.1, 0.25, 0.5, 0.75)
+  mymethods <- c("SCAS-bc", "SCAS", "AS-bc", "AS", "MOVER-NJ", "MOVER-NW", "MOVER-W",
+                 "BP", "BP-J", "BP-cc", "Wald", "Wald-cc",
                  "SCAS-c5", "SCAS-c25", "SCAS-c125", "MOVER-c5", "MOVER-c25", "MOVER-c125",
-                 "SCASp", "SCASpu", "Jeffreys", "mid-p", "Wilson",
+                 "SCASp", "SCASpu", "Jeffreys", "mid-p", "Wilson", "Blaker", "Laplace",
                  "SCASp-c5", "SCASp-c25", "SCASp-c125", "C-P", "Jeffreys-c25", "Jeffreys-c125")
   nmeth <- length(mymethods)
   load(file=paste0(outpath, "cparrays.RD.", 40, ".",200,".Rdata"))
@@ -136,8 +137,9 @@ if (FALSE) {
   }
   for (num in mynums) {
     load(file=paste0(outpath, "cparrays.OR.", num, ".",200,".Rdata"))
-    bigarray[,ORmeth,,,paste(num), "OR"] <- arrays$summaries[,ORmeth,,,paste(num),]
+    bigarray[,ORmeth,,,paste(num), "OR"] <- arrays$summaries[paste(phis), ORmeth,,,paste(num),]
   }
+
 
   save(bigarray, file = paste0(outpath, "allsummaries.Rdata"))
 
