@@ -469,8 +469,13 @@ if (FALSE) {
   apply(mytiers[,4:5], 2, function(x) mean(x > 0.05))
   apply(mytiers[,4:5], 2, function(x) mean(x < 0.03))
 
+
+  # PLACEHOLER: create a plot of TIERs?
+
   ### OPTIONAL: run the code below to reproduce the analysis,
   ### or run with different set of parameters
+
+  # PLACEHOLDER: simplify to use test formula from paper instead of scorepairci()
 
   tier <- function(myparams) {
     n <- c(myparams[1])
@@ -513,7 +518,9 @@ if (FALSE) {
   }
 
   # Parameter scenarios matching Fagerland 2013
-  allparams <- expand.grid(p1 = seq(0, 1, 0.01), psi = c(1, 2, 3, 5, 10), n = seq(10, 100, 5))
+  allparams <- expand.grid(p1 = seq(0, 1, 0.01), psi = c(1, 2, 3, 5, 10), n = rev(seq(10, 50, 5)))
+  # Optional enhancement: Add random jitter to n, to avoid reliance on round numbers
+  # allparams$n <- allparams$n + floor(runif(dim(allparams)[[1]],-2, 3))
 
   # Runtime: 3.3 hours - progressBar timer can't be trusted as each iteration
   # takes different time depending on n.
