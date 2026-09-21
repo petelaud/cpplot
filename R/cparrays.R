@@ -794,16 +794,18 @@ onecpfun <- function(
     xsub <- xs[prob > 1E-10, ]
 
     tester <- allpairci(x = rep(10,4), contrast = contrast)
-    if (is.null(methods) || methods == "All") {
+    if (is.null(methods) || (length(methods) == 1 && methods == "All")) {
         mymethods <- dimnames(tester)[[3]]
     } else mymethods <- methods
     nmeth <- length(mymethods)
 
     cpl <- lncpl <- rncpl <- lenl <- locindexl <-
       array(NA, dim = c(dim(px)[1], nmeth))
+    dimnames(lenl) <- list(p1, mymethods)
 
 #    ci <- allpairci(x = xsub, contrast = contrast, alpha = alph, methods = mymethods)
     ci <- array(NA, dim=c(dim(xsub)[1], 2, nmeth))
+    dimnames(ci)[[3]] <- mymethods
     # Process one x at a time so we can show progress and expected time
     pb <- pbapply::timerProgressBar(min = 0, max = dim(xsub)[1], width = 50, char = '=', style = 1) #timer bar
     on.exit(pbapply::closepb(pb))
@@ -821,9 +823,26 @@ onecpfun <- function(
       theta <- pij[2] / pij[3] # Conditional OR
     }
 
+    probsub <- prob[prob > 1E-10]
     cpl[i, ] <- t(ci[, 1, ] <= theta[i] & ci[, 2, ] >= theta[i] & ci[, 2, ] > ci[, 1, ]) %*% prob[prob > 1E-10] # 2-sided coverage probability. NB degenerate intervals excluded
     lncpl[i, ] <- t(ci[, 1, ] > theta[i] | ci[, 2, ] == ci[, 1, ]) %*% prob[prob > 1E-10] # L-sided non-coverage (R-side is a mirror image)
     rncpl[i, ] <- t(ci[, 2, ] < theta[i] | ci[, 2, ] == ci[, 1, ]) %*% prob[prob > 1E-10] # R-sided non-coverage
+    if (contrast %in% c("RD")) {
+      lens <- ci[, 2, ] - ci[, 1, ]
+    } else if (contrast %in% c("RR", "OR")) {
+      # for RR, use length on the log scale
+      lens <- log(ci[, 2, ]) - log(ci[, 1, ])
+    }
+    lens[ci[, 2, ] == ci[, 1, ]] <- 0
+
+    methi <- mymethods[1]
+    for (methi in mymethods) {
+      lenpermeth <- lens[, methi]
+      lennoninf <- lenpermeth[lenpermeth < Inf & lenpermeth > 0]
+      probnoninf <- probsub[lenpermeth < Inf & lenpermeth > 0]
+      probmod <- probnoninf / sum(probnoninf) # Rescale probabilities excluding infinite lengths (and zero widths?)
+      lenl[1, methi] <- lennoninf %*% probmod
+    }
 
     mncpl <- rncpl
     thetagt <- px[,1] > px[,2]
