@@ -316,8 +316,8 @@ if (FALSE) {
   #############################################################################
   load(file = paste0(outpath, "cparrays.OR.", 105, ".",40,".Rdata"))
   plotpanel(plotdata = arrays, alpha = 0.05, par3 = 0.25,
-            sel = c("SCASp-c125", "SCASp-c25", "SCASp-c5", "midp-c25", "Jeffreys-c125", "Jeffreys-c25", "C-P"),
-            plotlab = "ORcpair", fmt="tiff", res.factor = 6)
+            sel = c("SCASp-c125", "SCASp-c25", "SCASp-c5", "midp-c25", "Jeffreys-c125", "Jeffreys-c25", "C-P", "Blaker"),
+            plotlab = "ORcpair", fmt="tiff", res.factor = 6, CIlen = TRUE)
 
   #############################################################################
   ### TABLE 2, 3 & 4: Summary of each metric for selected methods for RD & RR, & OR
