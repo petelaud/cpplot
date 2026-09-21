@@ -8,24 +8,75 @@ if (FALSE) {
   outpath <- "D:/Pete/Documents/Research/paired/" # Remove for final upload
 
 
+myNs <- c(39, 40, 41)
+
 res.factor <- 3
-tiff(file = paste0(outpath,"_tiff/unluckyN.tiff"),
-width = (600) * res.factor,
-height = 200 * res.factor,
+tiff(file = paste0(outpath,"_tiff/unluckyN_v2.tiff"),
+#     width = (200 * length(myNs)) * res.factor,
+     width = (300 * 1) * res.factor,
+     height = 300 * res.factor,
 #    type="quartz"
 type="windows"
 )
 par(cex.main = res.factor*0.8*1, cex.axis=res.factor*0.8*1)
 #par(mar = res.factor*(c(2,3,1,0.5)+0.1))
+par(pty='s')
+par(mar = res.factor*(c(2,3,2,0.5)+0.1))
 
 
-par(mfrow = c(1, 3)) #, cex = res.factor)
+# par(mfrow = c(1, length(myNs))) #, cex = res.factor)
 
-for (myN in c(39, 40, 41)) {
-
-#myN <- 41
 psi <- 3
-load(file=paste0(outpath, "cis.RR.", myN, ".Rdata"))
+load(file=paste0(outpath, "cis.RD.40.Rdata"))
+del <- 0.2 # * myN/40
+p2 <- seq(0, 1-del, length.out=101)
+p1 <- p2 + del
+cp1 <- onecpfun(
+  n = myN,
+  p1 = p1,
+  p2 = p2,
+  #    ciarrays = mycis,
+  ciarrays = ciarrays,
+  alph = 0.05,
+  psis = 3
+  #    phis = 0.25
+)
+plot(p2,
+     cp1[,"AS","cp"],
+     type = "l",
+     lwd = 2,
+     ylim = c(0.90, 1),
+#     ylab = "Coverage Probability",
+#     xlab = "p2",
+      xlab = '',
+      ylab = '',
+      xaxt='n',
+     yaxt='n',
+     main = paste0("N = 39,40,41, θ = ", del, "±0.005, ψ = ", psi, "\n",
+                   "Solid line: N = 40, θ = 0.2")
+)
+abline(h=0.95)
+rect(
+  xleft = par("usr")[1], xright = par("usr")[2], ybottom = 0.945, ytop = 0.955,
+  border = NA, col = adjustcolor("gray", alpha = 0.3)
+)
+axis(side = 2, las = 2)
+axis(side = 1, las = 1, )
+mtext(side = 1,
+      text = bquote(paste(italic(p)[2])),
+      cex = res.factor*1,
+      line = 1.5*res.factor)
+mtext(side = 2,
+      text = "Coverage probability",
+      cex = res.factor*1,
+      line = 2*res.factor)
+
+
+for (myN in myNs) {
+
+#myN <- 40
+psi <- 3
+load(file=paste0(outpath, "cis.RD.", myN, ".Rdata"))
 #system.time(ciarrays <- cifun(n=myN, contrast="RD", alph = 0.05))[[3]]/60
 
 #p0 <- as.numeric(dimnames(arrays$mastercp)[[1]])
@@ -65,10 +116,12 @@ p1 <- p2 + del
 #        phis = 0.25
   )
   }
+
+  if (FALSE) {
   plot(p2,
      cp1[,"AS","cp"],
      type = "l",
-     lwd = 2,
+     lwd = 3,
      ylim = c(0.90, 1),
      ylab = "Coverage Probability",
      xlab = "p2",
@@ -80,8 +133,10 @@ rect(
   border = NA, col = adjustcolor("gray", alpha = 0.3)
 )
 #abline(h=0.945,lty=2)
+}
 
-dels <- del + seq(-0.005,0.005,0.001)[-6]
+#dels <- del + seq(-0.01,0.01,0.002)[-6]
+dels <- del + seq(-0.005,0.005,0.001) #[-6]
 for(i in 1:length(dels)){
   p1 <- p2 + dels[i]
   cp1 <- onecpfun(
@@ -100,6 +155,9 @@ for(i in 1:length(dels)){
 
 }
 dev.off()
+
+
+
 
 # 2-D Type I error plot
 load(file=paste0(outpath, "cparrays.RD.", 65, ".",200,".Rdata"))
