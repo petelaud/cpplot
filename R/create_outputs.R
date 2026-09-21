@@ -324,10 +324,12 @@ if (FALSE) {
   #############################################################################
   load(file = paste0(outpath, "allsummaries.Rdata"))
   mysummaries <-
-    bigarray[, , c('95', '90'), c("meanCP", "pctCons", "pctnear", "pctgoodloc", "meanlocindex", "pctBad.DNCP", "minCP", "pctCons.both"), c("20", "40", "65"), ,drop=F]
+    bigarray[, , c('95', '90'), c("meanCP", "pctCons", "pctnear", "pctnear.1side", "pctnear.DNCP",
+                                  "pctgoodloc", "meanlocindex", "pctBad.DNCP", "minCP", "pctCons.both"),
+             c("20", "40", "65"), ,drop=F]
   # Round to 0dps
-  mysummaries[, , , c("pctCons", "pctnear", "pctgoodloc", "pctBad.DNCP"),,] <-
-    round(as.numeric(mysummaries[, , ,c("pctCons", "pctnear", "pctgoodloc", "pctBad.DNCP"),,]), 0)
+  mysummaries[, , , c("pctCons", "pctnear", "pctgoodloc", "pctBad.DNCP", "pctnear.1side", "pctnear.DNCP"),,] <-
+    round(as.numeric(mysummaries[, , ,c("pctCons", "pctnear", "pctgoodloc", "pctBad.DNCP", "pctnear.1side", "pctnear.DNCP"),,]), 0)
   # Add brackets to anticonservative methods
   anticons <- (as.numeric(mysummaries[,,,"pctCons",,]) < 50)
   mysummaries[,,,"pctnear",,] <- paste0(ifelse(anticons,"["," "),
@@ -340,9 +342,18 @@ if (FALSE) {
 #  ORmeth <- c("SCASp", "SCASpu", "mid-p", "Jeffreys", "Wilson")
 
   # Summarise by metric for N=40 for new tables in resubmission
-  ftable((mysummaries[, RDmeth[1:6], , c("pctnear", "pctgoodloc", "pctBad.DNCP"),"40",c("RD")]), col.vars = c(3,1), row.vars = c(4,2))
-  ftable((mysummaries[, RRmeth[1:7], , c("pctnear", "pctgoodloc", "pctBad.DNCP"), "40", c("RR")]), col.vars = c(3,1), row.vars = c(4,2))
-  ftable((mysummaries[, ORmeth[1:5], , c("pctnear", "pctgoodloc", "pctBad.DNCP"),"40",c("OR")]), col.vars = c(3,1), row.vars = c(4,2))
+  ftable((mysummaries[, RDmeth[c(1, 3:9)], ,
+#                      c("pctnear", "pctnear.1side", "pctnear.DNCP", "pctBad.DNCP", "meanlocindex"),
+                      c("pctnear", "pctnear.1side", "pctBad.DNCP", "meanlocindex"),
+                      "40",c("RD")]), col.vars = c(3,1), row.vars = c(4,2))
+  ftable((mysummaries[, RRmeth[c(1, 3:10)], ,
+#                      c("pctnear", "pctnear.1side", "pctnear.DNCP", "pctBad.DNCP", "meanlocindex"),
+                      c("pctnear", "pctnear.1side", "pctBad.DNCP", "meanlocindex"),
+                      "40", c("RR")]), col.vars = c(3,1), row.vars = c(4,2))
+  ftable((mysummaries[, ORmeth[c(1:5, 7:8)], ,
+#                      c("pctnear", "pctnear.1side", "pctnear.DNCP", "pctgoodloc", "pctBad.DNCP", "meanlocindex"),
+                      c("pctnear", "pctnear.1side", "pctBad.DNCP", "meanlocindex"),
+                      "40",c("OR")]), col.vars = c(3,1), row.vars = c(4,2))
 
 
   #############################################################################
