@@ -197,16 +197,16 @@ allpairci <- function(xs,
 
     # Explore continuity adjustments - could also try reduced gamma variations, e.g. cc=0.125
     if ("SCASp-c5" %in% methods) {
-      tempout5 <- aperm(array((sapply(1:lenxs, function(i) ratesci::orpairci(x = xs[i,], level = 1-alpha, cc = TRUE)$estimates[,c(1,3)])), dim = c(4,2,lenxs)), c(3, 2, 1))
-      ci[, 1:2, c("SCASp-c5", "C-P", "Wilson-c")] <- tempout5[, , 1:3]
+      tempout5 <- aperm(array((sapply(1:lenxs, function(i) ratesci::orpairci(x = xs[i,], level = 1-alpha, cc = TRUE)$estimates[,c(1,3)])), dim = c(6,2,lenxs)), c(3, 2, 1))
+      ci[, 1:2, c("SCASp-c5", "C-P", "Wilson-c", "Blaker")] <- tempout5[, , c(1, 3, 4, 6)]
     }
     if ("SCASp-c25" %in% methods) {
-      tempout25 <- aperm(array((sapply(1:lenxs, function(i) ratesci::orpairci(x = xs[i,], level = 1-alpha, cc = 0.25)$estimates[,c(1,3)])), dim = c(4,2,lenxs)), c(3, 2, 1))
-      ci[, 1:2, c("SCASp-c25", "midp-c25", "Jeffreys-c25")] <- tempout25[, , c(1, 2, 4)]
+      tempout25 <- aperm(array((sapply(1:lenxs, function(i) ratesci::orpairci(x = xs[i,], level = 1-alpha, cc = 0.25)$estimates[,c(1,3)])), dim = c(5,2,lenxs)), c(3, 2, 1))
+      ci[, 1:2, c("SCASp-c25", "midp-c25", "Jeffreys-c25")] <- tempout25[, , c(1, 3, 5)]
     }
     if ("SCASp-c125" %in% methods) {
-      tempout125 <- aperm(array((sapply(1:lenxs, function(i) ratesci::orpairci(x = xs[i,], level = 1-alpha, cc = 0.125)$estimates[,c(1,3)])), dim = c(4,2,lenxs)), c(3, 2, 1))
-      ci[, 1:2, c("SCASp-c125", "Jeffreys-c125")] <- tempout125[, , c(1, 4)]
+      tempout125 <- aperm(array((sapply(1:lenxs, function(i) ratesci::orpairci(x = xs[i,], level = 1-alpha, cc = 0.125)$estimates[,c(1,3)])), dim = c(5,2,lenxs)), c(3, 2, 1))
+      ci[, 1:2, c("SCASp-c125", "Jeffreys-c125")] <- tempout125[, , c(1, 5)]
     }
 
     # (Add conditional logistic regression CI?)
