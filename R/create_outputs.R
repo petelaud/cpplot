@@ -143,10 +143,10 @@ if (FALSE) {
 
 
   #############################################################################
-  ### OPTIONAL: re-run calculations for large sample size
+  ### OPTIONAL: re-run calculations for large sample size (Table 5) (takes several hours)
   #############################################################################
   # For RD
-  system.time(cp205RD10 <- onecpfun(0.4, 0.1, n=205, contrast = "RD", alph=0.05, phis=0.10, methods=RDpairteam))[[3]]/60
+  system.time(cp205RD10 <- onecpfun(p1=0.4, p2=0.1, n=205, contrast = "RD", alph=0.05, phis=0.10, methods=RDpairteam))[[3]]/60
   system.time(cp205RD25 <- onecpfun(0.4, 0.1, n=205, contrast = "RD", alph=0.05, phis=0.25, methods=RDpairteam))[[3]]/60
   system.time(cp205RD50 <- onecpfun(0.4, 0.2, n=205, contrast = "RD", alph=0.05, phis=0.50, methods=RDpairteam))[[3]]/60
   system.time(cp205RD75 <- onecpfun(0.4, 0.3, n=205, contrast = "RD", alph=0.05, phis=0.75, methods=RDpairteam))[[3]]/60
@@ -155,13 +155,13 @@ if (FALSE) {
   system.time(cp205RD5099 <- onecpfun(0.4, 0.2, n=205, contrast = "RD", alph=0.01, phis=0.50, methods=RDpairteam))[[3]]/60
   system.time(cp205RD7599 <- onecpfun(0.4, 0.3, n=205, contrast = "RD", alph=0.01, phis=0.75, methods=RDpairteam))[[3]]/60
   # For RR
-  system.time(cp205RR10 <- onecpfun(0.4, 0.1, n=205, contrast = "RR", alph=0.05, phis=0.10, methods=RDpairteam))[[3]]/60
+  system.time(cp205RR10 <- onecpfun(0.4, 0.1, n=205, contrast = "RR", alph=0.05, phis=0.10, methods=RRpairteam))[[3]]/60
   system.time(cp205RR25 <- onecpfun(0.4, 0.1, n=205, contrast = "RR", alph=0.05, phis=0.25, methods=RRpairteam))[[3]]/60
-  system.time(cp205RR50 <- onecpfun(0.4, 0.2, n=205, contrast = "RR", alph=0.05, phis=0.50, methods=RDpairteam))[[3]]/60
+  system.time(cp205RR50 <- onecpfun(0.4, 0.2, n=205, contrast = "RR", alph=0.05, phis=0.50, methods=RRpairteam))[[3]]/60
   system.time(cp205RR75 <- onecpfun(0.4, 0.3, n=205, contrast = "RR", alph=0.05, phis=0.75, methods=RRpairteam))[[3]]/60
-  system.time(cp205RR1099 <- onecpfun(0.4, 0.1, n=205, contrast = "RR", alph=0.01, phis=0.10, methods=RDpairteam))[[3]]/60
+  system.time(cp205RR1099 <- onecpfun(0.4, 0.1, n=205, contrast = "RR", alph=0.01, phis=0.10, methods=RRpairteam))[[3]]/60
   system.time(cp205RR2599 <- onecpfun(0.4, 0.1, n=205, contrast = "RR", alph=0.01, phis=0.25, methods=RRpairteam))[[3]]/60
-  system.time(cp205RR5099 <- onecpfun(0.4, 0.2, n=205, contrast = "RR", alph=0.01, phis=0.50, methods=RDpairteam))[[3]]/60
+  system.time(cp205RR5099 <- onecpfun(0.4, 0.2, n=205, contrast = "RR", alph=0.01, phis=0.50, methods=RRpairteam))[[3]]/60
   system.time(cp205RR7599 <- onecpfun(0.4, 0.3, n=205, contrast = "RR", alph=0.01, phis=0.75, methods=RRpairteam))[[3]]/60
   # Combine results into a data object
   bignsummary <- array(NA, dim=c(6, 6, 4, 2, 2, 1))
@@ -375,7 +375,7 @@ if (FALSE) {
   #############################################################################
 
   RDcpairteam <- c("SCAS-c5", "SCAS-c25", "SCAS-c125", "SCAS", "MOVER-c5", "MOVER-c25", "MOVER-c125", "MOVER-NJ", "Wald-cc") 	#Paired RD, cc
-  RRcpairteam <- c("SCAS-c5", "SCAS-c25", "SCAS-c125", "SCAS", "MOVER-c5", "MOVER-c25", "MOVER-c125", "MOVER-NJ", "BP-cc") 	#Paired RD, cc
+  RRcpairteam <- c("SCAS-c5", "SCAS-c25", "SCAS-c125", "SCAS", "MOVER-c5", "MOVER-c25", "MOVER-c125", "MOVER-NJ", "BP-cc") 	#Paired RR, cc
   ORcpairteam <- c("SCASp-c5", "SCASp-c25", "SCASp-c125", "SCASp", "C-P", "Blaker", "Jeffreys-c25", "Jeffreys-c125", "Jeffreys")
 
   # Overall minimum coverage for each continuity-adjusted method per contrast
