@@ -120,7 +120,7 @@ mtext(expression(paste("at selected values of ", theta["RR"])),
 
 
 # Calculate all (or selected) CI methods for a given set of x's
-#' @importFrom ratesci pairbinci scorepairci rrpairci rdpairci orpairci
+#' @importFrom ratesci rrpairci rdpairci orpairci
 #'
 allpairci <- function(xs,
                       contrast = "RD",
@@ -176,19 +176,19 @@ allpairci <- function(xs,
       ci[, 1:2, c("SCAS-c125", "MOVER-c125")] <- tempout125r[, , c(1, 7)]
     }
 
-    # MOVER methods, alternative versions
-    if ("MOVER-J" %in% methods) ci[, 1:2, "MOVER-J"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method = "MOVER", moverbase = "jeff", level = 1-alpha)$estimates[,c(1,3)]))
-    if ("MOVER-NS" %in% methods)  ci[, 1:2, "MOVER-NS"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method = "MOVER_newc", moverbase = "SCASp", level = 1-alpha)$estimates[,c(1,3)]))
+    # MOVER methods, potential alternative versions - omitted from final evaluation
+#    if ("MOVER-J" %in% methods) ci[, 1:2, "MOVER-J"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method = "MOVER", moverbase = "jeff", level = 1-alpha)$estimates[,c(1,3)]))
+#    if ("MOVER-NS" %in% methods)  ci[, 1:2, "MOVER-NS"] <- t(sapply(1:lenxs,function(i) pairbinci(x = xs[i,], contrast = contrast, method = "MOVER_newc", moverbase = "SCASp", level = 1-alpha)$estimates[,c(1,3)]))
 
   } else if (contrast == "OR") {
     # Explore various options for transformed binomial intervals for conditional OR
     # Transformed SCASp with experimental bcf using N/(N-1) to match 'N-1' test for association
 #    if ("SCASp" %in% mymethods) ci[, 1:2, "SCASp"] <- t(sapply(1:lenxs,function(i) ratesci::scorepairci(x = xs[i,], contrast = contrast, closedform = TRUE, bcf = TRUE, level = 1-alpha)$estimates[,c(1,3)]))
     # Transformed Uncorrected SCAS (i.e. skewness-corrected Wilson)
-    if ("SCASpu" %in% methods) ci[, 1:2, "SCASpu"] <- t(sapply(1:lenxs,function(i) ratesci::scorepairci(x = xs[i,], contrast = contrast, closedform = TRUE, bcf = FALSE, level = 1-alpha)$estimates[,c(1,3)]))
+#    if ("SCASpu" %in% methods) ci[, 1:2, "SCASpu"] <- t(sapply(1:lenxs,function(i) ratesci::scorepairci(x = xs[i,], contrast = contrast, closedform = TRUE, bcf = FALSE, level = 1-alpha)$estimates[,c(1,3)]))
 
     tempout <- aperm(array((sapply(1:lenxs, function(i) ratesci::orpairci(x = xs[i,], level = 1-alpha)$estimates[,c(1,3)])), dim = c(6,2,lenxs)), c(3, 2, 1))
-    ci[, 1:2, c("SCASp", "mid-p", "Wilson", "Jeffreys", "Blaker", "Wald")] <- tempout[, , 1:6]
+    ci[, 1:2, c("SCASp", "SCASpu", "mid-p", "Wilson", "Jeffreys", "Wald")] <- tempout[, , 1:6]
 
     # Wald approximate normal methods
 #    if ("Wald" %in% methods) ci[, 1:2, "Wald"] <- t(sapply(1:lenxs,function(i) waldpairci(x = xs[i,], contrast = contrast, level = 1-alpha)$estimates[,c(1,3)]))
