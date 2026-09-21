@@ -539,16 +539,16 @@ if (FALSE) {
   ### with N = 40, \alpha=0.05 and \phi=0.25
   #############################################################################
   # RD
-  RDpairteam <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP")  	#Paired RD
-  RDpairteam <- c("SCAS-bc", "AS-bc", "AS", "MOVER-NJ", "MOVER-NW", "MOVER-W", "BP", "Wald")
+  RDpairteam <- c("SCAS-bc", "AS-bc", "AS", "MOVER-NJ", "MOVER-NW", "MOVER-W", "BP", "Wald") #Paired RD
   RDcpairteam <- c("SCAS-c125", "SCAS-c25", "SCAS-c5", "MOVER-c125", "MOVER-c25", "MOVER-c5", "Wald-cc") 	#Paired RD, cc
   teamlist <- list(RDpairteam, RDcpairteam)
   teamlabels <- c("RDpair", "RDcpair")
 #  load(file = paste0(outpath, "cparrays.RD.", 40, ".", 200, ".Rdata"))
   for (n in c(20, 40, 65)) {
-    load(file = paste0(outpath, "cparrays.RD.", n, ".", 200, ".Rdata"))
-    for (j in c(0.1, 0.25, 0.5, 0.75)) {
-      for (i in c(0.05, 0.1, 0.01)) {
+  load(file = paste0(outpath, "cparrays.RD.", n, ".", 200, ".Rdata"))
+  for (j in c(0.1, 0.25, 0.5, 0.75)) {
+#    for (j in c(-0.25, -0.1, 0.9, 0.99)) {
+    for (i in c(0.05, 0.1, 0.01)) {
         #  for (i in c(0.05)) {
         for (k in 1:2) {
           if (!((k ==2) & (n %in% c(20, 65)))) {
@@ -564,8 +564,8 @@ if (FALSE) {
   }
 
   # RR
-  RRpairteam <- c("SCAS-bc", "SCAS", "AS", "MOVER-NJ", "MOVER-W", "BP", "BP-J")  	#Paired RR
-  RRcpairteam <- c("SCAS-c125", "SCAS-c25", "SCAS-c5", "MOVER-c125", "MOVER-c25", "MOVER-c5") 	#Paired RR, cc
+  RRpairteam <- c("SCAS-bc", "AS-bc", "AS", "MOVER-NJ", "MOVER-NW", "MOVER-W", "BP", "BP-J", "Wald")  	#Paired RR
+  RRcpairteam <- c("SCAS-c125", "SCAS-c25", "SCAS-c5", "MOVER-c125", "MOVER-c25", "MOVER-c5", "BP-cc") 	#Paired RR, cc
   teamlist <- list(RRpairteam, RRcpairteam)
   teamlabels <- c("RRpair", "RRcpair")
 #  load(file=paste0(outpath, "cparrays.RR.", 40, ".",200,".Rdata"))
@@ -577,7 +577,7 @@ if (FALSE) {
           if (!((k ==2) & (n %in% c(20, 65)))) {
             plotpanel(plotdata=arrays, alpha=i, par3=j,
                     limits=c(0,1), sel=teamlist[[k]], plotlab=teamlabels[k],
-                    fmt="png", res.factor = 4)
+                    fmt="png", res.factor = 4, CIlen = TRUE)
           }
         }
       }
@@ -585,8 +585,8 @@ if (FALSE) {
   }
 
   # OR
-  ORpairteam <- c("SCASp", "SCASpu", "mid-p", "Jeffreys", "Wilson")
-  ORcpairteam <- c("SCASp-c125", "SCASp-c25", "SCASp-c5", "midp-c25", "Jeffreys-c125", "Jeffreys-c25", "C-P")
+  ORpairteam <- c("SCASp", "SCASpu", "mid-p", "Jeffreys", "Wilson", "Wald", "Laplace")
+  ORcpairteam <- c("SCASp-c125", "SCASp-c25", "SCASp-c5", "midp-c25", "Jeffreys-c125", "Jeffreys-c25", "C-P", "Blaker")
   teamlist <- list(ORpairteam, ORcpairteam)
   teamlabels <- c("ORpair", "ORcpair")
 #  load(file=paste0(outpath, "cparrays.OR.", 40, ".",200,".Rdata"))
@@ -598,13 +598,12 @@ if (FALSE) {
           if (!((k ==2) & (n %in% c(20, 65)))) {
             plotpanel(plotdata=arrays, alpha=i, par3=j,
                   limits=c(0,1), sel=teamlist[[k]], plotlab=teamlabels[k],
-                  fmt="png", res.factor = 4, smoothed=T)
+                  fmt="png", res.factor = 4, CIlen = TRUE)
           }
         }
       }
     }
   }
-
 
 
   # Sample code to retrieve a previously run array:
