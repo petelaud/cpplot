@@ -363,8 +363,9 @@ if (FALSE) {
   ### Table 6: Conservative coverage summary
   #############################################################################
 
-  RDcpairteam <- RRcpairteam <- c("SCAS-c5", "SCAS-c25", "SCAS-c125", "SCAS", "MOVER-c5", "MOVER-c25", "MOVER-c125", "MOVER-NJ") 	#Paired RD, cc
-  ORcpairteam <- c("SCASp-c5", "SCASp-c25", "SCASp-c125", "SCASp", "C-P", "Jeffreys-c25", "Jeffreys-c125", "Jeffreys")
+  RDcpairteam <- c("SCAS-c5", "SCAS-c25", "SCAS-c125", "SCAS", "MOVER-c5", "MOVER-c25", "MOVER-c125", "MOVER-NJ", "Wald-cc") 	#Paired RD, cc
+  RRcpairteam <- c("SCAS-c5", "SCAS-c25", "SCAS-c125", "SCAS", "MOVER-c5", "MOVER-c25", "MOVER-c125", "MOVER-NJ", "BP-cc") 	#Paired RD, cc
+  ORcpairteam <- c("SCASp-c5", "SCASp-c25", "SCASp-c125", "SCASp", "C-P", "Blaker", "Jeffreys-c25", "Jeffreys-c125", "Jeffreys")
 
   # Overall minimum coverage for each continuity-adjusted method per contrast
   # (Including corresponding unadjusted method for reference)
