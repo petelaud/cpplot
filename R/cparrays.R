@@ -33,6 +33,7 @@ params <- function(p1,
     B <- p1+p2-1-psi*(p1+p2)
     C <- psi*p1*p2
     p11 <- (-B - sqrt(B^2-4*A*C))/(2*A)
+    p11[A == 0] <- -C / B
   }
   if (is.null(psi)) {
     p11 <- p1 * p2 + phi*sqrt(p1*(1-p1)*p2*(1-p2))
