@@ -7,31 +7,12 @@ if (FALSE) {
   outpath <- "D:/Pete/Documents/GitHub/cpplot/data/"
   outpath <- "D:/Pete/Documents/Research/paired/" # Remove for final upload
 
+  # 2-D Type I error plot, showing multiple traces, and multiple methods in a grid
 
 myNs <- c(39, 40, 41)
-
-
-plot811 <- function(method = "AS", label = "Tango", measure = "cp", lab2 = "CP") {
-
-res.factor <- 3
-tiff(file = paste0(outpath,"_tiff/unluckyN_", method, measure, ".tiff"),
-#     width = (200 * length(myNs)) * res.factor,
-     width = (300 * 1) * res.factor,
-     height = 300 * res.factor,
-#    type="quartz"
-type="windows"
-)
-par(cex.main = res.factor*0.8*1, cex.axis=res.factor*0.8*1)
-#par(mar = res.factor*(c(2,3,1,0.5)+0.1))
-par(pty='s')
-par(mar = res.factor*(c(2,3,3,0.5)+0.1))
-
-
-# par(mfrow = c(1, length(myNs))) #, cex = res.factor)
-
-psi <- 3
-load(file=paste0(outpath, "cis.RD.40.Rdata"))
 del <- 0.2 # * myN/40
+dels <- del + seq(-0.005,0.005,0.001) #[-6]
+
 p2 <- seq(0, 1-del, length.out=101)
 p1 <- p2 + del
 cp1 <- onecpfun(
@@ -44,146 +25,134 @@ cp1 <- onecpfun(
   psis = 3
   #    phis = 0.25
 )
-if (measure == "cp") {
-  lims <- c(0.9, 1)
-} else lims <- c(0, 0.05)
 
-plot(p2,
-     cp1[, method, measure],
-     type = "l",
-     lwd = 2,
-     ylim = lims,
-#     ylab = "Coverage Probability",
-#     xlab = "p2",
-      xlab = '',
-      ylab = '',
-      xaxt='n',
-     yaxt='n',
-     main = paste0("Method: ", method, "\n",
-                   "N = 39,40,41, θ = ", del, "±0.005, ψ = ", psi, "\n",
-                   "Solid line: N = 40, θ = 0.2")
-)
-
-if (measure == "cp") {
-  abline(h=0.95)
-  rect(
-    xleft = par("usr")[1], xright = par("usr")[2], ybottom = 0.945, ytop = 0.955,
-    border = NA, col = adjustcolor("gray", alpha = 0.3)
-  )
-} else {
-  abline(h=0.025)
-  rect(
-    xleft = par("usr")[1], xright = par("usr")[2], ybottom = 0.02, ytop = 0.03,
-    border = NA, col = adjustcolor("gray", alpha = 0.3)
-  )
-
-}
-axis(side = 2, las = 2)
-axis(side = 1, las = 1, )
-mtext(side = 1,
-      text = bquote(paste(italic(p)[2])),
-      cex = res.factor*1,
-      line = 1.5*res.factor)
-mtext(side = 2,
-      text = lab2,
-      cex = res.factor*1,
-      line = 2*res.factor)
-
+bigarray <- array(NA, dim=c(dim(cp1), length(myNs), length(dels)))
+dimnames(bigarray)[1:3] <- dimnames(cp1)
+dimnames(bigarray)[4:5] <- list(paste(myNs), paste(dels))
 
 for (myN in myNs) {
+  cat(paste0("N=", myN,"\n"))
+  load(file=paste0(outpath, "cis.RD.", myN, ".Rdata"))
 
-#myN <- 40
-psi <- 3
-load(file=paste0(outpath, "cis.RD.", myN, ".Rdata"))
-#system.time(ciarrays <- cifun(n=myN, contrast="RD", alph = 0.05))[[3]]/60
-
-#p0 <- as.numeric(dimnames(arrays$mastercp)[[1]])
-del <- 0.2 # * myN/40
-#del <- 0.1
-#del <- 0
-#length(p0)
-#p0 <- seq(0, 1-del, length.out=51)
-#p2 <- p0
-
-#p2 <- p0[p0 + del >= 0 & p0 + del <= 1]
-
-# 2-D coverage plot, e.g. illustrating how unrepresentative Fig 8.11 is
-p2 <- seq(0, 1-del, length.out=101)
-p1 <- p2 + del
-  cp1 <- onecpfun(
-    n = myN,
-    p1 = p1,
-    p2 = p2,
-#    ciarrays = mycis,
-    ciarrays = ciarrays,
-    alph = 0.05,
-    psis = 3
-#    phis = 0.25
-  )
-
-  if (FALSE) {
-  # One point at a time is inefficient
-  cp1 <- onecpfun(
-    n = 40,
-    contrast = "RD",
-    p1 = p1[10],
-    p2 = p2[10],
-    #    ciarrays = arrays,
-    alph = 0.05,
-    psis = 3
-#        phis = 0.25
-  )
+  for(i in 1:length(dels)){
+    cat(paste0("delta=", dels[i],"\n"))
+    p2i <- seq(0, 1 - dels[i], length.out=101)
+    p1i <- p2i + dels[i]
+    bigarray[,,, paste(myN), paste(dels[i])] <- onecpfun(
+      p1 = p1i,
+      p2 = p2i,
+      ciarrays = ciarrays,
+      alph = 0.05,
+      psis = psi
+    )
   }
+}
 
-  if (FALSE) {
+
+plot2d <- function(method = "AS", label = "Tango", measure = "cp", lab2 = "CP") {
+
+  if (measure == "cp") {
+    lims <- c(0.9, 1)
+  } else lims <- c(0, 0.05)
+
+  par(pty='s')
   plot(p2,
-     cp1[,"AS","cp"],
-     type = "l",
-     lwd = 3,
-     ylim = c(0.90, 1),
-     ylab = "Coverage Probability",
-     xlab = "p2",
-     main = paste0("N = ", myN, ", θ = ", del, "±0.005, ψ = ", psi)
+       bigarray[, method, measure, "40", "0.2"],
+       type = "l",
+       lwd = 3,
+       ylim = lims,
+       xlab = '',
+       ylab = '',
+       xaxt='n',
+       yaxt='n',
+       main = paste0("Method: ", method, "\n",
+                     "N = 39,40,41, θ = ", del, "±0.005, ψ = ", psi, "\n",
+                     "Solid line: N = 40, θ = 0.2")
   )
-abline(h=0.95)
-rect(
-  xleft = par("usr")[1], xright = par("usr")[2], ybottom = 0.945, ytop = 0.955,
-  border = NA, col = adjustcolor("gray", alpha = 0.3)
+
+
+  if (measure == "cp") {
+    abline(h=0.95)
+    rect(
+      xleft = par("usr")[1], xright = par("usr")[2], ybottom = 0.945, ytop = 0.955,
+      border = NA, col = adjustcolor("gray", alpha = 0.3)
+    )
+  } else {
+    abline(h=0.025)
+    rect(
+      xleft = par("usr")[1], xright = par("usr")[2], ybottom = 0.02, ytop = 0.03,
+      border = NA, col = adjustcolor("gray", alpha = 0.3)
+    )
+
+  }
+  axis(side = 2, las = 2)
+  axis(side = 1, las = 1, padj=1)
+  mtext(side = 1,
+        text = bquote(paste(italic(p)[2])),
+        font = 2,
+        cex = res.factor*1,
+        line = 3*res.factor)
+  mtext(side = 2,
+        text = lab2,
+        font = 2,
+        cex = res.factor*1,
+        line = 4*res.factor)
+
+  for (myN in myNs) {
+    for(i in 1:length(dels)){
+      p2i <- seq(0, 1 - dels[i], length.out=101)
+      p1i <- p2i + dels[i]
+      if (dels[i] == del & myN == 40) {
+        mylty <-  1
+        mycol <- "black"
+      } else {
+        mylty <- 2
+        mycol <- "gray33"
+      }
+      lines(p2i,
+            bigarray[, method, measure, paste(myN), paste(dels[i])],
+            lty = mylty,
+            col = mycol
+      )
+
+    }
+  }
+}
+
+res.factor <- 3
+grid.factor <- 4
+tiff(file = paste0(outpath,"_tiff/","Laud_Fig1.tiff"),
+     width = 300*grid.factor*res.factor,
+     height = 650*res.factor,
+     type = "windows"
+     #       type="quartz"
 )
-#abline(h=0.945,lty=2)
-}
+  par(pty='s')
+par(mfrow = c(2, 4))
+par(cex.main = 1.5*res.factor*1, cex.axis=1.5*res.factor*1)
+par(mar = 2*res.factor*(c(2,2,3,0.5)+0.1))
 
-#dels <- del + seq(-0.01,0.01,0.002)[-6]
-dels <- del + seq(-0.005,0.005,0.001) #[-6]
-for(i in 1:length(dels)){
-  p1 <- p2 + dels[i]
-  cp1 <- onecpfun(
-    p1 = p1,
-    p2 = p2,
-    ciarrays = ciarrays,
-    alph = 0.05,
-#    phis = 0.25
-    psis = psi
-  )
-  lines(p2,
-       cp1[, method, measure],
-       lty = 2
-  )
-}
 
-}
+plot2d(method = "AS", label = "Tango")
+plot2d(method = "BP", label = "BP")
+plot2d(method = "MOVER-NW", label = "MOVER-NW")
+plot2d(method = "SCAS", label = "SCAS")
+
+plot2d(method = "AS", label = "Tango", measure = "rncp", lab2 = "RNCP")
+plot2d(method = "BP", label = "BP", measure = "rncp", lab2 = "RNCP")
+plot2d(method = "MOVER-NW", label = "MOVER-NW", measure = "rncp", lab2 = "RNCP")
+plot2d(method = "SCAS", label = "SCAS", measure = "rncp", lab2 = "RNCP")
+
 dev.off()
 
-}
-
-plot811(method = "AS", label = "Tango")
-plot811(method = "MOVER-NW", label = "MOVER-NW")
-plot811(method = "BP", label = "BP")
 
 
-plot811(method = "AS", label = "Tango", measure = "rncp", lab2 = "RNCP")
-plot811(method = "MOVER-NW", label = "MOVER-NW", measure = "rncp", lab2 = "RNCP")
-plot811(method = "BP", label = "BP", measure = "rncp", lab2 = "RNCP")
+
+
+
+
+
+
 
 
 # 2-D Type I error plot
