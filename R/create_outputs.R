@@ -490,74 +490,213 @@ if (FALSE) {
   apply(mytiers[,4:5], 2, function(x) mean(x < 0.03))
 
 
-  # PLACEHOLER: create a plot of TIERs?
+
 
   ### OPTIONAL: run the code below to reproduce the analysis,
   ### or run with different set of parameters
 
   # PLACEHOLDER: simplify to use test formula from paper instead of scorepairci()
 
-  tier <- function(myparams) {
-    n <- c(myparams[1])
-    psi <- myparams[2]
-    p1 <- p2 <- myparams[3]
+  tiern <- function(ns = fixn,
+                    myparams = myparams) {
+
+    tierout <- NULL
+    n <- 10
+    for (n in ns) {
+      cat(paste0("N=", n,"\n"))
+
     g <- expand.grid(x11 = 0:n, x12 = 0:n, x21 = 0:n)
     # reduce to possible combinations of a,b,c for paired data.
     g <- g[(g$x12 <= n - g$x11) &
              (g$x21 <= n - g$x11 - g$x12), ]
     xs <- data.matrix(cbind(g, x22 = n - rowSums(g)))
-    prob <- pdfpair(p1 = p1,
-                    p2 = p2,
-                    psi = psi,
-                    x = xs)
-    xsub <- xs[prob > 1E-8, , drop=F]
-    if (dim(xsub)[1] > 0) {
-      pvals <- sapply(1:dim(xsub)[[1]], function(i)
-        pchisq(scorepair(theta = 0,
-                         x = xsub[i,],
-                         contrast = "RD",
-                         cc = FALSE,
-                         skew = TRUE,
-                         bcf = TRUE)$score^2, df=1, lower.tail=F) # 2-sided p-value
-      )
-      tier <- (pvals < 0.05) %*% prob[prob > 1E-8]
-      pvals2 <- sapply(1:dim(xsub)[[1]], function(i)
-        pchisq(scorepair(theta = 0,
-                         x = xsub[i,],
-                         contrast = "RD",
-                         cc = FALSE,
-                         skew = FALSE,
-                         bcf = FALSE)$score^2, df=1, lower.tail=F)
-      )
-      tier2 <- (pvals2 < 0.05) %*% prob[prob > 1E-8]
-    } else {
-      tier <- 0
-      tier2 <- 0
+    ndis <- rowSums(xs[, 2:3])
+
+    psi <- phi <- NULL
+    pbapply::pboptions(style=1)
+    i <- 1
+    out <- pbapply::pbsapply(1:dim(myparams)[1], function(i)   {
+      if (dimnames(myparams)[[2]][2] == "psi") {
+        psi <- myparams[i, 2]
+      }
+      if (dimnames(myparams)[[2]][2] == "phi") {
+        phi <- myparams[i, 2]
+      }
+#      psi <- myparams[i, 2]
+      p1 <- p2 <- myparams[i, 1]
+      prob <- pdfpair(p1 = p1,
+                      p2 = p2,
+                      psi = psi,
+                      phi = phi,
+                      x = xs)
+#      sel <-
+      xsub <- xs[prob > 1E-8, , drop=F]
+      ndissub <- ndis[prob > 1E-8]
+      #    dim(xsub)
+      if (dim(xsub)[1] > 0) {
+
+        # vectorised 'N-1' test from equation
+        n1test <- pchisq(((n-1)/n) * (xsub[, 3] - xsub[, 2])^2 / ndissub, df = 1, lower.tail = FALSE)
+        n1test[ndissub == 0] <- 1
+        tier <- (n1test < 0.05) %*% prob[prob > 1E-8]
+
+        # vectorised McNemar test from equation
+        mactest <- pchisq((xsub[, 3] - xsub[, 2])^2 / ndissub, df = 1, lower.tail = FALSE)
+        mactest[ndissub == 0] <- 1
+        tier2 <- (mactest < 0.05) %*% prob[prob > 1E-8]
+if (FALSE) {
+        pvals2 <- sapply(1:dim(xsub)[[1]], function(i)
+          pchisq(scorepair(theta = 0,
+                           x = xsub[i,],
+                           contrast = "RD",
+                           cc = FALSE,
+                           skew = FALSE,
+                           bcf = FALSE)$score^2, df=1, lower.tail=F)
+        )
+        tier2a <- (pvals2 < 0.05) %*% prob[prob > 1E-8]
+}
+
+        # McNemar mid-p test from Fagerland 2013
+        px <- 2 * pbinom(pmin(xsub[, 2], xsub[, 3]), ndissub, 0.5, lower.tail = TRUE)
+#        px <- 2 * pbinom(apply(xsub[, 2:3], 1, min), ndissub, 0.5, lower.tail = TRUE)
+        midp <-  px - dbinom(xsub[, 2], ndissub, 0.5)
+        midp[xsub[, 2] == xsub[, 3]] <- (1 - 0.5*dbinom(xsub[, 2], ndissub, 0.5))[xsub[, 2]==xsub[, 3]]
+        tier3 <- (midp < 0.05) %*% prob[prob > 1E-8]
+
+        # vectorised cc'd McNemar test from equation
+        ccmactest <- pchisq((abs(xsub[, 3] - xsub[, 2]) - 1)^2 / ndissub, df = 1, lower.tail = FALSE)
+        ccmactest[ndissub == 0] <- 1
+        tier4 <- (ccmactest < 0.05) %*% prob[prob > 1E-8]
+
+        # Exact unconditional test doesnt cope with b=c=0
+        # and takes too long anyway
+      if (FALSE) {
+        pvals.exact <- sapply(1:dim(xsub)[[1]], function(j) {
+          contingencytables::McNemar_exact_unconditional_test_paired_2x2(matrix(c(xsub[1, ]), nrow=2))$Pvalue
+        })
+        tier5 <- (pvals.exact < 0.05) %*% prob[prob > 1E-8]
+      }
+#        summary(midp[xsub[, 2] > xsub[, 3]])
+#        summary(midp[xsub[, 2] < xsub[, 3]])
+#        summary(midp)
+
+      } else {
+        tier <- 0
+        tier2 <- 0
+        tier2a <- 0
+        tier3 <- 0
+        tier4 <- 0
+        tier5 <- 0
+      }
+
+    c(nminus1 = tier, mcnemar = tier2, midp = tier3, mcnemarcc = tier4)
+    })
+
+    tierout <- rbind(tierout, cbind(n = n, myparams, t(out)))
     }
-    c(nminus1 = tier, mcnemar = tier2)
+
+    tierout
   }
 
+  myparams <- expand.grid(p1 = 0.2, psi = 3)
+  myparams <- expand.grid(p1 = 0.2, phi = 0.25)
+
   # Parameter scenarios matching Fagerland 2013
-  allparams <- expand.grid(p1 = seq(0, 1, 0.01), psi = c(1, 2, 3, 5, 10), n = rev(seq(10, 50, 5)))
-  # Optional enhancement: Add random jitter to n, to avoid reliance on round numbers
-  # allparams$n <- allparams$n + floor(runif(dim(allparams)[[1]],-2, 3))
+  myparams1 <- expand.grid(p1 = seq(0, 1, 0.01), psi = c(1, 2, 3, 5, 10))
+  system.time(tiers1 <- tiern(ns = seq(10, 100, 5), myparams = myparams1))[[3]]/60
+  # TIER summaries matching Fagerland 2013
+  # Note 'N-1' test performance is almost identical to the exact unconditional method
+  apply(tiers1[,4:7], 2, mean)
+  apply(tiers1[,4:7], 2, max)
+  apply(tiers1[,4:7], 2, function(x) mean(x > 0.05))
+  apply(tiers1[,4:7], 2, function(x) mean(x < 0.03))
 
-  # Runtime: 3.3 hours - progressBar timer can't be trusted as each iteration
-  # takes different time depending on n.
-  pbapply::pboptions(style=1)
-  system.time(
-    tiers <- pbapply::pbsapply(1:dim(allparams)[1], function(i) tier(myparams=rev(unlist(allparams[i,]))))
-    )[[3]]/60
-  # Alternative scenarios with larger correlations
-  # - requires edits to the tiers function to use phi instead of psi
-#  myparams <- expand.grid(p1 = seq(0, 1, 0.02), phi = seq(0.25, 0.75, 0.05), n = seq(10, 100, 5))
-#  system.time(tiers2 <- sapply(1:dim(myparams)[1], function(i) tier(rev(unlist(myparams[i,])))))[[3]]/60
+  # Extended parameter combinations with stronger correlations
+  myparams2 <- expand.grid(p1 = seq(0, 1, 0.02), phi = seq(0.25, 0.75, 0.05))
+  system.time(tiers2 <- tiern(ns = seq(10, 100, 5), myparams = myparams2))[[3]]/60
 
-  mytiers <- t(tiers)
-  dimnames(mytiers)[[2]] <- c("nminus1_tier", "mcnemar_tier")
-  mytiers <- cbind(allparams, mytiers)
-  head(mytiers)
-  save(mytiers, file = paste0(outpath, "tiers.Rdata"))
+  # Combined extended parameter combinations (Note: negative values of phi lead to NAs)
+  # Runtime: 46 mins
+  myparams3 <- expand.grid(p1 = seq(0, 1, 0.02), phi = c(0, seq(0.05, 0.95, 0.1)))
+  nseq <- seq(10, 200, 10)
+  nseq2 <- nseq + floor(runif(length(nseq),-4, 6))
+  system.time(tiers3 <- tiern(ns = nseq2, myparams = myparams3))[[3]]/60
+
+  # Unexplained issue with one parameter combination needs checking:
+ #  n  p1  phi nminus1 mcnemar midp mcnemarcc
+ #143 0.5 0.25       0       0    0         0
+
+
+  save(tiers1, file = paste0(outpath, "newtiers1.Rdata"))
+  save(tiers2, file = paste0(outpath, "newtiers2.Rdata"))
+  save(tiers3, file = paste0(outpath, "newtiers3.Rdata"))
+
+
+  # Create a plot of TIERs
+  mytiers <- tiers3
+  res.factor <- 3
+  grid.factor <- 2
+  tiff(file = paste0(outpath,"_tiff/","Laud_Fig5new3.tiff"),
+       width = 300*grid.factor*res.factor,
+       height = 600*res.factor,
+       type = "windows"
+       #       type="quartz"
+  )
+  #  par(pty='s')
+  par(mfrow = c(2, 2))
+  par(cex.main = grid.factor*res.factor*0.8*1, cex.axis=grid.factor*res.factor*0.5*1)
+  #  par(mar = res.factor*(c(2,3,3,0.5)+0.1))
+  methods <- c("nminus1", "midp", "mcnemar", "mcnemarcc")
+  labels <- c("\'N - 1\' AS", "mid-p", "McNemar asymptotic", "McNemar asymptotic (cc)")
+  for (i in 1:4) {
+    par(mar = grid.factor*res.factor*(c(2,3,3,0.5)+0.1))
+    plot(mytiers$p1,
+         eval(parse(text=paste0("mytiers$", methods[i]))),
+         type = "n",
+         ylim = c(0, 0.06),
+         xlab = '',
+         ylab = '',
+         main = labels[i],
+         xaxt='n',
+         yaxt='n',
+         cex.lab = res.factor
+    )
+    axis(side = 2, las = 2)
+    axis(side = 1, las = 1, padj=1)
+    mtext(side = 1,
+          text = bquote(paste(italic(p)[1]," = ",italic(p)[2])),
+          cex = res.factor*1,
+          line = 1.5*1.5*res.factor)
+    mtext(side = 2,
+          text = "Type I error rate",
+          cex = res.factor*1,
+          line = 1.5*2*res.factor)
+    abline(h=0.05, lty=3, lwd=res.factor)
+
+    #    for (ps in c(1, 2, 3, 5, 10)) {
+    for (ps in unique(mytiers[,3])) {
+      for (n in nseq2[1:4]) {
+        #        tiersub <- mytiers[mytiers$psi == ps & mytiers$n == n, ]
+        tiersub <- mytiers[mytiers[,3] == ps & mytiers$n == n, ]
+        lines(tiersub$p1,
+              eval(parse(text=paste0("tiersub$", methods[i]))),
+              lty = 2,
+              lwd = 0.5*res.factor,
+              col = "gray50")
+      }
+      for (n in nseq2[5:length(nseq2)]) {
+        #        tiersub <- mytiers[mytiers$psi == ps & mytiers$n == n, ]
+        tiersub <- mytiers[mytiers[,3] == ps & mytiers$n == n, ]
+        lines(tiersub$p1,
+              eval(parse(text=paste0("tiersub$", methods[i]))),
+              lty = 1,
+              lwd = 0.25*res.factor)
+      }
+    }
+
+  }
+  dev.off()
+
 
 
 
