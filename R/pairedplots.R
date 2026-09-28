@@ -77,13 +77,13 @@ CPcontour <- function(plotdata,
 	lencols1 <- c(colorRampPalette(c("WHITE",col4))(100),
 	              colorRampPalette(c(col4,col1))(201))
 	lencols <- c(colorRampPalette(c(col4,col3))(180),
-	             c(rep(col3, 20),rep(col2, 20)),
+	             c(rep(col3, 21),rep(col2, 20)),
 	             colorRampPalette(c(col2,col1))(180),
-	             colorRampPalette(c(col1,"BLACK"))(101)
+	             colorRampPalette(c(col1,"BLACK"))(100)
 	            )
-	lencols <- c(colorRampPalette(c(col4,col3))(80),
+	lencols <- c(colorRampPalette(c(col4,col3))(81),
 	             c(rep(col3, 20),rep(col2, 20)),
-	             colorRampPalette(c(col2,col1))(81)
+	             colorRampPalette(c(col2,col1))(80)
 	              )
 	loccols = (c(colorRampPalette(c("BLACK",col1))(5)[-1],
 	              col2,col3,
@@ -312,8 +312,9 @@ CPcontour <- function(plotdata,
 	          col=contcol,
 	          vfont=c("sans serif","bold")
 	          )
-	  if (CIlen) {
-      contour(x,
+#	  if (CIlen) {
+	  if (FALSE) {
+	    contour(x,
 	            y,
 	            zc,
 	            levels=switch(as.character(CIlen),
@@ -609,11 +610,11 @@ plotpanel <- function(plotdata,
                     "=",
                     summaries[i, "pctnear.1side"],
                     "%",
-                                "\n","above ",
-                                format(1.2*alpha/2, scientific=F),
-                                "=",(summaries[i,"pctBad.1side"]),
-                                "%"
-#             "\n","meanDNCP",
+                    "\n","DNCP above ",
+                    format(1.2*alpha/2, scientific=F),
+                    "=",(summaries[i,"pctBad.DNCP"]),
+                    "%"
+                    #             "\n","meanDNCP",
 #            "=",(summaries[i,"meanDNCP"]),
 #            "\n","DNCP above ",
 #            format(1.2*alpha/2,scientific=F),
