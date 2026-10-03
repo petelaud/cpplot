@@ -273,50 +273,76 @@ if (FALSE) {
   ### FIGURE 5: Type I error for McNemar tests, mid-p test and 'N-1' AS test
   ### Uses TIERs dataset - see further down
   #############################################################################
-  # 2-D Type I error plot
-  load(file=paste0(outpath, "cparrays.RD.", 65, ".",200,".Rdata"))
-  p2 <- p1 <- seq(0, 1, length.out=201)
-  cp1 <- onecpfun(
-    p1 = p1,
-    p2 = p2,
-    ciarrays = arrays,
-    alph = 0.05,
-    phis = 0.25
-  )
+
+  # Load the saved dataset
+  load(file=paste0(outpath,"newtiers1.Rdata"))
+
+  # Create a plot of TIERs
+  mytiers <- tiers1
   res.factor <- 3
-  tiff(file = paste0(outpath,"_tiff/","Laud_Fig3.tiff"),
-       width=300*res.factor,
-       height=300*res.factor,
-       type="quartz"
+  grid.factor <- 2
+  tiff(file = paste0(outpath,"_tiff/","Laud_Fig5new.tiff"),
+       width = 300*grid.factor*res.factor,
+       height = 600*res.factor,
+       type = "windows"
+       #       type="quartz"
   )
-  par(pty='s')
-  par(cex.main = res.factor*0.8*1, cex.axis=res.factor*0.8*1)
-  par(mar = res.factor*(c(2,3,1,0.5)+0.1))
-  plot(p2,
-       1 - cp1[,"SCAS-bc","cp"],
-       type = "l",
-       ylim = c(0, 0.06),
-       xlab = '',
-       ylab = '',
-       main = paste0("N = 65, \u03D5 = 0.25"),
-       xaxt='n',
-       yaxt='n',
-       cex.lab = res.factor
-  )
-  axis(side = 2, las = 2)
-  axis(side = 1, las = 1, )
-  mtext(side = 1,
-        text = bquote(paste(italic(p)[1]," = ",italic(p)[2])),
-        cex = res.factor*1,
-        line = 1.5*res.factor)
-  mtext(side = 2,
-        text = "Type I error rate",
-        cex = res.factor*1,
-        line = 2*res.factor)
-  abline(h=0.05, lty=3, lwd=res.factor)
-  lines(p2, 1 - cp1[,"SCAS-bc","cp"], lty=1, lwd = 2*res.factor)
-  lines(p2, 1 - cp1[,"AS","cp"], lty=2, lwd = 2*res.factor)
+  #  par(pty='s')
+  par(mfrow = c(2, 2))
+  par(cex.main = grid.factor*res.factor*0.8*1, cex.axis=grid.factor*res.factor*0.5*1)
+  #  par(mar = res.factor*(c(2,3,3,0.5)+0.1))
+  methods <- c("nminus1", "midp", "mcnemar", "mcnemarcc")
+  labels <- c("\'N - 1\' AS", "mid-p", "McNemar asymptotic", "McNemar asymptotic (cc)")
+  for (i in 1:4) {
+    par(mar = grid.factor*res.factor*(c(2,3,3,0.5)+0.1))
+    plot(mytiers$p1,
+         eval(parse(text=paste0("mytiers$", methods[i]))),
+         type = "n",
+         ylim = c(0, 0.06),
+         xlab = '',
+         ylab = '',
+         main = labels[i],
+         xaxt='n',
+         yaxt='n',
+         cex.lab = res.factor
+    )
+    axis(side = 2, las = 2)
+    axis(side = 1, las = 1, padj=1)
+    mtext(side = 1,
+          text = bquote(paste(italic(p)[1]," = ",italic(p)[2])),
+          cex = res.factor*1,
+          line = 1.5*1.5*res.factor)
+    mtext(side = 2,
+          text = "Type I error rate",
+          cex = res.factor*1,
+          line = 1.5*2*res.factor)
+    abline(h=0.05, lty=3, lwd=res.factor)
+
+    #    for (ps in c(1, 2, 3, 5, 10)) {
+    for (ps in unique(mytiers[,3])) {
+      for (n in nseq2[1:4]) {
+        #        tiersub <- mytiers[mytiers$psi == ps & mytiers$n == n, ]
+        tiersub <- mytiers[mytiers[,3] == ps & mytiers$n == n, ]
+        lines(tiersub$p1,
+              eval(parse(text=paste0("tiersub$", methods[i]))),
+              lty = 2,
+              lwd = 0.5*res.factor,
+              col = "gray50")
+      }
+      for (n in nseq2[5:length(nseq2)]) {
+        #        tiersub <- mytiers[mytiers$psi == ps & mytiers$n == n, ]
+        tiersub <- mytiers[mytiers[,3] == ps & mytiers$n == n, ]
+        lines(tiersub$p1,
+              eval(parse(text=paste0("tiersub$", methods[i]))),
+              lty = 1,
+              lwd = 0.25*res.factor)
+      }
+    }
+
+  }
   dev.off()
+
+
 
 
 
