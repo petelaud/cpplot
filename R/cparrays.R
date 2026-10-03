@@ -133,7 +133,7 @@ allpairci <- function(xs,
   lenxs <- dim(xs)[1]
     if (contrast %in% c("RD", "RR")) {
       mymethods <- c("AS", "AS-bc", "SCAS", "SCAS-bc",
-                     "MOVER-W", "MOVER-J", "MOVER-NW", "MOVER-NJ", "MOVER-NS",
+                     "MOVER-W", "MOVER-NW", "MOVER-NJ", # "MOVER-NS",
                      "SCAS-c5", "SCAS-c25", "SCAS-c125",
                      "AS-bc-c5", "AS-bc-c25", "AS-bc-c125",
                      "MOVER-c5", "MOVER-c25", "MOVER-c125", "BP", "Wald")
