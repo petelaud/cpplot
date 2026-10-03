@@ -291,7 +291,7 @@ cpfun <- function(
                   smooth = TRUE,
                   prerun = F,
                   jitt = TRUE,
-                  sided = "R",
+#                  sided = "L",
                   pcut = 1E-10,
                   outdir = outpath
                   ) {
