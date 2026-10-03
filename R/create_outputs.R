@@ -420,14 +420,50 @@ if (FALSE) {
   ### Table 5: DNCP (One-sided type I error) for selected PSPs with larger sample size: N=205. Target DNCP=\ \alpha/2
   #############################################################################
   load(file=paste0(outpath,"bignsummary.Rdata"))
-  mytable4a <-
-    ftable(bignsummary[,"dncp",,,,], col.vars = c(3,2), row.vars = c(4,1))
-  write.ftable(round(mytable4a, 4), sep=',', quote=TRUE, file = paste0(outpath, "bigntable205.csv"))
+  mytable5aa <- round(bignsummary[,"dncp",,,,], 4)
+  limit <- mytable5aa
+  limit[,,"0.01", ] <- 0.0055
+  limit[,,"0.05", ] <- 0.0275
+  # Add brackets to methods with unacceptable coverage
+  anticons <- (mytable5aa > limit)
+  anticons[is.na(anticons)] <- FALSE
+  mytable5at <- apply(mytable5aa, 1:4,
+                      function(x) {
+                              formatC(round(x, 4), format='f', digits=4)
+                      }
+                      )
+  mytable5at[anticons] <- paste0("[", mytable5at[anticons], "]")
+
+
+  mytable5a <-
+#    round(ftable(bignsummary[,"dncp",,,,], col.vars = c(3,2), row.vars = c(4,1)), 4)
+    ftable(mytable5at, col.vars = c(3,2), row.vars = c(4,1))
+  write.ftable(mytable5a, sep=',', quote=TRUE, justify="none", file = paste0(outpath, "bigntable205.csv"))
+
 
   load(file=paste0(outpath,"bignsummaryOR.Rdata"))
-  mytable4b <-
-    ftable(bignsummaryOR[,"dncp",,,,], col.vars = c(3,2), row.vars = c(1))
-  write.ftable(round(mytable4b, 4), sep=',', quote=TRUE, file = paste0(outpath, "bignORtable205.csv"))
+  mytable5ba <- round(bignsummaryOR[,"dncp",,,,], 4)
+  dim(mytable5ba)
+  limit <- mytable5ba
+  dimnames(limit)
+  limit[,,"0.01"] <- 0.0055
+  limit[,,"0.05"] <- 0.0275
+  # Add brackets to methods with unacceptable coverage
+  anticons <- (mytable5ba > limit)
+  anticons[is.na(anticons)] <- FALSE
+  mytable5bt <- apply(mytable5ba, 1:3,
+                      function(x) {
+                        formatC(round(x, 4), format='f', digits=4)
+                      }
+  )
+  mytable5bt[anticons] <- paste0("[", mytable5bt[anticons], "]")
+
+
+
+  mytable5b <-
+#    ftable(bignsummaryOR[,"dncp",,,,], col.vars = c(3,2), row.vars = c(1))
+    ftable(mytable5bt, col.vars = c(3,2), row.vars = c(1))
+  write.ftable(mytable5b, sep=',', quote=TRUE, justify="none", file = paste0(outpath, "bignORtable205.csv"))
 
 
   #############################################################################
