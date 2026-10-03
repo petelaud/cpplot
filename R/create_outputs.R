@@ -257,7 +257,7 @@ if (FALSE) {
   #############################################################################
   load(file = paste0(outpath, "cparrays.RR.", 40, ".", 200, ".Rdata"))
   plotpanel(plotdata = arrays, alpha = 0.05, par3 = 0.25,
-            sel = c("SCAS-bc", "AS-bc", "AS", "MOVER-NJ", "MOVER-NW", "MOVER-W", "BP-J", "BP", "Wald"),
+            sel = c("SCAS-bc", "AS-bc", "AS", "MOVER-NJ", "MOVER-NW", "MOVER-W", "BP", "Wald"),
             plotlab = "RRpairW", fmt="tiff", res.factor = 6, CIlen = TRUE)
 
   #############################################################################
@@ -266,7 +266,7 @@ if (FALSE) {
   load(file = paste0(outpath, "cparrays.OR.", 40, ".",100,".Rdata"))
 #  dimnames(arrays$summaries)
   plotpanel(plotdata = arrays, alpha = 0.05, par3 = 0.25,
-            sel = c("SCASp", "SCASpu", "mid-p", "Jeffreys", "Wilson", "Blaker", "Wald", "Laplace"),
+            sel = c("SCASp", "SCASpu", "mid-p", "Jeffreys", "Wilson", "Wald", "Laplace"),
             plotlab = "ORpairW", fmt="tiff", res.factor = 6, CIlen = TRUE)
 
   #############################################################################
