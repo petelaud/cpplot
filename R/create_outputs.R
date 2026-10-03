@@ -226,15 +226,21 @@ if (FALSE) {
 
 
   #############################################################################
-  ### FIGURE 1: CP, MACP, location index and DNCP for selected methods for RD, with N = 40, \alpha=0.05 and \phi=0.25
+  ### FIGURE 1: 2-D plots of CP and LNCP for selected methods. See cpslice.R
   #############################################################################
-  load(file = paste0(outpath, "cparrays.RD.", 20, ".",200,".Rdata"))
-  plotpanel(plotdata = arrays, alpha = 0.05, par3 = 0.75,
+
+
+
+  #############################################################################
+  ### FIGURE 2: CP, MACP, LNCP, location index and DNCP for selected methods for RD, with N = 40, \alpha=0.05 and \phi=0.25
+  #############################################################################
+  load(file = paste0(outpath, "cparrays.RD.", 40, ".",200,".Rdata"))
+  plotpanel(plotdata = arrays, alpha = 0.05, par3 = 0.25,
             sel = c("SCAS-bc", "AS-bc", "AS", "MOVER-NJ", "MOVER-NW", "MOVER-W", "BP", "Wald"),
             plotlab = "RDpairW", fmt="tiff", res.factor = 6, CIlen = TRUE)
 
   #############################################################################
-  ### FIGURE 2: CP, MACP, location index and DNCP for selected methods for RR, with N = 40, \alpha=0.05 and \phi=0.25
+  ### FIGURE 3: CP, MACP, location index and DNCP for selected methods for RR, with N = 40, \alpha=0.05 and \phi=0.25
   #############################################################################
   load(file = paste0(outpath, "cparrays.RR.", 40, ".", 200, ".Rdata"))
   plotpanel(plotdata = arrays, alpha = 0.05, par3 = 0.25,
@@ -242,17 +248,17 @@ if (FALSE) {
             plotlab = "RRpairW", fmt="tiff", res.factor = 6, CIlen = TRUE)
 
   #############################################################################
-  ### FIGURE 3: CP, MACP, location index and DNCP for selected methods for OR, with N = 40, \alpha=0.05 and \phi=0.25
+  ### FIGURE 4: CP, MACP, location index and DNCP for selected methods for OR, with N = 40, \alpha=0.05 and \phi=0.25
   #############################################################################
-  load(file = paste0(outpath, "cparrays.OR.", 105, ".",100,".Rdata"))
+  load(file = paste0(outpath, "cparrays.OR.", 40, ".",100,".Rdata"))
 #  dimnames(arrays$summaries)
   plotpanel(plotdata = arrays, alpha = 0.05, par3 = 0.25,
             sel = c("SCASp", "SCASpu", "mid-p", "Jeffreys", "Wilson", "Blaker", "Wald", "Laplace"),
             plotlab = "ORpairW", fmt="tiff", res.factor = 6, CIlen = TRUE)
 
   #############################################################################
-  ### FIGURE 4: Type I error for McNemar test and 'N-1' test
-  ### Requires local run of cpfun for N=65 (dataset too large to upload)
+  ### FIGURE 5: Type I error for McNemar tests, mid-p test and 'N-1' AS test
+  ### Uses TIERs dataset - see further down
   #############################################################################
   # 2-D Type I error plot
   load(file=paste0(outpath, "cparrays.RD.", 65, ".",200,".Rdata"))
@@ -302,7 +308,7 @@ if (FALSE) {
 
 
   #############################################################################
-  ### FIGURE 5: CP, MACP, location index and DNCP for selected conservative methods for RD, with N = 40, \alpha=0.05 and \phi=0.25
+  ### FIGURE 6: CP, MACP, location index and DNCP for selected conservative methods for RD, with N = 40, \alpha=0.05 and \phi=0.25
   #############################################################################
   load(file = paste0(outpath, "cparrays.RD.", 40, ".",200,".Rdata"))
   plotpanel(plotdata = arrays, alpha = 0.05, par3 = 0.25,
@@ -311,7 +317,7 @@ if (FALSE) {
 
 
   #############################################################################
-  ### FIGURE 6: CP, MACP, location index and DNCP for selected conservative methods for RR, with N = 40, \alpha=0.05 and \phi=0.25
+  ### FIGURE 7: CP, MACP, location index and DNCP for selected conservative methods for RR, with N = 40, \alpha=0.05 and \phi=0.25
   #############################################################################
   load(file = paste0(outpath, "cparrays.RR.", 40, ".", 200, ".Rdata"))
   plotpanel(plotdata = arrays, alpha = 0.05, par3 = 0.25,
@@ -319,12 +325,13 @@ if (FALSE) {
             plotlab = "RRcpair", fmt="tiff", res.factor = 6, CIlen = TRUE)
 
   #############################################################################
-  ### FIGURE 7: CP, MACP, location index and DNCP for selected methods for OR, with N = 40, \alpha=0.05 and \phi=0.25
+  ### FIGURE 8: CP, MACP, location index and DNCP for selected methods for OR, with N = 40, \alpha=0.05 and \phi=0.25
   #############################################################################
-  load(file = paste0(outpath, "cparrays.OR.", 105, ".",40,".Rdata"))
+  load(file = paste0(outpath, "cparrays.OR.", 40, ".",200,".Rdata"))
   plotpanel(plotdata = arrays, alpha = 0.05, par3 = 0.25,
             sel = c("SCASp-c125", "SCASp-c25", "SCASp-c5", "midp-c25", "Jeffreys-c125", "Jeffreys-c25", "C-P", "Blaker"),
             plotlab = "ORcpair", fmt="tiff", res.factor = 6, CIlen = TRUE)
+
 
   #############################################################################
   ### TABLE 2, 3 & 4: Summary of each metric for selected methods for RD & RR, & OR
