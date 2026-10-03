@@ -1,7 +1,6 @@
 set.seed(2012) #ensure we use the same jitters for each run
 
 if (FALSE) {
-
   # The following code reproduces the results in the manuscript
   # 'Equal-tailed confidence intervals for paired binomial proportions' by Peter J. Laud
   #
@@ -27,7 +26,7 @@ if (FALSE) {
   ### Run the CP calculation function for N=20, N=40 and N=65
   ### WARNING: for N=40 and 65, these take several hours to run!
   #############################################################################
-  RDpairteam <- c("SCAS-bc", "AS-bc", "AS", "MOVER-NJ", "MOVER-NW", "MOVER-W", "BP", "Wald", "Wald-cc")
+  RDpairteam <- c("SCAS-bc", "AS-bc", "AS", "MOVER-NJ", "MOVER-NW", "MOVER-W", "BP", "AM", "Wald")
   RRpairteam <- c("SCAS-bc", "AS-bc", "AS", "MOVER-NJ", "MOVER-NW", "MOVER-W", "BP", "BP-J", "Wald")
   # ^^ Example of how you might specify a subset of methods used for larger N
   # for reduced runtimes using methods= argument in cpfun() below
@@ -115,7 +114,7 @@ if (FALSE) {
   mynums <- c(20, 40, 65)
   phis <- c(0.1, 0.25, 0.5, 0.75)
   mymethods <- c("SCAS-bc", "SCAS", "AS-bc", "AS", "MOVER-NJ", "MOVER-NW", "MOVER-W",
-                 "BP", "BP-J", "BP-cc", "Wald", "Wald-cc",
+                 "AM", "BP", "BP-J", "BP-cc", "Wald", "Wald-cc",
                  "SCAS-c5", "SCAS-c25", "SCAS-c125", "MOVER-c5", "MOVER-c25", "MOVER-c125",
                  "SCASp", "SCASpu", "Jeffreys", "mid-p", "Wilson", "Blaker", "Laplace",
                  "SCASp-c5", "SCASp-c25", "SCASp-c125", "C-P", "Jeffreys-c25", "Jeffreys-c125")
@@ -706,7 +705,7 @@ if (FALSE) {
   ### with N = 40, \alpha=0.05 and \phi=0.25
   #############################################################################
   # RD
-  RDpairteam <- c("SCAS-bc", "AS-bc", "AS", "MOVER-NJ", "MOVER-NW", "MOVER-W", "BP", "Wald") #Paired RD
+  RDpairteam <- c("SCAS-bc", "AS-bc", "AS", "MOVER-NJ", "MOVER-NW", "MOVER-W", "BP", "AM", "Wald") #Paired RD
   RDcpairteam <- c("SCAS-c125", "SCAS-c25", "SCAS-c5", "MOVER-c125", "MOVER-c25", "MOVER-c5", "Wald-cc") 	#Paired RD, cc
   teamlist <- list(RDpairteam, RDcpairteam)
   teamlabels <- c("RDpair", "RDcpair")
@@ -730,7 +729,7 @@ if (FALSE) {
     }
   }
 
-  # RR
+  # selection of RR methods for supplementary plots
   RRpairteam <- c("SCAS-bc", "AS-bc", "AS", "MOVER-NJ", "MOVER-NW", "MOVER-W", "BP", "BP-J", "Wald")  	#Paired RR
   RRcpairteam <- c("SCAS-c125", "SCAS-c25", "SCAS-c5", "MOVER-c125", "MOVER-c25", "MOVER-c5", "BP-cc") 	#Paired RR, cc
   teamlist <- list(RRpairteam, RRcpairteam)
