@@ -31,7 +31,7 @@ if (FALSE) {
   # ^^ Example of how you might specify a subset of methods used for larger N
   # for reduced runtimes using methods= argument in cpfun() below
   alphas <- c(0.1, 0.05, 0.01)
-  phis <- c(-0.25, 0.1, 0.25, 0.5, 0.75)
+  phis <- c(-0.1, 0.1, 0.25, 0.5, 0.75)
 
   system.time(mycis <- cifun(n=20, contrast="RD", alph = alphas))[[3]]/60
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
