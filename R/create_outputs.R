@@ -725,7 +725,7 @@ if (FALSE) {
   save(tiers3, file = paste0(outpath, "newtiers3.Rdata"))
 
 
-  # Create a plot of TIERs
+  # Create a plot from other TIERs runs
   mytiers <- tiers3
   res.factor <- 3
   grid.factor <- 2
