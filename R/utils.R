@@ -21,7 +21,7 @@ pdfpair <- function(x,
   }
   p12 <- p1 - p11
   p21 <- p2 - p11
-  p22 <- pmax(0, 1 - p11 - p12 - p21)
+  p22 <- 1 - p11 - p12 - p21
   dens <- exp(
     lfactorial(rowSums(x)) -
       (lfactorial(x[, 1]) + lfactorial(x[, 2]) + lfactorial(x[, 3]) + lfactorial(x[, 4]))
