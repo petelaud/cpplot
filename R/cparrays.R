@@ -138,7 +138,7 @@ allpairci <- function(xs,
                      "AS-bc-c5", "AS-bc-c25", "AS-bc-c125",
                      "MOVER-c5", "MOVER-c25", "MOVER-c125", "BP", "Wald")
       if (contrast == "RD") {
-        mymethods <- c(mymethods, "Wald-cc")
+        mymethods <- c(mymethods, "AM", "Wald-cc")
       }
       if (contrast == "RR") {
         mymethods <- c(mymethods, "BP-J", "BP-cc") #, "Tang-ccdr")
@@ -160,7 +160,8 @@ allpairci <- function(xs,
 
     if (contrast == "RD") {
       tempout <- aperm(array((sapply(1:lenxs, function(i) ratesci::rdpairci(x = xs[i,], level = 1-alpha)$estimates[,c(1,3)])), dim = c(10,2,lenxs)), c(3, 2, 1))
-      ci[, 1:2, c("SCAS-bc", "SCAS", "AS-bc", "AS", "MOVER-W", "MOVER-NW", "MOVER-NJ", "Wald", "BP")] <- tempout[, , c(1:8, 10)]
+      ci[, 1:2, c("SCAS-bc", "SCAS", "AS-bc", "AS", "MOVER-W", "MOVER-NW", "MOVER-NJ", "Wald", "AM", "BP")] <-
+        tempout[, , c(1:10)]
       tempout5 <- aperm(array((sapply(1:lenxs, function(i) ratesci::rdpairci(x = xs[i,], level = 1-alpha, cc = TRUE)$estimates[,c(1,3)])), dim = c(8,2,lenxs)), c(3, 2, 1))
       ci[, 1:2, c("SCAS-c5", "AS-bc-c5", "MOVER-c5", "Wald-cc")] <- tempout5[, , c(1, 3, 7, 8)]
       tempout25 <- aperm(array((sapply(1:lenxs, function(i) ratesci::rdpairci(x = xs[i,], level = 1-alpha, cc = 0.25)$estimates[,c(1,3)])), dim = c(8,2,lenxs)), c(3, 2, 1))
