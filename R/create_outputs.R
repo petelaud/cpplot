@@ -488,6 +488,11 @@ if (FALSE) {
   apply(bigarray[,ORcpairteam,c("95","90"),"pctCons.both",,"OR"], 2:3,  function(x) round(mean(as.numeric(x)), 2))
   apply(bigarray[,ORcpairteam,c("95","90"),"pctCons.both",,"OR"], 2:3,  function(x) round(mean(as.numeric(x)), 0))
 
+  # Experimental: Overall average location index for N>=40
+  apply(bigarray[,RDpairteam,c("95","90"),"meanlocindex",c(2:3),"RD"], 2:3,  function(x) round(mean(as.numeric(x)), 2))
+  apply(bigarray[,RRpairteam,c("95","90"),"meanlocindex",2:3,"RR"], 2:3,  function(x) round(mean(as.numeric(x)), 2))
+  apply(bigarray[,ORpairteam,c("95","90"),"meanlocindex",2:3,"OR"], 2:3,  function(x) round(mean(as.numeric(x)), 2))
+
 
 
   #############################################################################
