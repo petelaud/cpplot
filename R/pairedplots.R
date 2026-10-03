@@ -7,7 +7,8 @@ CPcontour <- function(plotdata,
                       ylim = xlim,
                       methlab = "AS",
                       avg = F,
-                      lside = F,
+                      onside = F,
+                      sided = "L",
                       lines = F,
                       lines1 = F,
                       CIlen = F,
@@ -132,12 +133,12 @@ CPcontour <- function(plotdata,
 	                                    "avecp",
 	                                    nums,])
 	if(avg) {
-		if(lside == TRUE) cpdata <- plotdata[["mastercp"]][paste(x),
+		if(onside == TRUE) cpdata <- plotdata[["mastercp"]][paste(x),
 		                                          paste(y),
 		                                          paste(par3),
 		                                          methlab,
 		                                          paste(100*(1-alpha)),
-		                                          "averncp",
+		                                          ifelse(sided=="R","averncp","avelncp"),
 		                                          nums,]
 		else cpdata <- avecpdata
 	} else {
@@ -156,14 +157,14 @@ CPcontour <- function(plotdata,
 	                               "cp",
 	                               nums,]
 
-	  if(lside == TRUE) {
+	  if(onside == TRUE) {
 #	    cpdata <- lirev * ncpval
 	    cpdata <- plotdata[["mastercp"]][paste(x),
 	                                        paste(y),
 	                                        paste(par3),
 	                                        methlab,
 	                                        paste(100*(1-alpha)),
-	                                        "rncp",
+	                                     ifelse(sided=="R","rncp","lncp"),
 	                                        nums,]
 	  } else cpdata <- rawcpdata
 	}
@@ -251,7 +252,7 @@ CPcontour <- function(plotdata,
 	} else if (alpha == 0.01) {
 	  ccol <- ceiling(2000*cpdata)
 	} else if (alpha == 0.025 | alpha == 0.05) {
-	  ccol <- ceiling(200*cpdata*ifelse(lside,2,1))
+	  ccol <- ceiling(200*cpdata*ifelse(onside,2,1))
 	}
 	if(CIlen) {
 	  if (contrast == "RD") { ccol <- ceiling(10*lendata)
@@ -268,7 +269,7 @@ CPcontour <- function(plotdata,
 	if(CIlen) zc <- lendata
 
 	shift <- 0
-	palette <- switch(as.character(lside), "TRUE" = oscols, "FALSE" = cols)
+	palette <- switch(as.character(onside), "TRUE" = oscols, "FALSE" = cols)
 	if (CIlen) {
 		if(avg) {
 		  palette <- lencols
@@ -303,7 +304,7 @@ CPcontour <- function(plotdata,
 	          zc,
 	          levels=switch(as.character(CIlen),
 	                        "TRUE"=lenconts,
-	                        "FALSE"=switch(as.character(lside),
+	                        "FALSE"=switch(as.character(onside),
 	                                       "TRUE"=osconts,
 	                                       "FALSE"=conts)),
 	          add=T,
@@ -319,7 +320,7 @@ CPcontour <- function(plotdata,
 	            zc,
 	            levels=switch(as.character(CIlen),
 	                          "TRUE"=lenconts2,
-	                          "FALSE"=switch(as.character(lside),
+	                          "FALSE"=switch(as.character(onside),
 	                                         "TRUE"=osconts,
 	                                         "FALSE"=conts)),
 	            add=T,
@@ -357,14 +358,14 @@ CPcontour <- function(plotdata,
 	box(lwd = 0.6*textsize*res.factor)
 
 	if(lines != FALSE){
-		if (lside && lines %in% c("both","1")) {
+		if (onside && lines %in% c("both","1")) {
 		  lines(x=c(0.5,0.85), y=c(0.6,0.95), lwd = 0.5*textsize*res.factor)
-		}	else if (lside==FALSE & lines %in% c("RR")) {
+		}	else if (onside==FALSE & lines %in% c("RR")) {
   		  abline(coef = c(0, 1/2), lwd = 0.5*textsize*res.factor)
   		  abline(coef = c(0, 1/3), lwd = 0.5*textsize*res.factor)
   		  abline(coef = c(0, 1/4.5), lwd = 0.5*textsize*res.factor)
   		  abline(coef = c(0, 1/6), lwd = 0.5*textsize*res.factor)
-		}	else if (lside==FALSE & lines %in% c("RD")) {
+		}	else if (onside==FALSE & lines %in% c("RD")) {
 		  abline(coef = c(0.1, 1), lwd = 0.5*textsize*res.factor)
 		  abline(coef = c(0.2, 1), lwd = 0.5*textsize*res.factor)
 		}
@@ -385,6 +386,7 @@ plotpanel <- function(plotdata,
                       par3,
                       sel,
                       oneside = F,
+                      sided = "L",
                       plotlab,
                       linesx = F,
                       smoothed = TRUE,
@@ -393,8 +395,7 @@ plotpanel <- function(plotdata,
                       fmt = "png",
                       colour = T,
                       textsize = 1,
-                      limits = c(0,1),
-                      sided = "R"
+                      limits = c(0,1)
 ) {
 
   g <- "gamma"
@@ -445,7 +446,7 @@ plotpanel <- function(plotdata,
   # Select plot output format depending on journal requirements
   if (fmt=="tiff")  {
     tiff(file = paste(outpath,"_",fmt,"/",
-                      ifelse(sided=="L","L",""),
+                      ifelse(sided=="R","R",""),
                       plotlab, nums, "_", 100*(1-alpha), "_", format(par3, nsmall=2),
                       ifelse(oneside, "os", ""), collab, ".tiff",
                       sep=""
@@ -457,7 +458,7 @@ plotpanel <- function(plotdata,
     )
   } else if (fmt=="png") {
     png(file = paste(outpath, "_", fmt, "/",
-                     ifelse(sided=="L","L",""),
+                     ifelse(sided=="R","R",""),
                      plotlab, nums, "_", 100*(1-alpha), "_", format(par3, nsmall=2),
                      ifelse(oneside, "os", ""), collab, ".png",
                      sep=""
@@ -474,7 +475,7 @@ plotpanel <- function(plotdata,
     if(fmt=="eps") {
     setEPS()
     postscript(file = paste(outpath,"_","png","/","summary",
-                            ifelse(sided=="L","L",""),plotlab,100*(1-alpha),"_",
+                            ifelse(sided=="R","R",""),plotlab,100*(1-alpha),"_",
                             nums,ifelse(oneside,"os",""),collab,".eps",
                             sep=""
     ),
@@ -484,7 +485,7 @@ plotpanel <- function(plotdata,
   } else {
     png(file = paste(outpath,"_",fmt,"/",plotlab,
                      format(100*(1-alpha),scientific=F),"/","summary_",
-                     ifelse(sided=="L","L",""),
+                     ifelse(sided=="R","R",""),
                      sub(",","_",nums),ifelse(oneside,"os",""),collab,".png",
                      sep=""
     ),
@@ -513,7 +514,7 @@ plotpanel <- function(plotdata,
                          par3 = par3,
                          nums = nums,
                          methlab = i,
-                         lside = oneside,
+                         onside = oneside,
                          avg = FALSE,
                          lines = linesx,
                          locind = FALSE,
@@ -562,7 +563,7 @@ plotpanel <- function(plotdata,
                          par3 = par3,
                          nums = nums,
                          methlab = i,
-                         lside = oneside,
+                         onside = oneside,
                          avg = TRUE,
                          lines = linesx,
                          locind = FALSE,
@@ -595,7 +596,7 @@ plotpanel <- function(plotdata,
                           par3 = par3,
                           nums = nums,
                           methlab = i,
-                          lside = TRUE,
+                          onside = TRUE,
                           lines = linesx,
                           res.factor = res.factor,
                           colour = colour,
@@ -631,7 +632,7 @@ plotpanel <- function(plotdata,
               par3=par3,
               nums = nums,
               methlab = i,
-              lside = oneside,
+              onside = oneside,
               lines = linesx,
               locind = TRUE,
               res.factor = res.factor,
@@ -657,7 +658,7 @@ plotpanel <- function(plotdata,
                 par3 = par3,
                 nums = nums,
                 methlab = i,
-                lside = oneside,
+                onside = oneside,
                 avg = TRUE,
                 lines = linesx,
                 locind = FALSE,
@@ -861,7 +862,7 @@ plotpanel <- function(plotdata,
            pos=4)
   }
   box(lwd=0.6*textsize*res.factor)
-  mtext(text="RNCP",
+  mtext(text=ifelse(sided=="R","LNCP","LNCP"),
         side=3,
         at = 0,
         adj = 0.5,
@@ -978,7 +979,7 @@ if (FALSE) {
         line=0.5*res.factor)
   mtext(side=2,
         outer=TRUE,
-        text = "RNCP\n for individual PSPs",
+        text = paste0(ifelse(sided=="R","RNCP","LNCP"),  "\n for individual PSPs"),
         cex=textsize*0.8*res.factor,
         at = 1/(2*rows) + (1 + labadj)/rows,
         line=0.5*res.factor)
