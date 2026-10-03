@@ -676,14 +676,14 @@ plotpanel <- function(plotdata,
             cex = res.factor*0.8*textsize,
             line = 0.5*res.factor,
             text = (paste0(
-              paste0("\n","mean width vs AS=",
+              paste0("\n","mean EWPD=",
                      ifelse(contrast == "RD",
                             round(100 * (as.numeric(summaries[i, "meanlen"]) / ASmeanlen - 1), 1),
                             round(100 * (exp(as.numeric(summaries[i, "meanlen"]) - ASmeanlen) - 1), 1)
                             ),
                             "%",
               "\n",
-              ifelse(contrast == "RD", "mean width=", "mean width (log)="),
+              ifelse(contrast == "RD", "mean EW=", "mean ELW="),
               (summaries[i,"meanlen"])#,
 #              "%" #,
             )))
@@ -936,7 +936,7 @@ if (FALSE) {
        cex=res.factor*textsize)
 }
   box(lwd=0.6*textsize*res.factor)
-  mtext(text="Width \n vs AS (%)",
+  mtext(text="EWPD (%)",
         side=3,
         at = 0,
         adj = 0.5,
@@ -965,7 +965,9 @@ if (FALSE) {
   if (CIlen) {
     mtext(side=2,
           outer=TRUE,
-          text = "Expected interval width\n vs AS (%)",
+          text = paste0("Expected width\n difference vs ",
+                        ifelse(contrast == "OR", "T-Wilson", "AS"),
+                        " (%)"),
           cex=textsize*0.8*res.factor,
           at = 1/(2*rows),
           line=0.5*res.factor)
