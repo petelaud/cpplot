@@ -281,7 +281,7 @@ CPcontour <- function(plotdata,
 	plot(x, y, type = 'n', col.axis="white", xlim=xlim,
 	     ylim=ylim, 	      xaxs="i",
 	     yaxs="i", xlab='', ylab='')
-	abline(h = seq(0, 1, 0.02), v = seq(0, 1, 0.025), col="black")
+	abline(h = seq(0, 1, 0.025), v = seq(0, 1, 0.025), col="black")
 	image(x,
 	      y,
 	      ccol,
@@ -501,7 +501,7 @@ plotpanel <- function(plotdata,
   } else matr <- matrix(c(1:(rows * nmeth), rows * nmeth + c(1:rows)),
                           rows, (nmeth + 1), byrow = FALSE)
   layout(matr, widths = c(rep(2, nmeth), 1), heights = rep(4, rows))
-  par(oma = res.factor*c(0,3,ifelse(fmt=="xxx",10,7),0), pty='s')
+  par(oma = res.factor*c(0,4,ifelse(fmt=="xxx",10,7),0), pty='s')
   par(cex.main = res.factor*0.8*textsize, cex.axis=res.factor*0.8*textsize)
   par(mar = res.factor*(c(2,1,1,0.5)+0.1))
 
@@ -743,7 +743,7 @@ plotpanel <- function(plotdata,
             ylab="")
       text(x=1.2,
            y = c(0:10/10, 0.45, 0.55),
-           labels=c((40:50)/50, 0.89, 0.99),
+           labels=c((40:50)/50, 0.89, 0.91),
            xpd=T,
            cex=res.factor*textsize,
            pos=4)
@@ -795,7 +795,7 @@ plotpanel <- function(plotdata,
             ylab="")
       text(x=1.2,
            y = c(0:10/10, 0.45, 0.55),
-           labels = c(((5*98):(5*100))/(5*100), 0.985, 0.995),
+           labels = c(((5*98):(5*100))/(5*100), 0.989, 0.991),
            xpd=T,
            cex=res.factor*textsize,
            pos=4)
