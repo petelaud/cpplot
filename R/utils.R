@@ -221,3 +221,26 @@ waldpairci <- function(x,
   list(estimates = estimates)
 }
 
+
+
+
+# Simple function for McNemar test and variants
+# Vectorised allowing x to be an array of 4 columns
+mcnemar.test <- function(xs,
+                         bcf = FALSE) {
+  # Force vector input to an array
+  if (is.vector(xs)) dim(xs) <- c(1, length(xs))
+  b <- xs[, 2]
+  c <- xs[, 3]
+  N <- rowSums(xs)
+  if (bcf == TRUE) {
+    lambda <- sqrt((N-1)/N)
+  } else lambda <- 1
+  z <- lambda * (b - c) / sqrt(b + c)
+  pval <- 2 * pnorm(abs(z), lower.tail = FALSE)
+  pval[b+c == 0] <- 1
+  pval
+}
+
+# mcnemar.test(c(1,1,7,12))
+# mcnemar.test(c(1,1,7,12), bcf = TRUE)
