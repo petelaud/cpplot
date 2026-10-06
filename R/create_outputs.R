@@ -403,25 +403,30 @@ if (FALSE) {
 #  ORmeth <- c("SCASp", "SCASpu", "mid-p", "Jeffreys", "Wilson")
 
   # Summarise by metric for N=40 for new tables in resubmission
-  mytable2a <- ftable((mysummaries[, RDmeth[c(1, 3:9)], ,
+  mytable2a <- ftable((mysummaries[, RDmeth[c(1, 3:10)], ,
                                    #                      c("pctnear", "pctnear.1side", "pctnear.DNCP", "pctBad.DNCP", "meanlocindex"),
                                    c("pctnear", "pctnear.1side", "pctBad.DNCP", "meanlocindex"),
                                    "40",c("RD")]), col.vars = c(3,1), row.vars = c(4,2))
-  mytable2b <- ftable((mysummaries[, RDmeth[c(1, 3:9)], ,
+  write.ftable(mytable2a, sep=',', quote=TRUE, justify="none", file = paste0(outpath, "table2a.csv"))
+  mytable2b <- ftable((mysummaries[, RDmeth[c(1, 3:10)], ,
                                    #                      c("pctnear", "pctnear.1side", "pctnear.DNCP", "pctBad.DNCP", "meanlocindex"),
                                    c("pctnear", "pctnear.1side", "pctBad.DNCP", "meanlocindex"),
                                    "65",c("RD")]), col.vars = c(3,1), row.vars = c(4,2))
-  write.ftable(mytable2a, sep=',', quote=TRUE, justify="none", file = paste0(outpath, "table2a.csv"))
   write.ftable(mytable2b, sep=',', quote=TRUE, justify="none", file = paste0(outpath, "table2b.csv"))
 
+  mytable3 <-
   ftable((mysummaries[, RRmeth[c(1, 3:10)], ,
 #                      c("pctnear", "pctnear.1side", "pctnear.DNCP", "pctBad.DNCP", "meanlocindex"),
                       c("pctnear", "pctnear.1side", "pctBad.DNCP", "meanlocindex"),
                       "40", c("RR")]), col.vars = c(3,1), row.vars = c(4,2))
-  ftable((mysummaries[, ORmeth[c(1:5, 7:8)], ,
+  write.ftable(mytable3, sep=',', quote=TRUE, justify="none", file = paste0(outpath, "table3.csv"))
+
+  mytable4 <-
+    ftable((mysummaries[, ORmeth[c(1:5, 7:8)], ,
 #                      c("pctnear", "pctnear.1side", "pctnear.DNCP", "pctgoodloc", "pctBad.DNCP", "meanlocindex"),
                       c("pctnear", "pctnear.1side", "pctBad.DNCP", "meanlocindex"),
                       "40",c("OR")]), col.vars = c(3,1), row.vars = c(4,2))
+  write.ftable(mytable4, sep=',', quote=TRUE, justify="none", file = paste0(outpath, "table4.csv"))
 
 
   #############################################################################
@@ -432,7 +437,7 @@ if (FALSE) {
   limit <- mytable5aa
   limit[,,"0.01", ] <- 0.0055
   limit[,,"0.05", ] <- 0.0275
-  # Add brackets to methods with unacceptable coverage
+  # Add brackets to methods with unacceptable coverage (defined before rounding)
   anticons <- (mytable5aa > limit)
   anticons[is.na(anticons)] <- FALSE
   mytable5at <- apply(mytable5aa, 1:4,
