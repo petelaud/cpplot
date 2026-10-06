@@ -287,13 +287,13 @@ if (FALSE) {
 
   # Create a plot of TIERs
   mytiers <- tiers1
+  nseq <- unique(mytiers[, "n"])
   res.factor <- 3
   grid.factor <- 2
   tiff(file = paste0(outpath,"_tiff/","Laud_Fig5new.tiff"),
        width = 300*grid.factor*res.factor,
        height = 600*res.factor,
        type = "windows"
-       #       type="quartz"
   )
   #  par(pty='s')
   par(mfrow = c(2, 2))
@@ -328,7 +328,7 @@ if (FALSE) {
 
     #    for (ps in c(1, 2, 3, 5, 10)) {
     for (ps in unique(mytiers[,3])) {
-      for (n in nseq2[1:4]) {
+      for (n in nseq[1:4]) {
         #        tiersub <- mytiers[mytiers$psi == ps & mytiers$n == n, ]
         tiersub <- mytiers[mytiers[,3] == ps & mytiers$n == n, ]
         lines(tiersub$p1,
@@ -337,7 +337,7 @@ if (FALSE) {
               lwd = 0.5*res.factor,
               col = "gray50")
       }
-      for (n in nseq2[5:length(nseq2)]) {
+      for (n in nseq[5:length(nseq)]) {
         #        tiersub <- mytiers[mytiers$psi == ps & mytiers$n == n, ]
         tiersub <- mytiers[mytiers[,3] == ps & mytiers$n == n, ]
         lines(tiersub$p1,
