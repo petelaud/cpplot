@@ -826,8 +826,7 @@ if (FALSE) {
 #  load(file = paste0(outpath, "cparrays.RD.", 40, ".", 200, ".Rdata"))
   for (n in c(20, 40, 65)) {
   load(file = paste0(outpath, "cparrays.RD.", n, ".", 200, ".Rdata"))
-  for (j in c(0.1, 0.25, 0.5, 0.75)) {
-#    for (j in c(-0.25, -0.1, 0.9, 0.99)) {
+  for (j in phis) {
     for (i in c(0.05, 0.1, 0.01)) {
         #  for (i in c(0.05)) {
         for (k in 1:2) {
@@ -851,7 +850,7 @@ if (FALSE) {
 #  load(file=paste0(outpath, "cparrays.RR.", 40, ".",200,".Rdata"))
   for (n in c(20, 40, 65)) {
     load(file=paste0(outpath, "cparrays.RR.", n, ".",200,".Rdata"))
-    for (j in c(0.1, 0.25, 0.5, 0.75)) {
+    for (j in phis) {
       for (i in c(0.05, 0.1, 0.01)) {
         for (k in 1:2) {
           if (!((k ==2) & (n %in% c(20, 65)))) {
@@ -872,7 +871,7 @@ if (FALSE) {
 #  load(file=paste0(outpath, "cparrays.OR.", 40, ".",200,".Rdata"))
   for (n in c(20, 40, 65)) {
     load(file=paste0(outpath, "cparrays.OR.", n, ".",200,".Rdata"))
-    for (j in c(0.1, 0.25, 0.5, 0.75)) {
+    for (j in phis) {
       for (i in c(0.05, 0.1, 0.01)) {
         for (k in 1:2) {
           if (!((k ==2) & (n %in% c(20, 65)))) {
