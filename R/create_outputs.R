@@ -66,7 +66,7 @@ if (FALSE) {
 #  system.time(mycis <- cifun(n=105, contrast="OR", alph = alphas, methods = ORpairteam))[[3]]/60
 #  Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=100, jitt=T, smooth=T, phis=phis))[[3]]/60
 
-  RDmeth <- c("SCAS-bc", "SCAS", "AS-bc", "AS", "MOVER-NJ", "MOVER-NW", "MOVER-W", "BP", "Wald", "Wald-cc",
+  RDmeth <- c("SCAS-bc", "SCAS", "AS-bc", "AS", "MOVER-NJ", "MOVER-NW", "MOVER-W", "BP", "AM", "Wald", "Wald-cc",
               "SCAS-c5", "SCAS-c25", "SCAS-c125", "MOVER-c5", "MOVER-c25", "MOVER-c125")
   RRmeth <- c("SCAS-bc", "SCAS", "AS-bc", "AS", "MOVER-NJ", "MOVER-NW", "MOVER-W", "BP", "BP-J", "Wald",
               "SCAS-c5", "SCAS-c25", "SCAS-c125", "MOVER-c5", "MOVER-c25", "MOVER-c125", "BP-cc")
@@ -249,7 +249,7 @@ if (FALSE) {
   #############################################################################
   load(file = paste0(outpath, "cparrays.RD.", 40, ".",200,".Rdata"))
   plotpanel(plotdata = arrays, alpha = 0.05, par3 = 0.25,
-            sel = c("SCAS-bc", "AS-bc", "AS", "MOVER-NJ", "MOVER-NW", "MOVER-W", "BP", "Wald"),
+            sel = c("SCAS-bc", "AS-bc", "AS", "MOVER-NJ", "MOVER-NW", "MOVER-W", "BP"),
             plotlab = "RDpairW", fmt="tiff", res.factor = 6, CIlen = TRUE)
 
   #############################################################################
@@ -257,7 +257,7 @@ if (FALSE) {
   #############################################################################
   load(file = paste0(outpath, "cparrays.RR.", 40, ".", 200, ".Rdata"))
   plotpanel(plotdata = arrays, alpha = 0.05, par3 = 0.25,
-            sel = c("SCAS-bc", "AS-bc", "AS", "MOVER-NJ", "MOVER-NW", "MOVER-W", "BP", "Wald"),
+            sel = c("SCAS-bc", "AS-bc", "AS", "MOVER-NJ", "MOVER-NW", "MOVER-W", "BP"),
             plotlab = "RRpairW", fmt="tiff", res.factor = 6, CIlen = TRUE)
 
   #############################################################################
@@ -266,7 +266,7 @@ if (FALSE) {
   load(file = paste0(outpath, "cparrays.OR.", 40, ".",100,".Rdata"))
 #  dimnames(arrays$summaries)
   plotpanel(plotdata = arrays, alpha = 0.05, par3 = 0.25,
-            sel = c("SCASp", "SCASpu", "mid-p", "Jeffreys", "Wilson", "Wald", "Laplace"),
+            sel = c("SCASp", "SCASpu", "mid-p", "Jeffreys", "Wilson"),
             plotlab = "ORpairW", fmt="tiff", res.factor = 6, CIlen = TRUE)
 
   #############################################################################
