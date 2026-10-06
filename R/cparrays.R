@@ -162,21 +162,33 @@ allpairci <- function(xs,
       tempout <- aperm(array((sapply(1:lenxs, function(i) ratesci::rdpairci(x = xs[i,], level = 1-alpha)$estimates[,c(1,3)])), dim = c(10,2,lenxs)), c(3, 2, 1))
       ci[, 1:2, c("SCAS-bc", "SCAS", "AS-bc", "AS", "MOVER-W", "MOVER-NW", "MOVER-NJ", "Wald", "AM", "BP")] <-
         tempout[, , c(1:10)]
-      tempout5 <- aperm(array((sapply(1:lenxs, function(i) ratesci::rdpairci(x = xs[i,], level = 1-alpha, cc = TRUE)$estimates[,c(1,3)])), dim = c(8,2,lenxs)), c(3, 2, 1))
-      ci[, 1:2, c("SCAS-c5", "AS-bc-c5", "MOVER-c5", "Wald-cc")] <- tempout5[, , c(1, 3, 7, 8)]
-      tempout25 <- aperm(array((sapply(1:lenxs, function(i) ratesci::rdpairci(x = xs[i,], level = 1-alpha, cc = 0.25)$estimates[,c(1,3)])), dim = c(8,2,lenxs)), c(3, 2, 1))
-      ci[, 1:2, c("SCAS-c25", "AS-bc-c25", "MOVER-c25")] <- tempout25[, , c(1, 3, 7)]
-      tempout125 <- aperm(array((sapply(1:lenxs, function(i) ratesci::rdpairci(x = xs[i,], level = 1-alpha, cc = 0.125)$estimates[,c(1,3)])), dim = c(8,2,lenxs)), c(3, 2, 1))
-      ci[, 1:2, c("SCAS-c125", "AS-bc-c125", "MOVER-c125")] <- tempout125[, , c(1, 3, 7)]
+      if ("SCAS-c5" %in% methods) {
+        tempout5 <- aperm(array((sapply(1:lenxs, function(i) ratesci::rdpairci(x = xs[i,], level = 1-alpha, cc = TRUE)$estimates[,c(1,3)])), dim = c(8,2,lenxs)), c(3, 2, 1))
+        ci[, 1:2, c("SCAS-c5", "AS-bc-c5", "MOVER-c5", "Wald-cc")] <- tempout5[, , c(1, 3, 7, 8)]
+      }
+      if ("SCAS-c25" %in% methods) {
+        tempout25 <- aperm(array((sapply(1:lenxs, function(i) ratesci::rdpairci(x = xs[i,], level = 1-alpha, cc = 0.25)$estimates[,c(1,3)])), dim = c(8,2,lenxs)), c(3, 2, 1))
+        ci[, 1:2, c("SCAS-c25", "AS-bc-c25", "MOVER-c25")] <- tempout25[, , c(1, 3, 7)]
+      }
+      if ("SCAS-c125" %in% methods) {
+        tempout125 <- aperm(array((sapply(1:lenxs, function(i) ratesci::rdpairci(x = xs[i,], level = 1-alpha, cc = 0.125)$estimates[,c(1,3)])), dim = c(8,2,lenxs)), c(3, 2, 1))
+        ci[, 1:2, c("SCAS-c125", "AS-bc-c125", "MOVER-c125")] <- tempout125[, , c(1, 3, 7)]
+      }
     } else if (contrast == "RR") {
       tempoutr <- aperm(array((sapply(1:lenxs, function(i) ratesci::rrpairci(x = xs[i,], level = 1-alpha)$estimates[, c(1,3)])), dim = c(10, 2, lenxs)), c(3, 2, 1))
       ci[, 1:2, c("SCAS-bc", "SCAS", "AS-bc", "AS", "MOVER-W", "MOVER-NW", "MOVER-NJ", "Wald", "BP", "BP-J")] <- tempoutr[, , c(1:10)]
-      tempout5r <- aperm(array((sapply(1:lenxs, function(i) ratesci::rrpairci(x = xs[i,], level = 1-alpha, cc = TRUE)$estimates[,c(1,3)])), dim = c(9,2,lenxs)), c(3, 2, 1))
-      ci[, 1:2, c("SCAS-c5", "AS-bc-c5", "MOVER-c5", "BP-cc")] <- tempout5r[, , c(1, 3, 7, 8)]
-      tempout25r <- aperm(array((sapply(1:lenxs, function(i) ratesci::rrpairci(x = xs[i,], level = 1-alpha, cc = 0.25)$estimates[,c(1,3)])), dim = c(9,2,lenxs)), c(3, 2, 1))
-      ci[, 1:2, c("SCAS-c25", "AS-bc-c25", "MOVER-c25")] <- tempout25r[, , c(1, 3, 7)]
-      tempout125r <- aperm(array((sapply(1:lenxs, function(i) ratesci::rrpairci(x = xs[i,], level = 1-alpha, cc = 0.125)$estimates[,c(1,3)])), dim = c(9,2,lenxs)), c(3, 2, 1))
-      ci[, 1:2, c("SCAS-c125", "AS-bc-c125", "MOVER-c125")] <- tempout125r[, , c(1, 3, 7)]
+      if ("SCAS-c5" %in% methods) {
+        tempout5r <- aperm(array((sapply(1:lenxs, function(i) ratesci::rrpairci(x = xs[i,], level = 1-alpha, cc = TRUE)$estimates[,c(1,3)])), dim = c(9,2,lenxs)), c(3, 2, 1))
+        ci[, 1:2, c("SCAS-c5", "AS-bc-c5", "MOVER-c5", "BP-cc")] <- tempout5r[, , c(1, 3, 7, 8)]
+      }
+      if ("SCAS-c25" %in% methods) {
+        tempout25r <- aperm(array((sapply(1:lenxs, function(i) ratesci::rrpairci(x = xs[i,], level = 1-alpha, cc = 0.25)$estimates[,c(1,3)])), dim = c(9,2,lenxs)), c(3, 2, 1))
+        ci[, 1:2, c("SCAS-c25", "AS-bc-c25", "MOVER-c25")] <- tempout25r[, , c(1, 3, 7)]
+      }
+      if ("SCAS-c125" %in% methods) {
+        tempout125r <- aperm(array((sapply(1:lenxs, function(i) ratesci::rrpairci(x = xs[i,], level = 1-alpha, cc = 0.125)$estimates[,c(1,3)])), dim = c(9,2,lenxs)), c(3, 2, 1))
+        ci[, 1:2, c("SCAS-c125", "AS-bc-c125", "MOVER-c125")] <- tempout125r[, , c(1, 3, 7)]
+      }
     }
 
     # MOVER methods, potential alternative versions - omitted from final evaluation
@@ -289,9 +301,7 @@ cpfun <- function(
                   window = 0.08,
                   square = TRUE,
                   smooth = TRUE,
-                  prerun = F,
                   jitt = TRUE,
-#                  sided = "L",
                   pcut = 1E-10,
                   outdir = outpath
                   ) {
@@ -429,8 +439,9 @@ tryCatch(
 
   },
       if (any(!is.na(prob))) {
-        cisub <- ci[prob > pcut, , ]
-        probsub <- prob[prob > pcut]
+        mysub <- (prob > pcut)
+        cisub <- ci[mysub, , ]
+        probsub <- prob[mysub]
         cpl[i, ] <- t(cisub[, 1, ] <= theta[i] & cisub[, 2, ] >= theta[i] & cisub[, 2, ] > cisub[, 1, ]) %*% probsub # 2-sided coverage probability. NB degenerate intervals excluded
         lncpl[i, ] <- t(cisub[, 1, ] > theta[i] | cisub[, 2, ] == cisub[, 1, ]) %*% probsub # L-sided non-coverage (R-side is a mirror image)
         rncpl[i, ] <- t(cisub[, 2, ] < theta[i] | cisub[, 2, ] == cisub[, 1, ]) %*% probsub # R-sided non-coverage
