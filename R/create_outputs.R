@@ -38,14 +38,18 @@ if (FALSE) {
   system.time(mycis <- cifun(n=20, contrast="RR", alph = alphas))[[3]]/60
 # load(file=paste0(outpath1, "cis.RR.20.Rdata")); mycis <- ciarrays
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
+
   system.time(mycis <- cifun(n=40, contrast="RD", alph = alphas))[[3]]/60
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
-  system.time(mycis <- cifun(n=40, contrast="RR", alph = alphas))[[3]]/60
-  # load(file=paste0(outpath1, "cis.RR.40.Rdata")); mycis <- ciarrays
-  Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
+#  system.time(mycis <- cifun(n=40, contrast="RR", alph = alphas))[[3]]/60
+ load(file=paste0(outpath, "cis.RR.40.Rdata")); mycis <- ciarrays
+ Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
+
   system.time(mycis <- cifun(n=65, contrast="RD", alph = alphas))[[3]]/60
+  load(file=paste0(outpath, "cis.RD.65.Rdata")); mycis <- ciarrays
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
-  system.time(mycis <- cifun(n=65, contrast="RR", alph = alphas))[[3]]/60
+#  system.time(mycis <- cifun(n=65, contrast="RR", alph = alphas))[[3]]/60
+  load(file=paste0(outpath, "cis.RR.65.Rdata")); mycis <- ciarrays
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
 
   # Evaluation for conditional OR
