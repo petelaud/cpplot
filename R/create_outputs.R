@@ -489,9 +489,16 @@ if (FALSE) {
 
   # Overall minimum coverage for each continuity-adjusted method per contrast
   # (Including corresponding unadjusted method for reference)
-  apply(bigarray[,RDcpairteam,c("95","90"),"minCP",,"RD"], 2:3, min)
-  apply(bigarray[,RRcpairteam,c("95","90"),"minCP",,"RR"], 2:3, min)
-  apply(bigarray[,ORcpairteam,c("95","90"),"minCP",,"OR"], 2:3, min)
+  apply(bigarray[,RDcpairteam,c("95","90"),"minCP",,"RD"], 2:3, function(x) round(min(as.numeric(x)), 3))
+  apply(bigarray[,RRcpairteam,c("95","90"),"minCP",,"RR"], 2:3, function(x) round(min(as.numeric(x)), 3))
+  apply(bigarray[,ORcpairteam,c("95","90"),"minCP",,"OR"], 2:3, function(x) round(min(as.numeric(x)), 3))
+
+  # Overall mean coverage for each continuity-adjusted method per contrast
+  # (Including corresponding unadjusted method for reference)
+  dimnames(bigarray)
+  apply(bigarray[,RDcpairteam,c("95","90"),"meanCP",,"RD"], 2:3, function(x) round(mean(as.numeric(x)), 3))
+  apply(bigarray[,RRcpairteam,c("95","90"),"meanCP",,"RR"], 2:3, function(x) round(mean(as.numeric(x)), 3))
+  apply(bigarray[,ORcpairteam,c("95","90"),"meanCP",,"OR"], 2:3, function(x) round(mean(as.numeric(x)), 3))
 
   # Overall average of %PSP that are doubly conservative (showing 2dps for results close to 100)
   apply(bigarray[,RDcpairteam,c("95","90"),"pctCons.both",,"RD"], 2:3,  function(x) round(mean(as.numeric(x)), 2))
