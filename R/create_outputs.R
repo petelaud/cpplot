@@ -128,25 +128,27 @@ if (FALSE) {
   mydims[5] <- length(mynums)
   mydims[6] <- 3
   mydims[2] <- nmeth
+  mydims[1] <- length(phis)
   mydimnames <- dimnames(arrays$summaries)
   mydimnames[[5]] <- paste(mynums)
   mydimnames[[6]] <- c("RD", "RR", "OR")
   mydimnames[[2]] <- mymethods
+  mydimnames[[1]] <- paste(phis)
 
   bigarray <- array(NA, dim = mydims)
   dimnames(bigarray) <- mydimnames
 
   for (num in mynums) {
     load(file=paste0(outpath, "cparrays.RD.", num, ".",200,".Rdata"))
-    bigarray[,RDmeth,,,paste(num), "RD"] <- arrays$summaries[,RDmeth,,,paste(num),]
+    bigarray[paste(phis), RDmeth,,,paste(num), "RD"] <- arrays$summaries[paste(phis),RDmeth,,,paste(num),]
   }
   for (num in mynums) {
     load(file=paste0(outpath, "cparrays.RR.", num, ".",200,".Rdata"))
-    bigarray[,RRmeth,,,paste(num), "RR"] <- arrays$summaries[,RRmeth,,,paste(num),]
+    bigarray[paste(phis), RRmeth,,,paste(num), "RR"] <- arrays$summaries[paste(phis), RRmeth,,,paste(num),]
   }
   for (num in mynums) {
     load(file=paste0(outpath, "cparrays.OR.", num, ".",200,".Rdata"))
-    bigarray[,ORmeth,,,paste(num), "OR"] <- arrays$summaries[paste(phis), ORmeth,,,paste(num),]
+    bigarray[paste(phis), ORmeth,,,paste(num), "OR"] <- arrays$summaries[paste(phis), ORmeth,,,paste(num),]
   }
 
 
