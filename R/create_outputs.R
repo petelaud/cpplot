@@ -249,8 +249,163 @@ if (FALSE) {
 
 
   #############################################################################
-  ### FIGURE 1: 2-D plots of CP and LNCP for selected methods. See cpslice.R
+  ### FIGURE 1: 2-D plots of CP and LNCP for selected methods.
   #############################################################################
+
+  # First need to run the CIs for all methods for the selected Ns
+  # if not run already
+  if (FALSE) {
+    system.time(cifun(n=39, contrast="RD", alph = 0.05))[[3]]/60
+    #  system.time(cifun(n=40, contrast="RD", alph = alphas))[[3]]/60
+    system.time(cifun(n=41, contrast="RD", alph = 0.05))[[3]]/60
+  }
+
+  slicemethods <- c("AS", "BP", "MOVER-NW", "SCAS")
+
+  myNs <- c(39, 40, 41)
+  mypsi <- 3
+  del <- 0.2
+  dels <- del + seq(-0.005,0.005,0.001)
+  p2 <- seq(0, 1-del, length.out=101)
+  p1 <- p2 + del
+
+  # Get dimnames from a single run of onecpfun()
+  load(file=paste0(outpath, "cis.RD.", 40, ".Rdata"))
+  cp1 <- onecpfun(
+    n = 40,
+    p1 = p1,
+    p2 = p2,
+    ciarrays = ciarrays,
+    methods = slicemethods,
+    alph = 0.05,
+    psis = mypsi
+  )
+
+  slicearray <- array(NA, dim=c(dim(cp1), length(myNs), length(dels)))
+  dimnames(slicearray)[1:3] <- dimnames(cp1)
+  dimnames(slicearray)[4:5] <- list(paste(myNs), paste(dels))
+
+  # Reduce dimensions to the methods of interest
+  slicearray <- slicearray[,slicemethods, ,,]
+
+  dim(slicearray)
+  dim(cp1)
+
+  # Generate array of coverage probabilities for multiple Ns and methods
+  for (myN in myNs) {
+    cat(paste0("N=", myN,"\n"))
+    load(file=paste0(outpath, "cis.RD.", myN, ".Rdata"))
+
+    for(i in 1:length(dels)){
+      cat(paste0("delta=", dels[i],"\n"))
+      p2i <- seq(0, 1 - dels[i], length.out=101)
+      p1i <- p2i + dels[i]
+      slicearray[,,, paste(myN), paste(dels[i])] <- onecpfun(
+        p1 = p1i,
+        p2 = p2i,
+        ciarrays = ciarrays,
+        alph = 0.05,
+        psis = mypsi
+      )[, slicemethods, ]
+    }
+  }
+  save(slicearray, file = paste0(outpath, "slicearray.Rdata"))
+
+
+  # Function to create a slice plot showing CP or LNCP for a single CI method
+  plot2d <- function(method = "AS", label = "Tango", measure = "cp", lab2 = "CP") {
+
+    if (measure == "cp") {
+      lims <- c(0.9, 1)
+    } else lims <- c(0, 0.05)
+
+    par(pty='s')
+    plot(p2,
+         slicearray[, method, measure, "40", "0.2"],
+         type = "l",
+         lwd = 3,
+         ylim = lims,
+         xlab = '',
+         ylab = '',
+         xaxt='n',
+         yaxt='n',
+         main = paste0("Method: ", method, "\n",
+                       "N = 39,40,41, θ = ", del, "±0.005, ψ = ", psi, "\n",
+                       "Solid line: N = 40, θ = 0.2")
+    )
+
+    if (measure == "cp") {
+      abline(h=0.95)
+      rect(
+        xleft = par("usr")[1], xright = par("usr")[2], ybottom = 0.945, ytop = 0.955,
+        border = NA, col = adjustcolor("gray", alpha = 0.3)
+      )
+    } else {
+      abline(h=0.025)
+      rect(
+        xleft = par("usr")[1], xright = par("usr")[2], ybottom = 0.02, ytop = 0.03,
+        border = NA, col = adjustcolor("gray", alpha = 0.3)
+      )
+
+    }
+    axis(side = 2, las = 2)
+    axis(side = 1, las = 1, padj=1)
+    mtext(side = 1,
+          text = bquote(paste(italic(p)[2])),
+          font = 2,
+          cex = res.factor*1,
+          line = 3*res.factor)
+    mtext(side = 2,
+          text = lab2,
+          font = 2,
+          cex = res.factor*1,
+          line = 4*res.factor)
+
+    for (myN in myNs) {
+      for(i in 1:length(dels)){
+        p2i <- seq(0, 1 - dels[i], length.out=101)
+        p1i <- p2i + dels[i]
+        if (dels[i] == del & myN == 40) {
+          mylty <-  1
+          mycol <- "black"
+        } else {
+          mylty <- 2
+          mycol <- "gray33"
+        }
+        lines(p2i,
+              slicearray[, method, measure, paste(myN), paste(dels[i])],
+              lty = mylty,
+              col = mycol
+        )
+
+      }
+    }
+  }
+
+  res.factor <- 3
+  grid.factor <- 4
+  tiff(file = paste0(outpath,"_tiff/","Laud_Fig1.tiff"),
+       width = 300*grid.factor*res.factor,
+       height = 650*res.factor,
+       type = "windows"
+  )
+  par(pty='s')
+  par(mfrow = c(2, 4))
+  par(cex.main = 1.5*res.factor*1, cex.axis=1.5*res.factor*1)
+  par(mar = 2*res.factor*(c(2,2,3,0.5)+0.1))
+
+
+  plot2d(method = "AS", label = "Tango")
+  plot2d(method = "BP", label = "BP")
+  plot2d(method = "MOVER-NW", label = "MOVER-NW")
+  plot2d(method = "SCAS", label = "SCAS")
+
+  plot2d(method = "AS", label = "Tango", measure = "rncp", lab2 = "RNCP")
+  plot2d(method = "BP", label = "BP", measure = "rncp", lab2 = "RNCP")
+  plot2d(method = "MOVER-NW", label = "MOVER-NW", measure = "rncp", lab2 = "RNCP")
+  plot2d(method = "SCAS", label = "SCAS", measure = "rncp", lab2 = "RNCP")
+
+  dev.off()
 
 
 
