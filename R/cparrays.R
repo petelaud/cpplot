@@ -309,9 +309,17 @@ cpfun <- function(
   xs <- ciarrays[["xs"]]
   cis <- ciarrays[["cis"]]
   contrast <- dimnames(cis)[[6]]
-  if (is.null(methods) || methods == "All") {
+
+  if (is.null(methods) ) {
     mymethods <- longlab <- dimnames(cis)[[3]]
-  } else mymethods <- longlab <- methods
+  } else {
+    if (length(methods) == 1) {
+      if (methods == "All") {
+        mymethods <- longlab <- dimnames(cis)[[3]]
+      }
+    } else mymethods <- methods
+  }
+
 
   if (is.null(alph)) alph <- 1 - (as.numeric(dimnames(cis)[[4]])/100)
   nmeth <- length(mymethods)
@@ -807,9 +815,15 @@ onecpfun <- function(
     xsub <- xs[prob > 1E-10, ]
 
     tester <- allpairci(x = rep(10,4), contrast = contrast)
-    if (is.null(methods) || (length(methods) == 1 && methods == "All")) {
+    if (is.null(methods) ) {
         mymethods <- dimnames(tester)[[3]]
-    } else mymethods <- methods
+    } else {
+      if (length(methods) == 1) {
+        if (methods == "All") {
+          mymethods <- dimnames(tester)[[3]]
+        }
+      } else mymethods <- methods
+    }
     nmeth <- length(mymethods)
 
     cpl <- lncpl <- rncpl <- lenl <- locindexl <-
