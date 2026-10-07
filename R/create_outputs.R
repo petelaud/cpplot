@@ -82,31 +82,33 @@ if (FALSE) {
   load(file=paste(outpath, "cparrays.RD.", 40, ".",200,".Rdata",sep=""))
   mycis <- arrays
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, alph=0.05, phis=phis,
-                                          methods = RDmeth[1:6], outdir="data/"))[[3]]/60
+                                          methods = RDmeth[1:10], outdir="data/"))[[3]]/60
   load(file=paste(outpath, "cparrays.RR.", 40, ".",200,".Rdata",sep=""))
   mycis <- arrays
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, alph=0.05, phis=phis,
-                                          methods = RRmeth[1:7], outdir="data/"))[[3]]/60
+                                          methods = RRmeth[1:10], outdir="data/"))[[3]]/60
   load(file=paste(outpath, "cparrays.OR.", 40, ".",200,".Rdata",sep=""))
   mycis <- arrays
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, alph=0.05, phis=phis,
                                           methods = ORmeth[1:7], outdir="data/"))[[3]]/60
 
-  # Subset arrays to selected N and methods for smaller file size to upload to GitHub
-  load(file=paste(outpath, "cparrays.RD.", 40, ".",200,".Rdata",sep=""))
-  arrays$cis <- arrays$cis[,, RDmeth[1:6], "95",,, drop=FALSE]
-  arrays$mastercp <- arrays$mastercp[,,, RDmeth[1:6], "95",,,, drop=FALSE]
-  save(arrays, file = paste("data/cparrays.RD.40.200.Rdata", sep = ""))
+  # Alternatively, if the full arrays have already been run,
+  # subset them to selected alpha and methods
+  #  for smaller file size to upload to GitHub
+  load(file=paste(outpath, "cparrays.RD.", 40, ".", 200, ".Rdata", sep=""))
+  arrays$cis <- arrays$cis[,, RDmeth[1:10], "95",,, drop=FALSE]
+  arrays$mastercp <- arrays$mastercp[,,, RDmeth[1:10], "95",,,, drop=FALSE]
+  save(arrays, file = paste0("data/cparrays.RD.40.200.Rdata"))
 
-  load(file=paste(outpath, "cparrays.RR.", 40, ".",200,".Rdata",sep=""))
-  arrays$cis <- arrays$cis[,, RRmeth[1:7], "95",,, drop=FALSE]
+  load(file=paste(outpath, "cparrays.RR.", 40, ".", 200, ".Rdata", sep=""))
+  arrays$cis <- arrays$cis[,, RRmeth[1:10], "95",,, drop=FALSE]
   arrays$mastercp <- arrays$mastercp[,,, RDmeth[1:7], "95",,,, drop=FALSE]
-  save(arrays, file = paste("data/cparrays.RR.40.200.Rdata", sep = ""))
+  save(arrays, file = paste0("data/cparrays.RR.40.200.Rdata"))
 
-  load(file=paste(outpath, "cparrays.OR.", 40, ".",200,".Rdata",sep=""))
+  load(file=paste(outpath, "cparrays.OR.", 40, ".", 200, ".Rdata", sep=""))
   arrays$cis <- arrays$cis[,, ORmeth[1:5], "95",,, drop=FALSE]
-  arrays$mastercp <- arrays$mastercp[,,, ORmeth[1:5], "95",,,, drop=FALSE]
-  save(arrays, file = paste("data/cparrays.OR.40.200.Rdata", sep = ""))
+  arrays$mastercp <- arrays$mastercp[,,, ORmeth[1:7], "95",,,, drop=FALSE]
+  save(arrays, file = paste0("data/cparrays.OR.40.200.Rdata"))
 
 
   #############################################################################
