@@ -9,27 +9,46 @@ if (FALSE) {
 
   # 2-D Type I error plot, showing multiple traces, and multiple methods in a grid
 
-myNs <- c(39, 40, 41)
-del <- 0.2 # * myN/40
-dels <- del + seq(-0.005,0.005,0.001) #[-6]
+# First need to run the CIs for all methods for the selected Ns
+# if not run already
+if (FALSE) {
+  system.time(cifun(n=39, contrast="RD", alph = 0.05))[[3]]/60
+#  system.time(cifun(n=40, contrast="RD", alph = alphas))[[3]]/60
+  system.time(cifun(n=41, contrast="RD", alph = 0.05))[[3]]/60
+}
 
+slicemethods <- c("AS", "BP", "MOVER-NW", "SCAS")
+
+myNs <- c(39, 40, 41)
+mypsi <- 3
+del <- 0.2
+dels <- del + seq(-0.005,0.005,0.001)
 p2 <- seq(0, 1-del, length.out=101)
 p1 <- p2 + del
+
+# Get dimnames from a single run of onecpfun()
+load(file=paste0(outpath, "cis.RD.", 40, ".Rdata"))
 cp1 <- onecpfun(
-  n = myN,
+  n = 40,
   p1 = p1,
   p2 = p2,
-  #    ciarrays = mycis,
   ciarrays = ciarrays,
+  methods = slicemethods,
   alph = 0.05,
-  psis = 3
-  #    phis = 0.25
+  psis = mypsi
 )
 
-bigarray <- array(NA, dim=c(dim(cp1), length(myNs), length(dels)))
-dimnames(bigarray)[1:3] <- dimnames(cp1)
-dimnames(bigarray)[4:5] <- list(paste(myNs), paste(dels))
+slicearray <- array(NA, dim=c(dim(cp1), length(myNs), length(dels)))
+dimnames(slicearray)[1:3] <- dimnames(cp1)
+dimnames(slicearray)[4:5] <- list(paste(myNs), paste(dels))
 
+# Reduce dimensions to the methods of interest
+slicearray <- slicearray[,slicemethods, ,,]
+
+dim(slicearray)
+dim(cp1)
+
+# Generate array of coverage probabilities for multiple Ns and methods
 for (myN in myNs) {
   cat(paste0("N=", myN,"\n"))
   load(file=paste0(outpath, "cis.RD.", myN, ".Rdata"))
@@ -38,17 +57,19 @@ for (myN in myNs) {
     cat(paste0("delta=", dels[i],"\n"))
     p2i <- seq(0, 1 - dels[i], length.out=101)
     p1i <- p2i + dels[i]
-    bigarray[,,, paste(myN), paste(dels[i])] <- onecpfun(
+    slicearray[,,, paste(myN), paste(dels[i])] <- onecpfun(
       p1 = p1i,
       p2 = p2i,
       ciarrays = ciarrays,
       alph = 0.05,
-      psis = psi
-    )
+      psis = mypsi
+    )[, slicemethods, ]
   }
 }
+save(slicearray, file = paste0(outpath, "slicearray.Rdata"))
 
 
+# Function to create a slice plot showing CP or LNCP for a single CI method
 plot2d <- function(method = "AS", label = "Tango", measure = "cp", lab2 = "CP") {
 
   if (measure == "cp") {
@@ -57,7 +78,7 @@ plot2d <- function(method = "AS", label = "Tango", measure = "cp", lab2 = "CP") 
 
   par(pty='s')
   plot(p2,
-       bigarray[, method, measure, "40", "0.2"],
+       slicearray[, method, measure, "40", "0.2"],
        type = "l",
        lwd = 3,
        ylim = lims,
@@ -69,7 +90,6 @@ plot2d <- function(method = "AS", label = "Tango", measure = "cp", lab2 = "CP") 
                      "N = 39,40,41, θ = ", del, "±0.005, ψ = ", psi, "\n",
                      "Solid line: N = 40, θ = 0.2")
   )
-
 
   if (measure == "cp") {
     abline(h=0.95)
@@ -110,7 +130,7 @@ plot2d <- function(method = "AS", label = "Tango", measure = "cp", lab2 = "CP") 
         mycol <- "gray33"
       }
       lines(p2i,
-            bigarray[, method, measure, paste(myN), paste(dels[i])],
+            slicearray[, method, measure, paste(myN), paste(dels[i])],
             lty = mylty,
             col = mycol
       )
@@ -125,7 +145,6 @@ tiff(file = paste0(outpath,"_tiff/","Laud_Fig1.tiff"),
      width = 300*grid.factor*res.factor,
      height = 650*res.factor,
      type = "windows"
-     #       type="quartz"
 )
   par(pty='s')
 par(mfrow = c(2, 4))
