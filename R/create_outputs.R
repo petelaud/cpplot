@@ -102,11 +102,11 @@ if (FALSE) {
 
   load(file=paste(outpath, "cparrays.RR.", 40, ".", 200, ".Rdata", sep=""))
   arrays$cis <- arrays$cis[,, RRmeth[1:10], "95",,, drop=FALSE]
-  arrays$mastercp <- arrays$mastercp[,,, RDmeth[1:7], "95",,,, drop=FALSE]
+  arrays$mastercp <- arrays$mastercp[,,, RRmeth[1:10], "95",,,, drop=FALSE]
   save(arrays, file = paste0("data/cparrays.RR.40.200.Rdata"))
 
   load(file=paste(outpath, "cparrays.OR.", 40, ".", 200, ".Rdata", sep=""))
-  arrays$cis <- arrays$cis[,, ORmeth[1:5], "95",,, drop=FALSE]
+  arrays$cis <- arrays$cis[,, ORmeth[1:7], "95",,, drop=FALSE]
   arrays$mastercp <- arrays$mastercp[,,, ORmeth[1:7], "95",,,, drop=FALSE]
   save(arrays, file = paste0("data/cparrays.OR.40.200.Rdata"))
 
@@ -118,7 +118,7 @@ if (FALSE) {
   # So the following requires all the cpfun calls above to be run
   #############################################################################
   mynums <- c(20, 40, 65)
-  phis <- c(0.1, 0.25, 0.5, 0.75)
+#  phis <- c(0.1, 0.25, 0.5, 0.75)
   mymethods <- c("SCAS-bc", "SCAS", "AS-bc", "AS", "MOVER-NJ", "MOVER-NW", "MOVER-W",
                  "AM", "BP", "BP-J", "BP-cc", "Wald", "Wald-cc",
                  "SCAS-c5", "SCAS-c25", "SCAS-c125", "MOVER-c5", "MOVER-c25", "MOVER-c125",
@@ -155,6 +155,7 @@ if (FALSE) {
 
 
   save(bigarray, file = paste0(outpath, "allsummaries.Rdata"))
+  save(bigarray, file = paste0("data/allsummaries.Rdata"))
 
 
   #############################################################################
@@ -516,7 +517,7 @@ if (FALSE) {
 
 
   #############################################################################
-  ### FIGURE 6: CP, MACP, location index and DNCP for selected conservative methods for RD, with N = 40, \alpha=0.05 and \phi=0.25
+  ### FIGURE 6 (optional extra): CP, MACP, location index and DNCP for selected conservative methods for RD, with N = 40, \alpha=0.05 and \phi=0.25
   #############################################################################
   load(file = paste0(outpath, "cparrays.RD.", 40, ".",200,".Rdata"))
   plotpanel(plotdata = arrays, alpha = 0.05, par3 = 0.25,
@@ -564,16 +565,11 @@ if (FALSE) {
 #  ORmeth <- c("SCASp", "SCASpu", "mid-p", "Jeffreys", "Wilson")
 
   # Summarise by metric for N=40 for new tables in resubmission
-  mytable2a <- ftable((mysummaries[, RDmeth[c(1, 3:10)], ,
+  mytable2 <- ftable((mysummaries[, RDmeth[c(1, 3:10)], ,
                                    #                      c("pctnear", "pctnear.1side", "pctnear.DNCP", "pctBad.DNCP", "meanlocindex"),
                                    c("pctnear", "pctnear.1side", "pctBad.DNCP", "meanlocindex"),
                                    "40",c("RD")]), col.vars = c(3,1), row.vars = c(4,2))
-  write.ftable(mytable2a, sep=',', quote=TRUE, justify="none", file = paste0(outpath, "table2a.csv"))
-  mytable2b <- ftable((mysummaries[, RDmeth[c(1, 3:10)], ,
-                                   #                      c("pctnear", "pctnear.1side", "pctnear.DNCP", "pctBad.DNCP", "meanlocindex"),
-                                   c("pctnear", "pctnear.1side", "pctBad.DNCP", "meanlocindex"),
-                                   "65",c("RD")]), col.vars = c(3,1), row.vars = c(4,2))
-  write.ftable(mytable2b, sep=',', quote=TRUE, justify="none", file = paste0(outpath, "table2b.csv"))
+  write.ftable(mytable2, sep=',', quote=TRUE, justify="none", file = paste0(outpath, "table2.csv"))
 
   mytable3 <-
   ftable((mysummaries[, RRmeth[c(1, 3:10)], ,
@@ -640,6 +636,7 @@ if (FALSE) {
 
   #############################################################################
   ### Table 6: Conservative coverage summary
+  ### Output needs rearranging for published table
   #############################################################################
 
   RDcpairteam <- c("SCAS-c5", "SCAS-c25", "SCAS-c125", "SCAS", "MOVER-c5", "MOVER-c25", "MOVER-c125", "MOVER-NJ", "Wald-cc") 	#Paired RD, cc
@@ -679,13 +676,14 @@ if (FALSE) {
   #############################################################################
   x <- c(1, 1, 7, 12)
   egCI <- allpairci(x = x, contrast = "RD",
-                    methods = c("SCAS-bc", "AS-bc", "AS", "MOVER-NJ", "MOVER-NW", "MOVER-W", "BP",
+                    methods = c("SCAS-bc", "AS-bc", "AS", "MOVER-NJ", "MOVER-NW", "MOVER-W", "BP", "AM",
                                  "SCAS-c125", "SCAS-c5", "AS-bc-c125", "AS-bc-c5", "MOVER-c125", "MOVER-c5"),
                     alpha=0.05)
   dimnames(egCI)[[1]] <- ""
   ftable(round(egCI, 3), row.vars = 3)
+  #  t(t((round(egCI[,2,], 3) - round(egCI[,1,],3))))
   # Calculate width from unrounded data, for consistency with Fagerland et al
-  t(t((round(egCI[,2,], 3) - round(egCI[,1,],3))))
+  t(t((round(egCI[,2,] - egCI[,1,],3))))
 
   egCI <- allpairci(x = x, contrast = "RR",
                     methods = c("SCAS-bc", "AS-bc", "AS", "MOVER-NJ", "MOVER-NW", "MOVER-W", "BP", "BP-J",
