@@ -341,7 +341,7 @@ if (FALSE) {
          xaxt='n',
          yaxt='n',
          main = paste0("Method: ", method, "\n",
-                       "N = 39,40,41, θ = ", del, "±0.005, ψ = ", psi, "\n",
+                       "N = 39,40,41, θ = ", del, "±0.005, ψ = ", mypsi, "\n",
                        "Solid line: N = 40, θ = 0.2")
     )
 
