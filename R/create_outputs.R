@@ -8,17 +8,17 @@ if (FALSE) {
   # > devtools::load.all(".")
   # then run selected code from within 'create_outputs.R'
 
-  ### NOTE methods have been re-labelled in the manuscript:
+  ### NOTE methods have been re-labelled in the manuscript
+  ###      since this code was developed:
   ### SCAS --> 'SCASu' (method without the 'N-1' variance bias correction)
   ### SCAS-bc --> 'SCAS' (including the 'N-1' bias correction)
+  ### AS-bc --> AS(N-1) (adding the 'N-1' correction to Tang/Tango)
+  ### And for conditional OR:
+  ### SCASp --> T-SCAS(N-1)
+  ### SCASpu --> T-SCAS
 
   # Set path for output files as required by user
   outpath <- '/myoutputpath/'
-  outpath <- paste0(root, "Main/Courses_papers/skewscore/paired/") # Remove for final upload
-  outpath <- "D:/Pete/Documents/Research/paired/" # Remove for final upload
-  outpath1 <- "D:/Pete/Documents/Research/paired/" # Remove for final upload
-  outpath <- "D:/Pete/Documents/Research/paired/negcorr/" # Remove for final upload
-
   #  outpath <- 'data/'
 
   #############################################################################
@@ -36,20 +36,21 @@ if (FALSE) {
   system.time(mycis <- cifun(n=20, contrast="RD", alph = alphas))[[3]]/60
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
   system.time(mycis <- cifun(n=20, contrast="RR", alph = alphas))[[3]]/60
-# load(file=paste0(outpath1, "cis.RR.20.Rdata")); mycis <- ciarrays
+# Use the line below to save time if the cis array has already been run:
+# load(file=paste0(outpath, "cis.RR.20.Rdata")); mycis <- ciarrays
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
 
   system.time(mycis <- cifun(n=40, contrast="RD", alph = alphas))[[3]]/60
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
-#  system.time(mycis <- cifun(n=40, contrast="RR", alph = alphas))[[3]]/60
- load(file=paste0(outpath, "cis.RR.40.Rdata")); mycis <- ciarrays
- Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
+  system.time(mycis <- cifun(n=40, contrast="RR", alph = alphas))[[3]]/60
+# load(file=paste0(outpath, "cis.RR.40.Rdata")); mycis <- ciarrays
+  Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
 
   system.time(mycis <- cifun(n=65, contrast="RD", alph = alphas))[[3]]/60
-  load(file=paste0(outpath, "cis.RD.65.Rdata")); mycis <- ciarrays
+#  load(file=paste0(outpath, "cis.RD.65.Rdata")); mycis <- ciarrays
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
-#  system.time(mycis <- cifun(n=65, contrast="RR", alph = alphas))[[3]]/60
-  load(file=paste0(outpath, "cis.RR.65.Rdata")); mycis <- ciarrays
+  system.time(mycis <- cifun(n=65, contrast="RR", alph = alphas))[[3]]/60
+#  load(file=paste0(outpath, "cis.RR.65.Rdata")); mycis <- ciarrays
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, phis=phis))[[3]]/60
 
   # Evaluation for conditional OR
@@ -79,6 +80,7 @@ if (FALSE) {
 
 
   # Limited versions for GitHub due to file size limit
+  # Either run them from scratch...
   load(file=paste(outpath, "cparrays.RD.", 40, ".",200,".Rdata",sep=""))
   mycis <- arrays
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, alph=0.05, phis=phis,
@@ -92,8 +94,8 @@ if (FALSE) {
   Sys.time(); system.time(arrays <- cpfun(ciarrays = mycis, n.grid=200, alph=0.05, phis=phis,
                                           methods = ORmeth[1:7], outdir="data/"))[[3]]/60
 
-  # Alternatively, if the full arrays have already been run,
-  # subset them to selected alpha and methods
+  # ... or if the full arrays have already been run,
+  # subset them to the selected alpha and methods
   #  for smaller file size to upload to GitHub
   load(file=paste(outpath, "cparrays.RD.", 40, ".", 200, ".Rdata", sep=""))
   arrays$cis <- arrays$cis[,, RDmeth[1:10], "95",,, drop=FALSE]
@@ -160,6 +162,7 @@ if (FALSE) {
 
   #############################################################################
   ### OPTIONAL: re-run calculations for large sample size (Table 5) (takes several hours)
+  ### (Alternatively use the saved output array to create output table)
   #############################################################################
   RDpairteam <- c("SCAS-bc", "SCAS", "AS-bc", "AS", "MOVER-NJ", "MOVER-NW", "MOVER-W", "BP", "AM", "Wald")
 #                  "Wald-cc", "SCAS-c125") # Waldcc included to match vector length for RR
@@ -423,7 +426,7 @@ if (FALSE) {
   load(file = paste0(outpath, "cparrays.RD.", 40, ".",200,".Rdata"))
   plotpanel(plotdata = arrays, alpha = 0.05, par3 = 0.25,
             sel = c("SCAS-bc", "AS-bc", "AS", "MOVER-NJ", "MOVER-NW", "MOVER-W", "BP"),
-            plotlab = "RDpairW", fmt="tiff", res.factor = 6, CIlen = TRUE)
+            plotlab = "RDpair", fmt="tiff", res.factor = 6, CIlen = TRUE)
 
   #############################################################################
   ### FIGURE 3: CP, MACP, location index and DNCP for selected methods for RR, with N = 40, \alpha=0.05 and \phi=0.25
@@ -431,7 +434,7 @@ if (FALSE) {
   load(file = paste0(outpath, "cparrays.RR.", 40, ".", 200, ".Rdata"))
   plotpanel(plotdata = arrays, alpha = 0.05, par3 = 0.25,
             sel = c("SCAS-bc", "AS-bc", "AS", "MOVER-NJ", "MOVER-NW", "MOVER-W", "BP"),
-            plotlab = "RRpairW", fmt="tiff", res.factor = 6, CIlen = TRUE)
+            plotlab = "RRpair", fmt="tiff", res.factor = 6, CIlen = TRUE)
 
   #############################################################################
   ### FIGURE 4: CP, MACP, location index and DNCP for selected methods for OR, with N = 40, \alpha=0.05 and \phi=0.25
@@ -440,15 +443,15 @@ if (FALSE) {
 #  dimnames(arrays$summaries)
   plotpanel(plotdata = arrays, alpha = 0.05, par3 = 0.25,
             sel = c("SCASp", "SCASpu", "mid-p", "Jeffreys", "Wilson"),
-            plotlab = "ORpairW", fmt="tiff", res.factor = 6, CIlen = TRUE)
+            plotlab = "ORpair", fmt="tiff", res.factor = 6, CIlen = TRUE)
 
   #############################################################################
   ### FIGURE 5: Type I error for McNemar tests, mid-p test and 'N-1' AS test
-  ### Uses TIERs dataset - see further down
+  ### Uses saved TIERs dataset - see further down for code
   #############################################################################
 
   # Load the saved dataset
-  load(file=paste0(outpath,"newtiers1.Rdata"))
+  load(file=paste0(outpath,"tiers1.Rdata"))
 
   # Create a plot of TIERs
   mytiers <- tiers1
@@ -706,8 +709,8 @@ if (FALSE) {
 
 
   #############################################################################
-  ### p.6 footnote: MOVER-NJ RD intervals discrepancy vs M-L Tang et al 2020a Table VI
-  ### (cf methods AS=TANGO, MOVER-NW=NW and MOVER=NJ≠NJ)
+  ### p.7 footnote: MOVER-NJ RD intervals discrepancy vs M-L Tang et al 2010a Table VI
+  ### (cf methods AS=TANGO, MOVER-NW=NW and MOVER-NJ≠NJ)
   #############################################################################
   xs <- rbind(c(43, 0, 1, 0),
              c(8, 3, 1, 2),
@@ -716,6 +719,11 @@ if (FALSE) {
             methods <- c("AS", "MOVER-NW", "MOVER-NJ"),
             alpha=0.05)
   ftable(round(egCI, 4), row.vars = 1, col.vars=c(3, 2))
+  # vs Tang 2010a Table VI:
+  #n x11 x10 x01 NA NW NJ
+  #44 43 0 1 (−0.1289,0.0757) (−0.1181,0.0597) (−0.1063,0.0401)
+  #14 8 3 1 (−0.1639,0.4178) (−0.1574,0.4136) (−0.1721,0.4323)
+  #32 4 9 3 (−0.0296,0.3823) (−0.0273,0.3807) (−0.0368,0.3934)
 
   # And RR intervals from the other M-L Tang et al paper, Tables 4, 6 & 8
   # (cf methods AS = Score:14 or NB:15, MOVER-W = WCI:3, MOVER-J ≠ JCI:4)
@@ -723,9 +731,32 @@ if (FALSE) {
               c(22, 2, 0, 1),
               c(43, 0, 1, 0))
   egCI <- allpairci(x = xs, contrast = "RR",
-                    methods <- c("AS", "MOVER-W", "MOVER-J", "MOVER-NJ"),
+                    methods <- c("AS", "MOVER-W"),
                     alpha=0.05)
-  ftable(round(egCI, 4), row.vars = 1, col.vars=c(3, 2))
+  moverjCI <- t(sapply(1:3,
+                       function(i) ratesci::moverpairci(c(xs[i,]),
+                                                        contrast = "RR",
+                                                        type = "jeff",
+                                                        corc = FALSE)$estimates[c(1, 3)]	))
+  egCI2 <- abind::abind(egCI, moverjCI)
+  dimnames(egCI2)[[3]][3] <- "MOVER-J"
+  dim(egCI2)
+
+  ftable(round(egCI2, 4), row.vars = 1, col.vars=c(3, 2))
+  # vs Tang 2010b Table 4
+  #(MOVER-W) WCI:3 0.8234 1.9539
+  #(MOVER-J) JCI:4 0.8101 2.0236
+  #(AS) NB:15 0.7759 2.0331
+
+  # vs Tang 2010b Table 6
+  #(MOVER-W) WCI:3 0.9431 1.3470
+  #(MOVER-J) JCI:4 0.9579 1.3356
+  #(AS) NB:15 0.9287 1.3486
+
+  # vs Tang 2010b Table 8
+  #(MOVER-W) WCI:3 0.8819 1.0648
+  #(MOVER-J) JCI:4 0.8937 1.0660
+  #(AS) NB:15 0.8819 1.0646
 
   # Check qbeta vs qf version of Jeffreys interval, for p = 11/14
   x <- 11
@@ -751,7 +782,7 @@ if (FALSE) {
   #############################################################################
 
   # Load the saved dataset
-  load(file=paste0(outpath,"tiers.Rdata"))
+  load(file=paste0(outpath,"tiers1.Rdata"))
 
   # TIER summaries matching Fagerland 2013
   apply(mytiers[,4:5], 2, mean)
@@ -760,18 +791,13 @@ if (FALSE) {
   apply(mytiers[,4:5], 2, function(x) mean(x < 0.03))
 
 
-
-
   ### OPTIONAL: run the code below to reproduce the analysis,
-  ### or run with different set of parameters
-
-  # PLACEHOLDER: simplify to use test formula from paper instead of scorepairci()
+  ### or to run with different set of parameters
 
   tiern <- function(ns = fixn,
                     myparams = myparams) {
 
     tierout <- NULL
-    n <- 10
     for (n in ns) {
       cat(paste0("N=", n,"\n"))
 
@@ -784,7 +810,6 @@ if (FALSE) {
 
     psi <- phi <- NULL
     pbapply::pboptions(style=1)
-    i <- 1
     out <- pbapply::pbsapply(1:dim(myparams)[1], function(i)   {
       if (dimnames(myparams)[[2]][2] == "psi") {
         psi <- myparams[i, 2]
@@ -792,20 +817,17 @@ if (FALSE) {
       if (dimnames(myparams)[[2]][2] == "phi") {
         phi <- myparams[i, 2]
       }
-#      psi <- myparams[i, 2]
       p1 <- p2 <- myparams[i, 1]
       prob <- pdfpair(p1 = p1,
                       p2 = p2,
                       psi = psi,
                       phi = phi,
                       x = xs)
-#      sel <-
       xsub <- xs[prob > 1E-8, , drop=F]
       ndissub <- ndis[prob > 1E-8]
-      #    dim(xsub)
       if (dim(xsub)[1] > 0) {
 
-        # vectorised 'N-1' test from equation
+        # vectorised 'N-1' AS test from equation
         n1test <- pchisq(((n-1)/n) * (xsub[, 3] - xsub[, 2])^2 / ndissub, df = 1, lower.tail = FALSE)
         n1test[ndissub == 0] <- 1
         tier <- (n1test < 0.05) %*% prob[prob > 1E-8]
@@ -815,6 +837,8 @@ if (FALSE) {
         mactest[ndissub == 0] <- 1
         tier2 <- (mactest < 0.05) %*% prob[prob > 1E-8]
 if (FALSE) {
+        # Unnecessary for evaluation, but in case you want to cross-check
+        # against the test result from ratesci:::scorepair
         pvals2 <- sapply(1:dim(xsub)[[1]], function(i)
           pchisq(scorepair(theta = 0,
                            x = xsub[i,],
@@ -828,7 +852,6 @@ if (FALSE) {
 
         # McNemar mid-p test from Fagerland 2013
         px <- 2 * pbinom(pmin(xsub[, 2], xsub[, 3]), ndissub, 0.5, lower.tail = TRUE)
-#        px <- 2 * pbinom(apply(xsub[, 2:3], 1, min), ndissub, 0.5, lower.tail = TRUE)
         midp <-  px - dbinom(xsub[, 2], ndissub, 0.5)
         midp[xsub[, 2] == xsub[, 3]] <- (1 - 0.5*dbinom(xsub[, 2], ndissub, 0.5))[xsub[, 2]==xsub[, 3]]
         tier3 <- (midp < 0.05) %*% prob[prob > 1E-8]
@@ -838,17 +861,14 @@ if (FALSE) {
         ccmactest[ndissub == 0] <- 1
         tier4 <- (ccmactest < 0.05) %*% prob[prob > 1E-8]
 
-        # Exact unconditional test doesnt cope with b=c=0
-        # and takes too long anyway
       if (FALSE) {
+        # Exact unconditional test from contingencytables doesnt cope with b=c=0
+        # and takes too long anyway
         pvals.exact <- sapply(1:dim(xsub)[[1]], function(j) {
           contingencytables::McNemar_exact_unconditional_test_paired_2x2(matrix(c(xsub[1, ]), nrow=2))$Pvalue
         })
         tier5 <- (pvals.exact < 0.05) %*% prob[prob > 1E-8]
       }
-#        summary(midp[xsub[, 2] > xsub[, 3]])
-#        summary(midp[xsub[, 2] < xsub[, 3]])
-#        summary(midp)
 
       } else {
         tier <- 0
@@ -868,8 +888,9 @@ if (FALSE) {
     tierout
   }
 
-  myparams <- expand.grid(p1 = 0.2, psi = 3)
-  myparams <- expand.grid(p1 = 0.2, phi = 0.25)
+  # For checking against Fagerland Figure 1
+  myparams <- expand.grid(p1 = 0.4, psi = 3)
+  tiern(ns = 60, myparams = myparams)
 
   # Parameter scenarios matching Fagerland 2013
   myparams1 <- expand.grid(p1 = seq(0, 1, 0.01), psi = c(1, 2, 3, 5, 10))
@@ -884,89 +905,25 @@ if (FALSE) {
   # Extended parameter combinations with stronger correlations
   myparams2 <- expand.grid(p1 = seq(0, 1, 0.02), phi = seq(0.25, 0.75, 0.05))
   system.time(tiers2 <- tiern(ns = seq(10, 100, 5), myparams = myparams2))[[3]]/60
+  # Number of combinations considered:
+  dim(myparams2) * length(seq(10, 100, 5))
 
-  # Combined extended parameter combinations (Note: negative values of phi lead to NAs)
+  # New selection of extended parameter combinations
+  # (Note: tried negative values of phi but they produce NAs)
   # Runtime: 46 mins
   myparams3 <- expand.grid(p1 = seq(0, 1, 0.02), phi = c(0, seq(0.05, 0.95, 0.1)))
   nseq <- seq(10, 200, 10)
-  nseq2 <- nseq + floor(runif(length(nseq),-4, 6))
+  # Add some fluctuation around multiples of 10
+  nseq2 <- nseq + floor(runif(length(nseq), -4, 6))
+  # Number of combinations considered for this evaluation:
+  dim(myparams3) * length(seq(10, 200, 10))
+
   system.time(tiers3 <- tiern(ns = nseq2, myparams = myparams3))[[3]]/60
 
-  # Unexplained issue with one parameter combination needs checking:
- #  n  p1  phi nminus1 mcnemar midp mcnemarcc
- #143 0.5 0.25       0       0    0         0
 
-
-  save(tiers1, file = paste0(outpath, "newtiers1.Rdata"))
-  save(tiers2, file = paste0(outpath, "newtiers2.Rdata"))
-  save(tiers3, file = paste0(outpath, "newtiers3.Rdata"))
-
-
-  # Create a plot from other TIERs runs
-  mytiers <- tiers3
-  res.factor <- 3
-  grid.factor <- 2
-  tiff(file = paste0(outpath,"_tiff/","Laud_Fig5new3.tiff"),
-       width = 300*grid.factor*res.factor,
-       height = 600*res.factor,
-       type = "windows"
-       #       type="quartz"
-  )
-  #  par(pty='s')
-  par(mfrow = c(2, 2))
-  par(cex.main = grid.factor*res.factor*0.8*1, cex.axis=grid.factor*res.factor*0.5*1)
-  #  par(mar = res.factor*(c(2,3,3,0.5)+0.1))
-  methods <- c("nminus1", "midp", "mcnemar", "mcnemarcc")
-  labels <- c("\'N - 1\' AS", "mid-p", "McNemar asymptotic", "McNemar asymptotic (cc)")
-  for (i in 1:4) {
-    par(mar = grid.factor*res.factor*(c(2,3,3,0.5)+0.1))
-    plot(mytiers$p1,
-         eval(parse(text=paste0("mytiers$", methods[i]))),
-         type = "n",
-         ylim = c(0, 0.06),
-         xlab = '',
-         ylab = '',
-         main = labels[i],
-         xaxt='n',
-         yaxt='n',
-         cex.lab = res.factor
-    )
-    axis(side = 2, las = 2)
-    axis(side = 1, las = 1, padj=1)
-    mtext(side = 1,
-          text = bquote(paste(italic(p)[1]," = ",italic(p)[2])),
-          cex = res.factor*1,
-          line = 1.5*1.5*res.factor)
-    mtext(side = 2,
-          text = "Type I error rate",
-          cex = res.factor*1,
-          line = 1.5*2*res.factor)
-    abline(h=0.05, lty=3, lwd=res.factor)
-
-    #    for (ps in c(1, 2, 3, 5, 10)) {
-    for (ps in unique(mytiers[,3])) {
-      for (n in nseq2[1:4]) {
-        #        tiersub <- mytiers[mytiers$psi == ps & mytiers$n == n, ]
-        tiersub <- mytiers[mytiers[,3] == ps & mytiers$n == n, ]
-        lines(tiersub$p1,
-              eval(parse(text=paste0("tiersub$", methods[i]))),
-              lty = 2,
-              lwd = 0.5*res.factor,
-              col = "gray50")
-      }
-      for (n in nseq2[5:length(nseq2)]) {
-        #        tiersub <- mytiers[mytiers$psi == ps & mytiers$n == n, ]
-        tiersub <- mytiers[mytiers[,3] == ps & mytiers$n == n, ]
-        lines(tiersub$p1,
-              eval(parse(text=paste0("tiersub$", methods[i]))),
-              lty = 1,
-              lwd = 0.25*res.factor)
-      }
-    }
-
-  }
-  dev.off()
-
+  save(tiers1, file = paste0("data/tiers1.Rdata"))
+  save(tiers2, file = paste0(outpath, "tiers2.Rdata"))
+  save(tiers3, file = paste0("data/tiers3.Rdata"))
 
 
 

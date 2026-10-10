@@ -4,7 +4,7 @@
 
 rm(list = ls())
 #install.packages("zoo")
-pak::pak('petelaud/ratesci')
+#pak::pak('petelaud/ratesci') # Option to use development version of package
 
 set.seed(2012) #ensure we use the same jitters for each run
 
