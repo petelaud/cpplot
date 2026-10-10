@@ -840,7 +840,7 @@ if (FALSE) {
         # Unnecessary for evaluation, but in case you want to cross-check
         # against the test result from ratesci:::scorepair
         pvals2 <- sapply(1:dim(xsub)[[1]], function(i)
-          pchisq(scorepair(theta = 0,
+          pchisq(ratesci:::scorepair(theta = 0,
                            x = xsub[i,],
                            contrast = "RD",
                            cc = FALSE,
